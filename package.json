@@ -22,18 +22,26 @@
     "format:check": "prettier --check .",
     "type-check": "npm run type-check --workspace=frontend && npm run type-check --workspace=backend",
     "test": "npm run test --workspace=frontend && npm run test --workspace=backend",
+    "test:e2e": "cypress run",
+    "test:e2e:open": "cypress open",
+    "test:e2e:dev": "start-server-and-test 'npm run dev' http://localhost:5173 'cypress open'",
+    "test:e2e:ci": "start-server-and-test 'npm run dev' http://localhost:5173 'cypress run --browser chrome --headless'",
     "clean": "npm run clean --workspace=frontend && npm run clean --workspace=backend"
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.14.5",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "concurrently": "^8.2.0",
+    "cypress": "^14.5.1",
     "eslint": "^8.45.0",
     "eslint-plugin-react": "^7.33.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
+    "nyc": "^17.1.0",
     "prettier": "^3.0.0",
+    "start-server-and-test": "^2.0.12",
     "typescript": "^5.0.2"
   },
   "keywords": [
