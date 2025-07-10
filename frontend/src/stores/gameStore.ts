@@ -16,18 +16,21 @@ interface GameState {
   players: Player[];
   maxPlayers: number;
   gameType: string | null;
-  
+
   // Game session state
   gameStatus: 'waiting' | 'starting' | 'playing' | 'paused' | 'finished';
   currentRound: number;
   totalRounds: number;
   roundTimeLimit: number | null;
   roundTimeRemaining: number | null;
-  
+
+  // Game-specific state
+  gameData: any | null;
+
   // Connection state
   isConnected: boolean;
   connectionError: string | null;
-  
+
   // Actions
   setLobbyInfo: (lobbyId: string, gameType: string, maxPlayers: number) => void;
   updatePlayers: (players: Player[]) => void;
@@ -35,8 +38,13 @@ interface GameState {
   removePlayer: (playerId: string) => void;
   updatePlayer: (playerId: string, updates: Partial<Player>) => void;
   setGameStatus: (status: GameState['gameStatus']) => void;
-  setRoundInfo: (round: number, totalRounds: number, timeLimit?: number) => void;
+  setRoundInfo: (
+    round: number,
+    totalRounds: number,
+    timeLimit?: number
+  ) => void;
   setRoundTimeRemaining: (time: number | null) => void;
+  setGameState: (gameData: any) => void;
   setConnectionStatus: (connected: boolean, error?: string | null) => void;
   resetGame: () => void;
 }
@@ -53,6 +61,7 @@ export const useGameStore = create<GameState>()(
     totalRounds: 0,
     roundTimeLimit: null,
     roundTimeRemaining: null,
+    gameData: null,
     isConnected: false,
     connectionError: null,
 
@@ -89,12 +98,16 @@ export const useGameStore = create<GameState>()(
       set({ gameStatus });
     },
 
-    setRoundInfo: (currentRound: number, totalRounds: number, roundTimeLimit?: number) => {
-      set({ 
-        currentRound, 
-        totalRounds, 
+    setRoundInfo: (
+      currentRound: number,
+      totalRounds: number,
+      roundTimeLimit?: number
+    ) => {
+      set({
+        currentRound,
+        totalRounds,
         roundTimeLimit: roundTimeLimit ?? null,
-        roundTimeRemaining: roundTimeLimit ?? null 
+        roundTimeRemaining: roundTimeLimit ?? null,
       });
     },
 
@@ -102,7 +115,14 @@ export const useGameStore = create<GameState>()(
       set({ roundTimeRemaining });
     },
 
-    setConnectionStatus: (isConnected: boolean, connectionError?: string | null) => {
+    setGameState: (gameData: any) => {
+      set({ gameData });
+    },
+
+    setConnectionStatus: (
+      isConnected: boolean,
+      connectionError?: string | null
+    ) => {
       set({ isConnected, connectionError: connectionError ?? null });
     },
 
@@ -117,6 +137,7 @@ export const useGameStore = create<GameState>()(
         totalRounds: 0,
         roundTimeLimit: null,
         roundTimeRemaining: null,
+        gameData: null,
         isConnected: false,
         connectionError: null,
       });
@@ -127,12 +148,16 @@ export const useGameStore = create<GameState>()(
 // Selectors for commonly used derived state
 export const useGameSelectors = () => {
   const gameStore = useGameStore();
-  
+
   return {
     ...gameStore,
-    isHost: gameStore.players.find(p => p.isHost)?.id === gameStore.players[0]?.id,
-    allPlayersReady: gameStore.players.length >= 3 && gameStore.players.every(p => p.isReady),
-    connectedPlayersCount: gameStore.players.filter(p => p.isConnected).length,
+    isHost:
+      gameStore.players.find((p) => p.isHost)?.id === gameStore.players[0]?.id,
+    allPlayersReady:
+      gameStore.players.length >= 3 &&
+      gameStore.players.every((p) => p.isReady),
+    connectedPlayersCount: gameStore.players.filter((p) => p.isConnected)
+      .length,
     currentPlayer: gameStore.players[0], // Assuming first player is current user
   };
-}; 
+};

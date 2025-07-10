@@ -7,16 +7,20 @@ interface UserState {
   playerName: string | null;
   currentLobbyId: string | null;
   isHost: boolean;
-  
+
   // User preferences (persisted)
   theme: 'light' | 'dark';
   soundEnabled: boolean;
   vibrationEnabled: boolean;
-  
+
   // Actions
   setPlayerInfo: (playerId: string, playerName: string) => void;
   setCurrentLobby: (lobbyId: string | null, isHost?: boolean) => void;
-  updatePreferences: (preferences: Partial<Pick<UserState, 'theme' | 'soundEnabled' | 'vibrationEnabled'>>) => void;
+  updatePreferences: (
+    preferences: Partial<
+      Pick<UserState, 'theme' | 'soundEnabled' | 'vibrationEnabled'>
+    >
+  ) => void;
   clearSession: () => void;
 }
 
@@ -67,4 +71,4 @@ export const useUserStore = create<UserState>()(
       }),
     }
   )
-); 
+);

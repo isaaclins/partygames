@@ -26,12 +26,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     ref
   ) => {
     const inputId = id || `input-${Math.random().toString(36).substring(2, 8)}`;
-    
-    const baseClasses = 'w-full px-4 py-3 text-slate-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]';
-    
+
+    const baseClasses =
+      'w-full px-4 py-3 text-slate-900 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]';
+
     const variantClasses = {
-      default: 'border border-slate-300 rounded-lg bg-white focus:ring-primary-500 focus:border-primary-500',
-      outline: 'border-2 border-slate-300 rounded-lg bg-transparent focus:ring-primary-500 focus:border-primary-500',
+      default:
+        'border border-slate-300 rounded-lg bg-white focus:ring-primary-500 focus:border-primary-500',
+      outline:
+        'border-2 border-slate-300 rounded-lg bg-transparent focus:ring-primary-500 focus:border-primary-500',
     };
 
     const errorClasses = error
@@ -39,23 +42,23 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       : '';
 
     return (
-      <div className="space-y-2">
+      <div className='space-y-2'>
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-slate-700"
+            className='block text-sm font-medium text-slate-700'
           >
             {label}
           </label>
         )}
-        
-        <div className="relative">
+
+        <div className='relative'>
           {leftIcon && (
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+            <div className='absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400'>
               {leftIcon}
             </div>
           )}
-          
+
           <input
             ref={ref}
             id={inputId}
@@ -69,20 +72,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             )}
             {...props}
           />
-          
+
           {rightIcon && (
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+            <div className='absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400'>
               {rightIcon}
             </div>
           )}
         </div>
-        
+
         {(error || helperText) && (
-          <div className="text-sm">
+          <div className='text-sm'>
             {error ? (
-              <p className="text-red-600">{error}</p>
+              <p className='text-red-600'>{error}</p>
             ) : (
-              <p className="text-slate-500">{helperText}</p>
+              <p className='text-slate-500'>{helperText}</p>
             )}
           </div>
         )}
@@ -91,4 +94,4 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
   }
 );
 
-Input.displayName = 'Input'; 
+Input.displayName = 'Input';

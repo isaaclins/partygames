@@ -24,13 +24,18 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const baseClasses = 'inline-flex items-center justify-center font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-    
+    const baseClasses =
+      'inline-flex items-center justify-center font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+
     const variantClasses = {
-      primary: 'bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-500',
-      secondary: 'bg-slate-200 hover:bg-slate-300 text-slate-900 focus:ring-slate-500',
-      outline: 'border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 focus:ring-slate-500',
-      ghost: 'bg-transparent hover:bg-slate-100 text-slate-700 focus:ring-slate-500',
+      primary:
+        'bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-500',
+      secondary:
+        'bg-slate-200 hover:bg-slate-300 text-slate-900 focus:ring-slate-500',
+      outline:
+        'border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 focus:ring-slate-500',
+      ghost:
+        'bg-transparent hover:bg-slate-100 text-slate-700 focus:ring-slate-500',
       danger: 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500',
     };
 
@@ -53,12 +58,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {isLoading ? (
-          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+          <div className='w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin' />
         ) : (
           <>
-            {leftIcon && <span className="mr-2">{leftIcon}</span>}
+            {leftIcon && <span className='mr-2'>{leftIcon}</span>}
             {children}
-            {rightIcon && <span className="ml-2">{rightIcon}</span>}
+            {rightIcon && <span className='ml-2'>{rightIcon}</span>}
           </>
         )}
       </button>
@@ -66,4 +71,4 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   }
 );
 
-Button.displayName = 'Button'; 
+Button.displayName = 'Button';

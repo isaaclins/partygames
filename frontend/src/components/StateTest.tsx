@@ -18,10 +18,12 @@ export function StateTest() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
-      <h3 className="text-lg font-medium text-slate-900 mb-4">State Management Test</h3>
-      
-      <div className="space-y-3 text-sm">
+    <div className='bg-white rounded-lg shadow-sm border border-slate-200 p-4'>
+      <h3 className='text-lg font-medium text-slate-900 mb-4'>
+        State Management Test
+      </h3>
+
+      <div className='space-y-3 text-sm'>
         <div>
           <strong>Player ID:</strong> {userStore.playerId || 'None'}
         </div>
@@ -38,7 +40,8 @@ export function StateTest() {
           <strong>Theme:</strong> {userStore.theme}
         </div>
         <div>
-          <strong>Sound Enabled:</strong> {userStore.soundEnabled ? 'Yes' : 'No'}
+          <strong>Sound Enabled:</strong>{' '}
+          {userStore.soundEnabled ? 'Yes' : 'No'}
         </div>
         <div>
           <strong>In Game:</strong> {isInGame ? 'Yes' : 'No'}
@@ -48,24 +51,22 @@ export function StateTest() {
         </div>
       </div>
 
-      <div className="mt-4 space-y-2">
+      <div className='mt-4 space-y-2'>
         <button
           onClick={testStateUpdates}
-          className="btn-secondary w-full text-sm"
+          className='btn-secondary w-full text-sm'
         >
           Toggle Preferences (Test Persistence)
         </button>
-        <button
-          onClick={clearState}
-          className="btn-secondary w-full text-sm"
-        >
+        <button onClick={clearState} className='btn-secondary w-full text-sm'>
           Clear Session
         </button>
       </div>
-      
-      <p className="text-xs text-slate-500 mt-3">
-        Refresh the page to test persistence - theme and sound settings should remain.
+
+      <p className='text-xs text-slate-500 mt-3'>
+        Refresh the page to test persistence - theme and sound settings should
+        remain.
       </p>
     </div>
   );
-} 
+}
