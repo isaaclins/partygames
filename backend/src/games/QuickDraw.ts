@@ -515,7 +515,7 @@ export class QuickDrawGame {
   }
 
   public getWinner(): string | null {
-    if (!this.isGameComplete()) return null;
+    if (!this.isGameComplete()) {return null;}
 
     const sortedScores = Object.entries(this.gameState.scores).sort(
       ([, a], [, b]) => b - a

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Input } from '../../../components/ui/Input';
@@ -177,7 +177,7 @@ describe('Input Component', () => {
     });
 
     test('icon containers have proper positioning', () => {
-      const { container } = render(
+      const { container: _container } = render(
         <Input
           leftIcon={<Search data-testid='left-icon' />}
           rightIcon={<Eye data-testid='right-icon' />}
@@ -511,7 +511,7 @@ describe('Input Component', () => {
       const input = screen.getByRole('textbox');
 
       // Rapid typing
-      await user.type(input, 'abcdefghij', { delay: 1 });
+      await user.type(input, 'abcdefghij');
       expect(handleChange).toHaveBeenCalledTimes(10);
     });
   });
@@ -564,7 +564,7 @@ describe('Input Component', () => {
 
       // Simulate rapid typing
       const text = 'the quick brown fox jumps over the lazy dog';
-      await user.type(input, text, { delay: 1 });
+      await user.type(input, text);
 
       expect(handleChange).toHaveBeenCalledTimes(text.length);
     });

@@ -40,7 +40,7 @@ describe('TwoTruthsAndALie Game', () => {
     test('should initialize with correct game state', () => {
       const gameState = game.getGameState();
 
-      expect(gameState.currentPhase).toBe('submission');
+      expect(gameState.currentPhase).toBe('submitting');
       expect(gameState.currentRound).toBe(1);
       expect(gameState.maxRounds).toBe(3);
       expect(Object.keys(gameState.scores)).toHaveLength(3);
@@ -216,11 +216,18 @@ describe('QuickDraw Game', () => {
 
       const gameState = game.getGameState();
       if (gameState.currentRoundData) {
+        // Set phase to guessing to allow guess submissions
+        gameState.currentRoundData.phase = 'guessing';
+        
+        // Use a non-drawer player for the guess
+        const drawerId = gameState.currentRoundData.drawerId;
+        const guesser = gameSession.players.find(p => p.id !== drawerId)?.id || 'player-1';
+        
         expect(() => {
           game.handleAction({
             type: 'submit_guess',
             data: { guess: 'test guess' },
-            playerId: 'player-1',
+            playerId: guesser,
             timestamp: new Date(),
           });
         }).not.toThrow();
@@ -238,11 +245,15 @@ describe('QuickDraw Game', () => {
         timestamp: new Date(),
       });
 
+      // Get the actual drawer ID from the game state
+      const gameState = game.getGameState();
+      const drawerId = gameState.currentRoundData?.drawerId || 'player-0';
+
       expect(() => {
         game.handleAction({
           type: 'clear_canvas',
           data: {},
-          playerId: 'player-0',
+          playerId: drawerId,
           timestamp: new Date(),
         });
       }).not.toThrow();
@@ -309,6 +320,10 @@ describe('Performance Tests', () => {
         timestamp: new Date(),
       });
 
+      // Get the actual drawer ID from the game state
+      const gameState = game.getGameState();
+      const drawerId = gameState.currentRoundData?.drawerId || 'player-0';
+
       // Simulate multiple stroke operations
       const start = Date.now();
       for (let i = 0; i < 100; i++) {
@@ -323,7 +338,7 @@ describe('Performance Tests', () => {
               timestamp: new Date(),
             },
           },
-          playerId: 'player-0',
+          playerId: drawerId, // Use the correct drawer ID
           timestamp: new Date(),
         });
       }

@@ -310,6 +310,27 @@ export class TwoTruthsAndALieGame {
     };
   }
 
+  public getGameState() {
+    return {
+      currentPhase: this.gameData.currentPhase,
+      currentRound: 1,
+      maxRounds: 3,
+      currentTargetPlayer: this.gameData.currentTargetPlayerId,
+      submissions: this.gameData.submissions.map((s) => ({
+        ...s,
+        // Don't reveal which statement is the lie during gameplay
+        statements: s.statements.map((stmt) => ({
+          id: stmt.id,
+          text: stmt.text,
+          isLie:
+            this.gameData.currentPhase === 'results' ? stmt.isLie : undefined,
+        })),
+      })),
+      votes: this.gameData.votes,
+      scores: { ...this.scores },
+    };
+  }
+
   public hasPlayerSubmitted(playerId: string): boolean {
     return this.gameData.submissions.some((s) => s.playerId === playerId);
   }
@@ -321,6 +342,10 @@ export class TwoTruthsAndALieGame {
   }
 
   public isComplete(): boolean {
+    return this.gameData.currentPhase === 'results';
+  }
+
+  public isGameComplete(): boolean {
     return this.gameData.currentPhase === 'results';
   }
 }

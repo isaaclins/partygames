@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
-import React from 'react';
+// React import removed as not needed with JSX transform
 
 // Mock the useGameSession hook
 vi.mock('../hooks/useGameSession', () => ({

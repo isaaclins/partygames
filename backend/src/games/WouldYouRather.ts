@@ -163,7 +163,7 @@ export class WouldYouRatherGame {
 
   private awardPointsForCurrentScenario(): void {
     const currentScenario = this.getCurrentScenario();
-    if (!currentScenario) return;
+    if (!currentScenario) {return;}
 
     const votesForScenario = this.gameState.votes.filter(
       (v) => v.scenarioId === currentScenario.id
@@ -236,7 +236,7 @@ export class WouldYouRatherGame {
   }
 
   public getWinner(): string | null {
-    if (!this.isGameComplete()) return null;
+    if (!this.isGameComplete()) {return null;}
 
     const sortedScores = Object.entries(this.scores).sort(
       ([, a], [, b]) => b - a

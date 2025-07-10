@@ -1,11 +1,11 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { Modal } from '../../../components/ui/Modal';
 
 // Mock createPortal to render in the same container for testing
 vi.mock('react-dom', async () => {
-  const actual = await vi.importActual('react-dom');
+  const actual = await vi.importActual('react-dom') as any;
   return {
     ...actual,
     createPortal: (children: React.ReactNode) => children,

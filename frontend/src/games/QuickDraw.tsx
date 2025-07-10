@@ -53,7 +53,7 @@ export const QuickDrawGame: React.FC = () => {
   };
 
   const handleSubmitGuess = async () => {
-    if (!guess.trim()) return;
+    if (!guess.trim()) {return;}
 
     setIsSubmitting(true);
     try {

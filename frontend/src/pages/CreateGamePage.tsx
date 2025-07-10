@@ -55,7 +55,7 @@ export default function CreateGamePage() {
 
   const handleCreateGame = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!hostName.trim() || !selectedGame) return;
+    if (!hostName.trim() || !selectedGame) {return;}
 
     setIsLoading(true);
     setError(null);

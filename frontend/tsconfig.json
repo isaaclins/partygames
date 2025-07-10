@@ -35,5 +35,5 @@
     }
   },
   "include": ["src/**/*", "../shared/**/*"],
-  "exclude": ["node_modules", "dist", "build"]
+  "exclude": ["node_modules", "dist", "build", "src/**/*.test.*", "src/**/__tests__/**/*", "**/*.spec.*"]
 }

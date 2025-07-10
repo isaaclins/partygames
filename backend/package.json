@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "type-check": "tsc --noEmit",
+    "type-check:ci": "tsc --noEmit -p tsconfig.ci.json",
     "clean": "rm -rf dist",
     "test": "jest",
     "test:watch": "jest --watch",
