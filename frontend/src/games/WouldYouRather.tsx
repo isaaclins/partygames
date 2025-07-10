@@ -111,18 +111,7 @@ export const WouldYouRatherGame: React.FC = () => {
     return gameState?.currentScenario?.submittedBy === playerId;
   };
 
-  const getVotesForCurrentScenario = () => {
-    if (!gameState?.currentScenario) return { A: [], B: [] };
-    
-    const scenarioVotes = gameState.votes.filter(
-      v => v.scenarioId === gameState.currentScenario!.id
-    );
-    
-    return {
-      A: scenarioVotes.filter(v => v.choice === 'A'),
-      B: scenarioVotes.filter(v => v.choice === 'B'),
-    };
-  };
+  // Removed unused getVotesForCurrentScenario function
 
   if (!gameState) {
     return (

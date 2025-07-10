@@ -39,7 +39,7 @@ const gameTypes: GameType[] = [
     minPlayers: 3,
     maxPlayers: 8,
     icon: Zap,
-    available: false,
+    available: true,
   },
 ];
 

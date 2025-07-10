@@ -1,4 +1,5 @@
 export { Button } from './Button';
 export { Input } from './Input';
+export { LoadingSpinner } from './LoadingSpinner';
 export { Modal } from './Modal';
-export { LoadingSpinner, LoadingOverlay } from './LoadingSpinner';
+export { default as DrawingCanvas } from '../DrawingCanvas';

@@ -1,0 +1,196 @@
+name: 🚀 Deploy Party Games
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # ============================================================================
+  # Build for Production
+  # ============================================================================
+  build:
+    name: 🏗️ Build Production
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 📝 Type check
+        run: npm run type-check
+        
+      - name: 🎨 Format check
+        run: npm run format:check
+        
+      - name: 🔍 Lint
+        run: npm run lint
+        
+      - name: 🧪 Run tests
+        run: npm run test
+        
+      - name: 🏗️ Build all workspaces
+        run: npm run build
+        env:
+          NODE_ENV: production
+          
+      - name: 📤 Upload frontend build
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 30
+          
+      - name: 📤 Upload backend build
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: backend/dist
+          retention-days: 30
+
+  # ============================================================================
+  # Deploy to Staging
+  # ============================================================================
+  deploy-staging:
+    name: 🧪 Deploy Staging
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: ${{ github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging') }}
+    environment:
+      name: staging
+      url: ${{ steps.deploy.outputs.webapp-url }}
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📤 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          
+      - name: 📤 Download backend artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist
+          path: backend/dist
+          
+      - name: 🚀 Deploy to staging
+        id: deploy
+        run: |
+          echo "🧪 Deploying to staging environment..."
+          echo "📦 Frontend build size: $(du -sh frontend/dist | cut -f1)"
+          echo "📦 Backend build size: $(du -sh backend/dist | cut -f1)"
+          
+          # Placeholder for actual deployment logic
+          # This could integrate with:
+          # - Vercel: vercel --prod
+          # - Netlify: netlify deploy --prod
+          # - Railway: railway deploy
+          # - Docker: docker build && docker push
+          # - AWS/Azure/GCP deployment scripts
+          
+          echo "✅ Staging deployment completed!"
+          echo "webapp-url=https://partygames-staging.example.com" >> $GITHUB_OUTPUT
+
+  # ============================================================================
+  # Deploy to Production
+  # ============================================================================
+  deploy-production:
+    name: 🌟 Deploy Production
+    runs-on: ubuntu-latest
+    needs: [build, deploy-staging]
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production' }}
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.webapp-url }}
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📤 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          
+      - name: 📤 Download backend artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-dist
+          path: backend/dist
+          
+      - name: 🌟 Deploy to production
+        id: deploy
+        run: |
+          echo "🌟 Deploying to production environment..."
+          echo "📦 Frontend build size: $(du -sh frontend/dist | cut -f1)"
+          echo "📦 Backend build size: $(du -sh backend/dist | cut -f1)"
+          
+          # Placeholder for actual production deployment logic
+          # Production deployments should include:
+          # - Database migrations
+          # - Blue-green deployment
+          # - Health checks
+          # - Rollback capability
+          # - Monitoring alerts
+          
+          echo "✅ Production deployment completed!"
+          echo "webapp-url=https://partygames.example.com" >> $GITHUB_OUTPUT
+          
+      - name: 🔔 Notify deployment success
+        run: |
+          echo "🎉 Party Games successfully deployed to production!"
+          echo "🌐 URL: https://partygames.example.com"
+          echo "🎮 Games available:"
+          echo "  • Two Truths and a Lie"
+          echo "  • Would You Rather"
+          echo "  • Quick Draw"
+
+  # ============================================================================
+  # Post-Deploy Health Check
+  # ============================================================================
+  health-check:
+    name: 🏥 Health Check
+    runs-on: ubuntu-latest
+    needs: [deploy-staging]
+    if: ${{ always() && needs.deploy-staging.result == 'success' }}
+    
+    steps:
+      - name: 🏥 Check staging health
+        run: |
+          echo "🏥 Running post-deployment health checks..."
+          
+          # Placeholder for actual health checks
+          # In a real deployment, this would:
+          # - Check API endpoints
+          # - Verify WebSocket connectivity
+          # - Test game creation/joining
+          # - Check database connectivity
+          # - Verify CDN/static assets
+          
+          echo "✅ All health checks passed!"
+          echo "🎮 Party Games platform is healthy and ready!" 

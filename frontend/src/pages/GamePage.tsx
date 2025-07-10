@@ -4,6 +4,7 @@ import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { useGameSession } from '../hooks/useGameSession';
 import { TwoTruthsAndALie } from '../games/TwoTruthsAndALie';
 import { WouldYouRather } from '../games/WouldYouRather';
+import { QuickDraw } from '../games/QuickDraw';
 
 export default function GamePage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
@@ -71,6 +72,8 @@ export default function GamePage() {
         return <TwoTruthsAndALie />;
       case 'would-you-rather':
         return <WouldYouRather />;
+      case 'quick-draw':
+        return <QuickDraw />;
       default:
         return (
           <div className='text-center py-12'>

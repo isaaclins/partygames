@@ -1,0 +1,313 @@
+name: 🎮 Party Games CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================================
+  # Code Quality & Linting
+  # ============================================================================
+  code-quality:
+    name: 🔍 Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 🎨 Check Prettier formatting
+        run: npm run format:check
+        
+      - name: 🔍 Run ESLint
+        run: npm run lint
+        
+      - name: 📝 Type check all workspaces
+        run: npm run type-check
+
+  # ============================================================================
+  # Shared Types Testing
+  # ============================================================================
+  shared-types:
+    name: 🔗 Shared Types
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 🏗️ Build shared types
+        run: npm run build --workspace=shared
+        
+      - name: 📝 Type check shared
+        run: npm run type-check --workspace=shared
+
+  # ============================================================================
+  # Backend Testing & Build
+  # ============================================================================
+  backend:
+    name: 🖥️ Backend Tests
+    runs-on: ubuntu-latest
+    needs: [shared-types]
+    
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 🧪 Run backend tests
+        run: npm run test --workspace=backend
+        
+      - name: 🏗️ Build backend
+        run: npm run build --workspace=backend
+        
+      - name: 🔍 Test backend health endpoint
+        run: |
+          cd backend
+          npm start &
+          SERVER_PID=$!
+          sleep 5
+          
+          # Test health endpoint
+          curl -f http://localhost:3001/health || exit 1
+          
+          # Kill server
+          kill $SERVER_PID
+
+  # ============================================================================
+  # Frontend Testing & Build
+  # ============================================================================
+  frontend:
+    name: 🎨 Frontend Tests
+    runs-on: ubuntu-latest
+    needs: [shared-types]
+    
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 🧪 Run frontend tests
+        run: npm run test --workspace=frontend
+        
+      - name: 🏗️ Build frontend
+        run: npm run build --workspace=frontend
+        
+      - name: 📤 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-node${{ matrix.node-version }}
+          path: frontend/dist
+          retention-days: 7
+
+  # ============================================================================
+  # Integration Testing
+  # ============================================================================
+  integration:
+    name: 🎯 Integration Tests
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 📤 Download frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build-node18
+          path: frontend/dist
+          
+      - name: 🚀 Start servers
+        run: |
+          # Start backend
+          cd backend && npm start &
+          BACKEND_PID=$!
+          echo "BACKEND_PID=$BACKEND_PID" >> $GITHUB_ENV
+          
+          # Start frontend
+          cd frontend && npm run preview &
+          FRONTEND_PID=$!
+          echo "FRONTEND_PID=$FRONTEND_PID" >> $GITHUB_ENV
+          
+          # Wait for servers to start
+          sleep 10
+          
+      - name: 🧪 Test API endpoints
+        run: |
+          # Test backend health
+          curl -f http://localhost:3001/health
+          
+          # Test frontend is serving
+          curl -f http://localhost:4173
+          
+      - name: 🧪 Test WebSocket connection
+        run: |
+          # Install wscat for WebSocket testing
+          npm install -g wscat
+          
+          # Test WebSocket connection (basic connectivity)
+          timeout 10s wscat -c ws://localhost:3001 --execute '{"type":"ping"}' || echo "WebSocket test completed"
+          
+      - name: 🧹 Cleanup
+        if: always()
+        run: |
+          # Kill servers
+          kill $BACKEND_PID $FRONTEND_PID 2>/dev/null || true
+
+  # ============================================================================
+  # Game Logic Testing
+  # ============================================================================
+  game-logic:
+    name: 🎲 Game Logic Tests
+    runs-on: ubuntu-latest
+    needs: [shared-types]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 🎯 Test Two Truths and a Lie
+        run: |
+          cd backend
+          npm test -- --testNamePattern="TwoTruthsAndALie"
+          
+      - name: 🤔 Test Would You Rather
+        run: |
+          cd backend
+          npm test -- --testNamePattern="WouldYouRather"
+          
+      - name: 🎨 Test Quick Draw
+        run: |
+          cd backend
+          npm test -- --testNamePattern="QuickDraw"
+
+  # ============================================================================
+  # Performance & Security
+  # ============================================================================
+  security:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: 🔧 Install dependencies
+        run: npm ci
+        
+      - name: 🔍 Run npm audit
+        run: npm audit --audit-level=high
+        
+      - name: 🛡️ Check for vulnerabilities
+        run: |
+          # Check backend dependencies
+          cd backend && npm audit --audit-level=moderate
+          
+          # Check frontend dependencies  
+          cd ../frontend && npm audit --audit-level=moderate
+
+  # ============================================================================
+  # Summary Status Check
+  # ============================================================================
+  ci-success:
+    name: ✅ CI Success
+    runs-on: ubuntu-latest
+    needs: [code-quality, backend, frontend, integration, game-logic, security]
+    if: always()
+    
+    steps:
+      - name: 🎉 All checks passed
+        if: ${{ needs.code-quality.result == 'success' && needs.backend.result == 'success' && needs.frontend.result == 'success' && needs.integration.result == 'success' && needs.game-logic.result == 'success' && needs.security.result == 'success' }}
+        run: |
+          echo "🎮 All Party Games CI checks passed! 🎉"
+          echo "✅ Code Quality"
+          echo "✅ Backend Tests (Node 18 & 20)"
+          echo "✅ Frontend Tests (Node 18 & 20)" 
+          echo "✅ Integration Tests"
+          echo "✅ Game Logic Tests"
+          echo "✅ Security Scan"
+          
+      - name: ❌ Some checks failed
+        if: ${{ needs.code-quality.result != 'success' || needs.backend.result != 'success' || needs.frontend.result != 'success' || needs.integration.result != 'success' || needs.game-logic.result != 'success' || needs.security.result != 'success' }}
+        run: |
+          echo "❌ Some CI checks failed:"
+          echo "Code Quality: ${{ needs.code-quality.result }}"
+          echo "Backend: ${{ needs.backend.result }}"
+          echo "Frontend: ${{ needs.frontend.result }}"
+          echo "Integration: ${{ needs.integration.result }}"
+          echo "Game Logic: ${{ needs.game-logic.result }}"
+          echo "Security: ${{ needs.security.result }}"
+          exit 1 

@@ -261,7 +261,7 @@ export function useGameSession() {
     // Combined state
     user: userStore,
     game: gameSelectors,
-    lobby: gameSelectors.lobby,
+    lobbyId: gameSelectors.lobbyId,
     players: gameSelectors.players,
     playerId: userStore.playerId,
 

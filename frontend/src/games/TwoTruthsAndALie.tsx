@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button, Input, LoadingSpinner } from '../components/ui';
 import { useGameSession } from '../hooks/useGameSession';
 
@@ -25,7 +25,7 @@ interface TwoTruthsGameState {
 export const TwoTruthsAndALieGame: React.FC = () => {
   const { game, playerId, sendGameAction } = useGameSession();
   const [statements, setStatements] = useState(['', '', '']);
-  const [selectedStatement, setSelectedStatement] = useState<string>('');
+  // Removed unused selectedStatement state
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Get game state from the store
@@ -65,7 +65,7 @@ export const TwoTruthsAndALieGame: React.FC = () => {
         playerId: playerId!,
         timestamp: new Date(),
       });
-      setSelectedStatement('');
+      // Removed setSelectedStatement call
     } catch (error) {
       console.error('Error submitting vote:', error);
       alert('Failed to submit vote. Please try again.');

@@ -204,6 +204,74 @@ export interface WouldYouRatherGameAction extends GameAction {
   };
 }
 
+// Quick Draw specific types
+export interface DrawingPoint {
+  x: number;
+  y: number;
+  pressure?: number;
+}
+
+export interface DrawingStroke {
+  id: string;
+  points: DrawingPoint[];
+  color: string;
+  width: number;
+  timestamp: Date;
+}
+
+export interface DrawingCanvas {
+  strokes: DrawingStroke[];
+  width: number;
+  height: number;
+  backgroundColor: string;
+}
+
+export interface QuickDrawGuess {
+  playerId: string;
+  guess: string;
+  timestamp: Date;
+  isCorrect: boolean;
+}
+
+export interface QuickDrawPrompt {
+  id: string;
+  word: string;
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  hints?: string[];
+}
+
+export interface QuickDrawRound {
+  roundNumber: number;
+  drawerId: string;
+  prompt: QuickDrawPrompt;
+  canvas: DrawingCanvas;
+  guesses: QuickDrawGuess[];
+  timeLimit: number; // seconds
+  timeRemaining: number;
+  phase: 'waiting' | 'drawing' | 'guessing' | 'reveal' | 'complete';
+  startedAt?: Date;
+  completedAt?: Date;
+}
+
+export interface QuickDrawGameState {
+  currentRound: number;
+  totalRounds: number;
+  rounds: QuickDrawRound[];
+  scores: Record<string, number>;
+  playerOrder: string[]; // Order for taking turns drawing
+  gamePhase: 'setup' | 'playing' | 'finished';
+}
+
+export interface QuickDrawGameAction extends GameAction {
+  type: 'start_drawing' | 'add_stroke' | 'submit_guess' | 'clear_canvas' | 'undo_stroke';
+  data: {
+    stroke?: DrawingStroke; // For add_stroke
+    guess?: string; // For submit_guess
+    strokeId?: string; // For undo_stroke
+  };
+}
+
 export interface RoundResults {
   roundNumber: number;
   scores: Record<string, number>;

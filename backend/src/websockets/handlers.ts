@@ -8,17 +8,19 @@ import {
   GameAction,
   TwoTruthsGameAction,
   WouldYouRatherGameAction,
+  QuickDrawGameAction,
 } from '../../../shared/types/index.js';
 import { lobbyService } from '../services/LobbyService.js';
 import { TwoTruthsAndALieGame } from '../games/TwoTruthsAndALie.js';
 import { WouldYouRatherGame } from '../games/WouldYouRather.js';
+import { QuickDrawGame } from '../games/QuickDraw.js';
 
 // Track socket to player mapping
 const socketToPlayer = new Map<string, string>(); // socketId -> playerId
 const playerToSocket = new Map<string, string>(); // playerId -> socketId
 
 // Track active game instances
-const activeGames = new Map<string, TwoTruthsAndALieGame | WouldYouRatherGame>(); // lobbyId -> gameInstance
+const activeGames = new Map<string, TwoTruthsAndALieGame | WouldYouRatherGame | QuickDrawGame>(); // lobbyId -> gameInstance
 
 export function setupWebSocketHandlers(
   io: Server<ClientToServerEvents, ServerToClientEvents>,
@@ -247,6 +249,16 @@ export function setupWebSocketHandlers(
             io.to(lobby.lobbyId).emit('game:stateUpdate', gameInstance.getGameState());
             
             console.log(`Would You Rather game started in lobby ${lobby.lobbyId}`);
+          } else if (lobby.gameType === 'quick-draw') {
+            const gameInstance = new QuickDrawGame(lobby);
+            activeGames.set(lobby.lobbyId, gameInstance);
+            
+            // Emit game started with initial game state
+            io.to(lobby.lobbyId).emit('game:started');
+            io.to(lobby.lobbyId).emit('lobby:updated', lobby);
+            io.to(lobby.lobbyId).emit('game:stateUpdate', gameInstance.getGameState());
+            
+            console.log(`Quick Draw game started in lobby ${lobby.lobbyId}`);
           } else {
             io.to(lobby.lobbyId).emit('game:started');
             io.to(lobby.lobbyId).emit('lobby:updated', lobby);
@@ -349,6 +361,39 @@ export function setupWebSocketHandlers(
             // Clean up game instance
             activeGames.delete(lobby.lobbyId);
             console.log(`Would You Rather game completed in lobby ${lobby.lobbyId}`);
+          }
+        } catch (error: any) {
+          callback({ success: false, error: error.message });
+        }
+      } else if (lobby.gameType === 'quick-draw') {
+        const gameInstance = activeGames.get(lobby.lobbyId) as QuickDrawGame;
+        if (!gameInstance) {
+          callback({ success: false, error: 'Game instance not found' });
+          return;
+        }
+
+        const gameAction = action as QuickDrawGameAction;
+        gameAction.playerId = playerId; // Ensure playerId is set from socket
+        
+        try {
+          const gameState = gameInstance.handleAction(gameAction);
+          
+          callback({ success: true });
+
+          // Broadcast updated game state to all players
+          io.to(lobby.lobbyId).emit('game:stateUpdate', gameState);
+
+          // Check if game is complete
+          if (gameInstance.isGameComplete()) {
+            lobby.status = 'finished';
+            const gameResults = gameInstance.getFinalResults();
+            io.to(lobby.lobbyId).emit('game:ended', gameResults);
+            io.to(lobby.lobbyId).emit('lobby:updated', lobby);
+            
+            // Clean up game instance
+            gameInstance.cleanup();
+            activeGames.delete(lobby.lobbyId);
+            console.log(`Quick Draw game completed in lobby ${lobby.lobbyId}`);
           }
         } catch (error: any) {
           callback({ success: false, error: error.message });
