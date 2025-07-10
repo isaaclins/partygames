@@ -489,3 +489,21 @@ export function cleanupInactiveLobbies() {
     console.log(`Cleaned up ${cleaned} inactive lobbies`);
   }
 }
+
+// Test helper functions (only for testing)
+export function __setSocketToPlayer(socketId: string, playerId: string): void {
+  socketToPlayer.set(socketId, playerId);
+  playerToSocket.set(playerId, socketId);
+}
+
+export function __clearSocketToPlayer(socketId: string): void {
+  const playerId = socketToPlayer.get(socketId);
+  if (playerId) {
+    playerToSocket.delete(playerId);
+  }
+  socketToPlayer.delete(socketId);
+}
+
+export function __setActiveGame(lobbyId: string, gameInstance: any): void {
+  activeGames.set(lobbyId, gameInstance);
+}

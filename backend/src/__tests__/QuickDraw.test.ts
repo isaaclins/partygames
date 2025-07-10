@@ -4,7 +4,7 @@ import {
   Player,
   QuickDrawGameAction,
   DrawingStroke,
-} from '../../../shared/types';
+} from '../../../shared/types/index.js';
 
 // Mock timer functions
 let mockTimers: any[] = [];

@@ -6,7 +6,7 @@ import {
   Player,
   ERROR_CODES,
   GAME_CONFIG,
-} from '../../../../shared/types';
+} from '../../../../shared/types/index.js';
 
 // Mock uuid
 jest.mock('uuid', () => ({

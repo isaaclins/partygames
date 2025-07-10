@@ -3,7 +3,7 @@ import {
   GameSession,
   Player,
   WouldYouRatherGameAction,
-} from '../../../shared/types';
+} from '../../../shared/types/index.js';
 
 describe('WouldYouRatherGame', () => {
   let gameSession: GameSession;

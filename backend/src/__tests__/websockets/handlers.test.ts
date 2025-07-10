@@ -8,7 +8,7 @@ import {
   TwoTruthsGameAction,
   WouldYouRatherGameAction,
   QuickDrawGameAction,
-} from '../../../../shared/types';
+} from '../../../../shared/types/index.js';
 import { setupWebSocketHandlers } from '../../websockets/handlers';
 import { lobbyService } from '../../services/LobbyService';
 import { TwoTruthsAndALieGame } from '../../games/TwoTruthsAndALie';
@@ -302,7 +302,10 @@ describe('WebSocket Handlers', () => {
 
     test('should handle leaving error when player not found', async () => {
       const mockCallback = jest.fn();
-      // Don't set up socket-to-player mapping
+      // Clear socket-to-player mapping to simulate player not found
+      require('../../websockets/handlers').__clearSocketToPlayer(
+        'test-socket-id'
+      );
 
       await eventHandlers['lobby:leave'](mockCallback);
 

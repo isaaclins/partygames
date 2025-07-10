@@ -3,7 +3,7 @@ import {
   GameSession,
   Player,
   TwoTruthsGameAction,
-} from '../../../shared/types';
+} from '../../../shared/types/index.js';
 
 describe('TwoTruthsAndALieGame', () => {
   let gameSession: GameSession;

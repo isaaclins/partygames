@@ -1,7 +1,7 @@
 import { TwoTruthsAndALieGame } from '../games/TwoTruthsAndALie';
 import { WouldYouRatherGame } from '../games/WouldYouRather';
 import { QuickDrawGame } from '../games/QuickDraw';
-import { GameSession, Player } from '../../../shared/types';
+import { GameSession, Player } from '../../../shared/types/index.js';
 
 // Mock game session setup
 const createMockGameSession = (playerCount: number = 3): GameSession => {
