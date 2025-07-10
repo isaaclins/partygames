@@ -13,34 +13,178 @@ import { v4 as uuidv4 } from 'uuid';
 // Word prompts for drawing challenges
 const WORD_PROMPTS: QuickDrawPrompt[] = [
   // Easy words
-  { id: '1', word: 'cat', category: 'animals', difficulty: 'easy', hints: ['pet', 'meows'] },
-  { id: '2', word: 'house', category: 'objects', difficulty: 'easy', hints: ['building', 'home'] },
-  { id: '3', word: 'sun', category: 'nature', difficulty: 'easy', hints: ['bright', 'sky'] },
-  { id: '4', word: 'car', category: 'vehicles', difficulty: 'easy', hints: ['wheels', 'drive'] },
-  { id: '5', word: 'tree', category: 'nature', difficulty: 'easy', hints: ['leaves', 'trunk'] },
-  { id: '6', word: 'fish', category: 'animals', difficulty: 'easy', hints: ['water', 'swim'] },
-  { id: '7', word: 'book', category: 'objects', difficulty: 'easy', hints: ['read', 'pages'] },
-  { id: '8', word: 'flower', category: 'nature', difficulty: 'easy', hints: ['petals', 'garden'] },
-  
+  {
+    id: '1',
+    word: 'cat',
+    category: 'animals',
+    difficulty: 'easy',
+    hints: ['pet', 'meows'],
+  },
+  {
+    id: '2',
+    word: 'house',
+    category: 'objects',
+    difficulty: 'easy',
+    hints: ['building', 'home'],
+  },
+  {
+    id: '3',
+    word: 'sun',
+    category: 'nature',
+    difficulty: 'easy',
+    hints: ['bright', 'sky'],
+  },
+  {
+    id: '4',
+    word: 'car',
+    category: 'vehicles',
+    difficulty: 'easy',
+    hints: ['wheels', 'drive'],
+  },
+  {
+    id: '5',
+    word: 'tree',
+    category: 'nature',
+    difficulty: 'easy',
+    hints: ['leaves', 'trunk'],
+  },
+  {
+    id: '6',
+    word: 'fish',
+    category: 'animals',
+    difficulty: 'easy',
+    hints: ['water', 'swim'],
+  },
+  {
+    id: '7',
+    word: 'book',
+    category: 'objects',
+    difficulty: 'easy',
+    hints: ['read', 'pages'],
+  },
+  {
+    id: '8',
+    word: 'flower',
+    category: 'nature',
+    difficulty: 'easy',
+    hints: ['petals', 'garden'],
+  },
+
   // Medium words
-  { id: '9', word: 'elephant', category: 'animals', difficulty: 'medium', hints: ['trunk', 'large'] },
-  { id: '10', word: 'pizza', category: 'food', difficulty: 'medium', hints: ['cheese', 'slice'] },
-  { id: '11', word: 'guitar', category: 'instruments', difficulty: 'medium', hints: ['strings', 'music'] },
-  { id: '12', word: 'bicycle', category: 'vehicles', difficulty: 'medium', hints: ['pedals', 'two wheels'] },
-  { id: '13', word: 'computer', category: 'technology', difficulty: 'medium', hints: ['screen', 'keyboard'] },
-  { id: '14', word: 'rainbow', category: 'nature', difficulty: 'medium', hints: ['colors', 'arc'] },
-  { id: '15', word: 'astronaut', category: 'people', difficulty: 'medium', hints: ['space', 'helmet'] },
-  { id: '16', word: 'lighthouse', category: 'buildings', difficulty: 'medium', hints: ['beacon', 'ocean'] },
+  {
+    id: '9',
+    word: 'elephant',
+    category: 'animals',
+    difficulty: 'medium',
+    hints: ['trunk', 'large'],
+  },
+  {
+    id: '10',
+    word: 'pizza',
+    category: 'food',
+    difficulty: 'medium',
+    hints: ['cheese', 'slice'],
+  },
+  {
+    id: '11',
+    word: 'guitar',
+    category: 'instruments',
+    difficulty: 'medium',
+    hints: ['strings', 'music'],
+  },
+  {
+    id: '12',
+    word: 'bicycle',
+    category: 'vehicles',
+    difficulty: 'medium',
+    hints: ['pedals', 'two wheels'],
+  },
+  {
+    id: '13',
+    word: 'computer',
+    category: 'technology',
+    difficulty: 'medium',
+    hints: ['screen', 'keyboard'],
+  },
+  {
+    id: '14',
+    word: 'rainbow',
+    category: 'nature',
+    difficulty: 'medium',
+    hints: ['colors', 'arc'],
+  },
+  {
+    id: '15',
+    word: 'astronaut',
+    category: 'people',
+    difficulty: 'medium',
+    hints: ['space', 'helmet'],
+  },
+  {
+    id: '16',
+    word: 'lighthouse',
+    category: 'buildings',
+    difficulty: 'medium',
+    hints: ['beacon', 'ocean'],
+  },
 
   // Hard words
-  { id: '17', word: 'democracy', category: 'concepts', difficulty: 'hard', hints: ['voting', 'government'] },
-  { id: '18', word: 'microscope', category: 'science', difficulty: 'hard', hints: ['magnify', 'small'] },
-  { id: '19', word: 'waterfall', category: 'nature', difficulty: 'hard', hints: ['cascade', 'rocks'] },
-  { id: '20', word: 'volcano', category: 'nature', difficulty: 'hard', hints: ['eruption', 'lava'] },
-  { id: '21', word: 'submarine', category: 'vehicles', difficulty: 'hard', hints: ['underwater', 'periscope'] },
-  { id: '22', word: 'chandelier', category: 'objects', difficulty: 'hard', hints: ['ceiling', 'crystal'] },
-  { id: '23', word: 'tornado', category: 'weather', difficulty: 'hard', hints: ['spiral', 'wind'] },
-  { id: '24', word: 'archaeology', category: 'science', difficulty: 'hard', hints: ['dig', 'ancient'] },
+  {
+    id: '17',
+    word: 'democracy',
+    category: 'concepts',
+    difficulty: 'hard',
+    hints: ['voting', 'government'],
+  },
+  {
+    id: '18',
+    word: 'microscope',
+    category: 'science',
+    difficulty: 'hard',
+    hints: ['magnify', 'small'],
+  },
+  {
+    id: '19',
+    word: 'waterfall',
+    category: 'nature',
+    difficulty: 'hard',
+    hints: ['cascade', 'rocks'],
+  },
+  {
+    id: '20',
+    word: 'volcano',
+    category: 'nature',
+    difficulty: 'hard',
+    hints: ['eruption', 'lava'],
+  },
+  {
+    id: '21',
+    word: 'submarine',
+    category: 'vehicles',
+    difficulty: 'hard',
+    hints: ['underwater', 'periscope'],
+  },
+  {
+    id: '22',
+    word: 'chandelier',
+    category: 'objects',
+    difficulty: 'hard',
+    hints: ['ceiling', 'crystal'],
+  },
+  {
+    id: '23',
+    word: 'tornado',
+    category: 'weather',
+    difficulty: 'hard',
+    hints: ['spiral', 'wind'],
+  },
+  {
+    id: '24',
+    word: 'archaeology',
+    category: 'science',
+    difficulty: 'hard',
+    hints: ['dig', 'ancient'],
+  },
 ];
 
 export class QuickDrawGame {
@@ -50,7 +194,7 @@ export class QuickDrawGame {
 
   constructor(private lobby: GameSession) {
     // Shuffle player order for fair turn distribution
-    const playerOrder = [...this.lobby.players.map(p => p.id)];
+    const playerOrder = [...this.lobby.players.map((p) => p.id)];
     this.shuffleArray(playerOrder);
 
     this.gameState = {
@@ -63,7 +207,7 @@ export class QuickDrawGame {
     };
 
     // Initialize scores
-    this.lobby.players.forEach(player => {
+    this.lobby.players.forEach((player) => {
       this.gameState.scores[player.id] = 0;
     });
   }
@@ -86,7 +230,10 @@ export class QuickDrawGame {
   }
 
   private handleStartDrawing(action: QuickDrawGameAction): any {
-    if (this.gameState.gamePhase !== 'setup' && this.gameState.gamePhase !== 'playing') {
+    if (
+      this.gameState.gamePhase !== 'setup' &&
+      this.gameState.gamePhase !== 'playing'
+    ) {
       throw new Error('Game is not in a state to start drawing');
     }
 
@@ -114,7 +261,7 @@ export class QuickDrawGame {
 
     // Add stroke to canvas
     currentRound.canvas.strokes.push(action.data.stroke);
-    
+
     return this.getGameState();
   }
 
@@ -138,7 +285,7 @@ export class QuickDrawGame {
 
     // Check if player already guessed correctly
     const existingGuess = currentRound.guesses.find(
-      g => g.playerId === action.playerId && g.isCorrect
+      (g) => g.playerId === action.playerId && g.isCorrect
     );
     if (existingGuess) {
       throw new Error('You already guessed correctly');
@@ -201,13 +348,14 @@ export class QuickDrawGame {
 
   private startNewRound(): void {
     this.gameState.currentRound++;
-    
+
     if (this.gameState.currentRound > this.gameState.totalRounds) {
       this.endGame();
       return;
     }
 
-    const drawerIndex = (this.gameState.currentRound - 1) % this.gameState.playerOrder.length;
+    const drawerIndex =
+      (this.gameState.currentRound - 1) % this.gameState.playerOrder.length;
     const drawerId = this.gameState.playerOrder[drawerIndex];
     const prompt = this.getRandomPrompt();
 
@@ -265,7 +413,7 @@ export class QuickDrawGame {
     round.completedAt = new Date();
 
     // Award points to drawer if anyone guessed correctly
-    const correctGuesses = round.guesses.filter(g => g.isCorrect);
+    const correctGuesses = round.guesses.filter((g) => g.isCorrect);
     if (correctGuesses.length > 0) {
       this.gameState.scores[round.drawerId] += correctGuesses.length * 2; // 2 points per correct guess
     }
@@ -282,20 +430,25 @@ export class QuickDrawGame {
 
   private checkRoundCompletion(round: QuickDrawRound): void {
     // End round early if all players guessed correctly
-    const nonDrawerPlayers = this.lobby.players.filter(p => p.id !== round.drawerId);
-    const correctGuesses = round.guesses.filter(g => g.isCorrect);
-    
+    const nonDrawerPlayers = this.lobby.players.filter(
+      (p) => p.id !== round.drawerId
+    );
+    const correctGuesses = round.guesses.filter((g) => g.isCorrect);
+
     if (correctGuesses.length >= nonDrawerPlayers.length) {
       this.endRound(round);
     }
   }
 
-  private awardPointsForCorrectGuess(playerId: string, round: QuickDrawRound): void {
-    const correctGuessCount = round.guesses.filter(g => g.isCorrect).length;
-    
+  private awardPointsForCorrectGuess(
+    playerId: string,
+    round: QuickDrawRound
+  ): void {
+    const correctGuessCount = round.guesses.filter((g) => g.isCorrect).length;
+
     // First correct guess gets 10 points, subsequent guesses get decreasing points
     let points = Math.max(10 - (correctGuessCount - 1) * 2, 2);
-    
+
     // Bonus points for speed (based on time remaining)
     if (round.timeRemaining > 60) {
       points += 3; // Speed bonus
@@ -308,7 +461,7 @@ export class QuickDrawGame {
 
   private endGame(): void {
     this.gameState.gamePhase = 'finished';
-    
+
     if (this.roundTimer) {
       clearInterval(this.roundTimer);
       this.roundTimer = null;
@@ -317,17 +470,20 @@ export class QuickDrawGame {
 
   private getRandomPrompt(): QuickDrawPrompt {
     // Filter out already used prompts
-    const availablePrompts = WORD_PROMPTS.filter(p => !this.usedPrompts.has(p.id));
-    
+    const availablePrompts = WORD_PROMPTS.filter(
+      (p) => !this.usedPrompts.has(p.id)
+    );
+
     // If all prompts used, reset the pool
     if (availablePrompts.length === 0) {
       this.usedPrompts.clear();
       return WORD_PROMPTS[Math.floor(Math.random() * WORD_PROMPTS.length)];
     }
 
-    const selectedPrompt = availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
+    const selectedPrompt =
+      availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
     this.usedPrompts.add(selectedPrompt.id);
-    
+
     return selectedPrompt;
   }
 
@@ -344,11 +500,12 @@ export class QuickDrawGame {
 
   public getGameState(): any {
     const currentRound = this.getCurrentRound();
-    
+
     return {
       ...this.gameState,
       currentRoundData: currentRound,
-      canDraw: currentRound?.phase === 'drawing' || currentRound?.phase === 'guessing',
+      canDraw:
+        currentRound?.phase === 'drawing' || currentRound?.phase === 'guessing',
       canGuess: currentRound?.phase === 'guessing',
     };
   }
@@ -360,8 +517,9 @@ export class QuickDrawGame {
   public getWinner(): string | null {
     if (!this.isGameComplete()) return null;
 
-    const sortedScores = Object.entries(this.gameState.scores)
-      .sort(([,a], [,b]) => b - a);
+    const sortedScores = Object.entries(this.gameState.scores).sort(
+      ([, a], [, b]) => b - a
+    );
 
     return sortedScores.length > 0 ? sortedScores[0][0] : null;
   }
@@ -382,4 +540,4 @@ export class QuickDrawGame {
       this.roundTimer = null;
     }
   }
-} 
+}

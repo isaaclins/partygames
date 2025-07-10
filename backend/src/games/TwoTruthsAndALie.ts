@@ -25,12 +25,15 @@ export class TwoTruthsAndALieGame {
     };
 
     // Initialize scores
-    this.gameSession.players.forEach(player => {
+    this.gameSession.players.forEach((player) => {
       this.scores[player.id] = 0;
     });
   }
 
-  public handleAction(action: TwoTruthsGameAction): { success: boolean; error?: string } {
+  public handleAction(action: TwoTruthsGameAction): {
+    success: boolean;
+    error?: string;
+  } {
     switch (action.type) {
       case 'submit_statements':
         return this.handleSubmitStatements(action);
@@ -41,7 +44,10 @@ export class TwoTruthsAndALieGame {
     }
   }
 
-  private handleSubmitStatements(action: TwoTruthsGameAction): { success: boolean; error?: string } {
+  private handleSubmitStatements(action: TwoTruthsGameAction): {
+    success: boolean;
+    error?: string;
+  } {
     if (this.gameData.currentPhase !== 'submitting') {
       return { success: false, error: 'Not in submission phase' };
     }
@@ -51,24 +57,30 @@ export class TwoTruthsAndALieGame {
     }
 
     // Check if player already submitted
-    const existingSubmission = this.gameData.submissions.find(s => s.playerId === action.playerId);
+    const existingSubmission = this.gameData.submissions.find(
+      (s) => s.playerId === action.playerId
+    );
     if (existingSubmission) {
       return { success: false, error: 'Already submitted statements' };
     }
 
     // Validate statements are not empty
-    const statements = action.data.statements.filter(s => s.trim().length > 0);
+    const statements = action.data.statements.filter(
+      (s) => s.trim().length > 0
+    );
     if (statements.length !== 3) {
       return { success: false, error: 'All statements must be non-empty' };
     }
 
     // Create statements with random lie assignment
     const lieIndex = Math.floor(Math.random() * 3);
-    const submissionStatements: TwoTruthsStatement[] = statements.map((text, index) => ({
-      id: randomUUID(),
-      text: text.trim(),
-      isLie: index === lieIndex,
-    }));
+    const submissionStatements: TwoTruthsStatement[] = statements.map(
+      (text, index) => ({
+        id: randomUUID(),
+        text: text.trim(),
+        isLie: index === lieIndex,
+      })
+    );
 
     const submission: TwoTruthsPlayerSubmission = {
       playerId: action.playerId,
@@ -86,13 +98,19 @@ export class TwoTruthsAndALieGame {
     return { success: true };
   }
 
-  private handleSubmitVote(action: TwoTruthsGameAction): { success: boolean; error?: string } {
+  private handleSubmitVote(action: TwoTruthsGameAction): {
+    success: boolean;
+    error?: string;
+  } {
     if (this.gameData.currentPhase !== 'voting') {
       return { success: false, error: 'Not in voting phase' };
     }
 
     if (!action.data.selectedStatementId || !action.data.targetPlayerId) {
-      return { success: false, error: 'Must specify statement and target player' };
+      return {
+        success: false,
+        error: 'Must specify statement and target player',
+      };
     }
 
     // Validate target player exists and is not the voter
@@ -100,25 +118,37 @@ export class TwoTruthsAndALieGame {
       return { success: false, error: 'Cannot vote on your own statements' };
     }
 
-    if (!this.gameData.currentTargetPlayerId || this.gameData.currentTargetPlayerId !== action.data.targetPlayerId) {
+    if (
+      !this.gameData.currentTargetPlayerId ||
+      this.gameData.currentTargetPlayerId !== action.data.targetPlayerId
+    ) {
       return { success: false, error: 'Not voting on the current player' };
     }
 
     // Check if player already voted for this target
     const existingVote = this.gameData.votes.find(
-      v => v.voterId === action.playerId && v.targetPlayerId === action.data.targetPlayerId
+      (v) =>
+        v.voterId === action.playerId &&
+        v.targetPlayerId === action.data.targetPlayerId
     );
     if (existingVote) {
       return { success: false, error: 'Already voted for this player' };
     }
 
     // Validate the statement exists for the target player
-    const targetSubmission = this.gameData.submissions.find(s => s.playerId === action.data.targetPlayerId);
+    const targetSubmission = this.gameData.submissions.find(
+      (s) => s.playerId === action.data.targetPlayerId
+    );
     if (!targetSubmission) {
-      return { success: false, error: 'Target player has not submitted statements' };
+      return {
+        success: false,
+        error: 'Target player has not submitted statements',
+      };
     }
 
-    const statementExists = targetSubmission.statements.find(s => s.id === action.data.selectedStatementId);
+    const statementExists = targetSubmission.statements.find(
+      (s) => s.id === action.data.selectedStatementId
+    );
     if (!statementExists) {
       return { success: false, error: 'Invalid statement selection' };
     }
@@ -133,8 +163,12 @@ export class TwoTruthsAndALieGame {
     this.gameData.votes.push(vote);
 
     // Check if all eligible players have voted for the current target
-    const eligibleVoters = this.gameSession.players.filter(p => p.id !== this.gameData.currentTargetPlayerId);
-    const votesForCurrentTarget = this.gameData.votes.filter(v => v.targetPlayerId === this.gameData.currentTargetPlayerId);
+    const eligibleVoters = this.gameSession.players.filter(
+      (p) => p.id !== this.gameData.currentTargetPlayerId
+    );
+    const votesForCurrentTarget = this.gameData.votes.filter(
+      (v) => v.targetPlayerId === this.gameData.currentTargetPlayerId
+    );
 
     if (votesForCurrentTarget.length === eligibleVoters.length) {
       this.moveToNextVotingTarget();
@@ -149,11 +183,14 @@ export class TwoTruthsAndALieGame {
   }
 
   private moveToNextVotingTarget(): void {
-    const currentIndex = this.gameSession.players.findIndex(p => p.id === this.gameData.currentTargetPlayerId);
+    const currentIndex = this.gameSession.players.findIndex(
+      (p) => p.id === this.gameData.currentTargetPlayerId
+    );
     const nextIndex = currentIndex + 1;
 
     if (nextIndex < this.gameSession.players.length) {
-      this.gameData.currentTargetPlayerId = this.gameSession.players[nextIndex].id;
+      this.gameData.currentTargetPlayerId =
+        this.gameSession.players[nextIndex].id;
     } else {
       this.endRound();
     }
@@ -166,10 +203,14 @@ export class TwoTruthsAndALieGame {
 
   private calculateScores(): void {
     // Award points for correct guesses
-    this.gameData.votes.forEach(vote => {
-      const targetSubmission = this.gameData.submissions.find(s => s.playerId === vote.targetPlayerId);
+    this.gameData.votes.forEach((vote) => {
+      const targetSubmission = this.gameData.submissions.find(
+        (s) => s.playerId === vote.targetPlayerId
+      );
       if (targetSubmission) {
-        const selectedStatement = targetSubmission.statements.find(s => s.id === vote.selectedStatementId);
+        const selectedStatement = targetSubmission.statements.find(
+          (s) => s.id === vote.selectedStatementId
+        );
         if (selectedStatement && selectedStatement.isLie) {
           // Correct guess - award points to voter
           this.scores[vote.voterId] += this.POINTS_FOR_CORRECT_GUESS;
@@ -178,14 +219,19 @@ export class TwoTruthsAndALieGame {
     });
 
     // Award points for fooling others
-    this.gameData.submissions.forEach(submission => {
-      const votesForPlayer = this.gameData.votes.filter(v => v.targetPlayerId === submission.playerId);
-      const truthStatements = submission.statements.filter(s => !s.isLie);
-      
-      truthStatements.forEach(truthStatement => {
-        const votesForTruth = votesForPlayer.filter(v => v.selectedStatementId === truthStatement.id);
+    this.gameData.submissions.forEach((submission) => {
+      const votesForPlayer = this.gameData.votes.filter(
+        (v) => v.targetPlayerId === submission.playerId
+      );
+      const truthStatements = submission.statements.filter((s) => !s.isLie);
+
+      truthStatements.forEach((truthStatement) => {
+        const votesForTruth = votesForPlayer.filter(
+          (v) => v.selectedStatementId === truthStatement.id
+        );
         // Award points for each player who incorrectly guessed a truth as the lie
-        this.scores[submission.playerId] += votesForTruth.length * this.POINTS_FOR_FOOLING_OTHERS;
+        this.scores[submission.playerId] +=
+          votesForTruth.length * this.POINTS_FOR_FOOLING_OTHERS;
       });
     });
   }
@@ -203,7 +249,7 @@ export class TwoTruthsAndALieGame {
   }
 
   public getGameResults(): GameResults {
-    const winner = Object.entries(this.scores).reduce((a, b) => 
+    const winner = Object.entries(this.scores).reduce((a, b) =>
       this.scores[a[0]] > this.scores[b[0]] ? a : b
     )[0];
 
@@ -219,10 +265,14 @@ export class TwoTruthsAndALieGame {
   }
 
   private generateRoundSummary(): string {
-    const totalCorrectGuesses = this.gameData.votes.filter(vote => {
-      const targetSubmission = this.gameData.submissions.find(s => s.playerId === vote.targetPlayerId);
+    const totalCorrectGuesses = this.gameData.votes.filter((vote) => {
+      const targetSubmission = this.gameData.submissions.find(
+        (s) => s.playerId === vote.targetPlayerId
+      );
       if (targetSubmission) {
-        const selectedStatement = targetSubmission.statements.find(s => s.id === vote.selectedStatementId);
+        const selectedStatement = targetSubmission.statements.find(
+          (s) => s.id === vote.selectedStatementId
+        );
         return selectedStatement && selectedStatement.isLie;
       }
       return false;
@@ -232,10 +282,12 @@ export class TwoTruthsAndALieGame {
   }
 
   private generateGameSummary(): string {
-    const winner = Object.entries(this.scores).reduce((a, b) => 
+    const winner = Object.entries(this.scores).reduce((a, b) =>
       this.scores[a[0]] > this.scores[b[0]] ? a : b
     );
-    const winnerPlayer = this.gameSession.players.find(p => p.id === winner[0]);
+    const winnerPlayer = this.gameSession.players.find(
+      (p) => p.id === winner[0]
+    );
     return `Game complete! ${winnerPlayer?.name || 'Unknown'} wins with ${winner[1]} points!`;
   }
 
@@ -243,13 +295,14 @@ export class TwoTruthsAndALieGame {
     return {
       phase: this.gameData.currentPhase,
       currentTargetPlayer: this.gameData.currentTargetPlayerId,
-      submissions: this.gameData.submissions.map(s => ({
+      submissions: this.gameData.submissions.map((s) => ({
         ...s,
         // Don't reveal which statement is the lie during gameplay
-        statements: s.statements.map(stmt => ({
+        statements: s.statements.map((stmt) => ({
           id: stmt.id,
           text: stmt.text,
-          isLie: this.gameData.currentPhase === 'results' ? stmt.isLie : undefined,
+          isLie:
+            this.gameData.currentPhase === 'results' ? stmt.isLie : undefined,
         })),
       })),
       votes: this.gameData.votes,
@@ -258,14 +311,16 @@ export class TwoTruthsAndALieGame {
   }
 
   public hasPlayerSubmitted(playerId: string): boolean {
-    return this.gameData.submissions.some(s => s.playerId === playerId);
+    return this.gameData.submissions.some((s) => s.playerId === playerId);
   }
 
   public hasPlayerVoted(playerId: string, targetPlayerId: string): boolean {
-    return this.gameData.votes.some(v => v.voterId === playerId && v.targetPlayerId === targetPlayerId);
+    return this.gameData.votes.some(
+      (v) => v.voterId === playerId && v.targetPlayerId === targetPlayerId
+    );
   }
 
   public isComplete(): boolean {
     return this.gameData.currentPhase === 'results';
   }
-} 
+}

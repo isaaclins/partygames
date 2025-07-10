@@ -26,7 +26,8 @@ const gameTypes: GameType[] = [
   {
     id: 'would-you-rather',
     name: 'Would You Rather',
-    description: 'Choose between challenging scenarios and see what others pick',
+    description:
+      'Choose between challenging scenarios and see what others pick',
     minPlayers: 3,
     maxPlayers: 8,
     icon: Plus,

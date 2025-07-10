@@ -53,7 +53,9 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [currentStroke, setCurrentStroke] = useState<DrawingStroke | null>(null);
+  const [currentStroke, setCurrentStroke] = useState<DrawingStroke | null>(
+    null
+  );
   const [selectedColor, setSelectedColor] = useState('#000000');
   const [brushSize, setBrushSize] = useState(4);
   const [tool, setTool] = useState<'brush' | 'eraser'>('brush');
@@ -72,13 +74,13 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     // Set canvas background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw all strokes
-    strokes.forEach(stroke => {
+    strokes.forEach((stroke) => {
       drawStroke(ctx, stroke);
     });
 
@@ -104,11 +106,11 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
     for (let i = 1; i < stroke.points.length; i++) {
       const point = stroke.points[i];
       const prevPoint = stroke.points[i - 1];
-      
+
       // Use quadratic curves for smoother lines
       const cpx = (prevPoint.x + point.x) / 2;
       const cpy = (prevPoint.y + point.y) / 2;
-      
+
       ctx.quadraticCurveTo(prevPoint.x, prevPoint.y, cpx, cpy);
     }
 
@@ -202,10 +204,10 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
     <div className={`flex flex-col space-y-4 ${className}`}>
       {/* Drawing Tools */}
       {canDraw && (
-        <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-          <div className="flex flex-wrap items-center gap-4">
+        <div className='bg-white p-4 rounded-lg border border-gray-200 shadow-sm'>
+          <div className='flex flex-wrap items-center gap-4'>
             {/* Tool Selection */}
-            <div className="flex items-center space-x-2">
+            <div className='flex items-center space-x-2'>
               <button
                 onClick={() => setTool('brush')}
                 className={`p-2 rounded-lg ${
@@ -213,9 +215,9 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
-                title="Brush"
+                title='Brush'
               >
-                <Brush className="w-4 h-4" />
+                <Brush className='w-4 h-4' />
               </button>
               <button
                 onClick={() => setTool('eraser')}
@@ -224,23 +226,25 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
-                title="Eraser"
+                title='Eraser'
               >
-                <Eraser className="w-4 h-4" />
+                <Eraser className='w-4 h-4' />
               </button>
             </div>
 
             {/* Color Palette */}
             {tool === 'brush' && (
-              <div className="flex items-center space-x-1">
-                <Palette className="w-4 h-4 text-gray-600" />
-                <div className="flex space-x-1">
-                  {COLORS.map(color => (
+              <div className='flex items-center space-x-1'>
+                <Palette className='w-4 h-4 text-gray-600' />
+                <div className='flex space-x-1'>
+                  {COLORS.map((color) => (
                     <button
                       key={color}
                       onClick={() => setSelectedColor(color)}
                       className={`w-6 h-6 rounded border-2 ${
-                        selectedColor === color ? 'border-gray-800' : 'border-gray-300'
+                        selectedColor === color
+                          ? 'border-gray-800'
+                          : 'border-gray-300'
                       }`}
                       style={{ backgroundColor: color }}
                       title={color}
@@ -251,14 +255,14 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
             )}
 
             {/* Brush Size */}
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">Size:</span>
+            <div className='flex items-center space-x-2'>
+              <span className='text-sm text-gray-600'>Size:</span>
               <select
                 value={brushSize}
                 onChange={(e) => setBrushSize(Number(e.target.value))}
-                className="px-2 py-1 border border-gray-300 rounded text-sm"
+                className='px-2 py-1 border border-gray-300 rounded text-sm'
               >
-                {BRUSH_SIZES.map(size => (
+                {BRUSH_SIZES.map((size) => (
                   <option key={size} value={size}>
                     {size}px
                   </option>
@@ -267,20 +271,20 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center space-x-2">
+            <div className='flex items-center space-x-2'>
               <button
                 onClick={onUndoStroke}
-                className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200"
-                title="Undo last stroke"
+                className='p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200'
+                title='Undo last stroke'
               >
-                <Undo className="w-4 h-4" />
+                <Undo className='w-4 h-4' />
               </button>
               <button
                 onClick={onClearCanvas}
-                className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200"
-                title="Clear canvas"
+                className='p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200'
+                title='Clear canvas'
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className='w-4 h-4' />
               </button>
             </div>
           </div>
@@ -288,7 +292,7 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
       )}
 
       {/* Canvas */}
-      <div className="relative bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+      <div className='relative bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden'>
         <canvas
           ref={canvasRef}
           width={width}
@@ -307,22 +311,23 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
             touchAction: 'none', // Prevent scrolling on touch devices
           }}
         />
-        
+
         {!canDraw && (
-          <div className="absolute inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center">
-            <span className="text-gray-600 font-medium">Drawing disabled</span>
+          <div className='absolute inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center'>
+            <span className='text-gray-600 font-medium'>Drawing disabled</span>
           </div>
         )}
       </div>
 
       {/* Canvas Info */}
-      <div className="text-xs text-gray-500 text-center">
+      <div className='text-xs text-gray-500 text-center'>
         Canvas: {width} × {height} | Strokes: {strokes.length}
-        {tool === 'brush' && ` | Color: ${selectedColor} | Size: ${brushSize}px`}
+        {tool === 'brush' &&
+          ` | Color: ${selectedColor} | Size: ${brushSize}px`}
         {tool === 'eraser' && ` | Eraser Size: ${brushSize * 2}px`}
       </div>
     </div>
   );
 };
 
-export default DrawingCanvas; 
+export default DrawingCanvas;

@@ -264,7 +264,12 @@ export interface QuickDrawGameState {
 }
 
 export interface QuickDrawGameAction extends GameAction {
-  type: 'start_drawing' | 'add_stroke' | 'submit_guess' | 'clear_canvas' | 'undo_stroke';
+  type:
+    | 'start_drawing'
+    | 'add_stroke'
+    | 'submit_guess'
+    | 'clear_canvas'
+    | 'undo_stroke';
   data: {
     stroke?: DrawingStroke; // For add_stroke
     guess?: string; // For submit_guess

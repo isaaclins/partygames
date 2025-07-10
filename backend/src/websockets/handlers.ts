@@ -20,7 +20,10 @@ const socketToPlayer = new Map<string, string>(); // socketId -> playerId
 const playerToSocket = new Map<string, string>(); // playerId -> socketId
 
 // Track active game instances
-const activeGames = new Map<string, TwoTruthsAndALieGame | WouldYouRatherGame | QuickDrawGame>(); // lobbyId -> gameInstance
+const activeGames = new Map<
+  string,
+  TwoTruthsAndALieGame | WouldYouRatherGame | QuickDrawGame
+>(); // lobbyId -> gameInstance
 
 export function setupWebSocketHandlers(
   io: Server<ClientToServerEvents, ServerToClientEvents>,
@@ -228,36 +231,46 @@ export function setupWebSocketHandlers(
 
           // Update lobby status and emit game started
           lobby.status = 'playing';
-          
+
           // Create game instance based on game type
           if (lobby.gameType === 'two-truths-and-a-lie') {
             const gameInstance = new TwoTruthsAndALieGame(lobby);
             activeGames.set(lobby.lobbyId, gameInstance);
-            
+
             // Emit game started with initial game state
             io.to(lobby.lobbyId).emit('game:started');
             io.to(lobby.lobbyId).emit('lobby:updated', lobby);
-            
-            console.log(`Two Truths and a Lie game started in lobby ${lobby.lobbyId}`);
+
+            console.log(
+              `Two Truths and a Lie game started in lobby ${lobby.lobbyId}`
+            );
           } else if (lobby.gameType === 'would-you-rather') {
             const gameInstance = new WouldYouRatherGame(lobby);
             activeGames.set(lobby.lobbyId, gameInstance);
-            
+
             // Emit game started with initial game state
             io.to(lobby.lobbyId).emit('game:started');
             io.to(lobby.lobbyId).emit('lobby:updated', lobby);
-            io.to(lobby.lobbyId).emit('game:stateUpdate', gameInstance.getGameState());
-            
-            console.log(`Would You Rather game started in lobby ${lobby.lobbyId}`);
+            io.to(lobby.lobbyId).emit(
+              'game:stateUpdate',
+              gameInstance.getGameState()
+            );
+
+            console.log(
+              `Would You Rather game started in lobby ${lobby.lobbyId}`
+            );
           } else if (lobby.gameType === 'quick-draw') {
             const gameInstance = new QuickDrawGame(lobby);
             activeGames.set(lobby.lobbyId, gameInstance);
-            
+
             // Emit game started with initial game state
             io.to(lobby.lobbyId).emit('game:started');
             io.to(lobby.lobbyId).emit('lobby:updated', lobby);
-            io.to(lobby.lobbyId).emit('game:stateUpdate', gameInstance.getGameState());
-            
+            io.to(lobby.lobbyId).emit(
+              'game:stateUpdate',
+              gameInstance.getGameState()
+            );
+
             console.log(`Quick Draw game started in lobby ${lobby.lobbyId}`);
           } else {
             io.to(lobby.lobbyId).emit('game:started');
@@ -294,7 +307,9 @@ export function setupWebSocketHandlers(
 
       // Handle game actions based on game type
       if (lobby.gameType === 'two-truths-and-a-lie') {
-        const gameInstance = activeGames.get(lobby.lobbyId) as TwoTruthsAndALieGame;
+        const gameInstance = activeGames.get(
+          lobby.lobbyId
+        ) as TwoTruthsAndALieGame;
         if (!gameInstance) {
           callback({ success: false, error: 'Game instance not found' });
           return;
@@ -302,9 +317,9 @@ export function setupWebSocketHandlers(
 
         const gameAction = action as TwoTruthsGameAction;
         gameAction.playerId = playerId; // Ensure playerId is set from socket
-        
+
         const result = gameInstance.handleAction(gameAction);
-        
+
         if (!result.success) {
           callback({ success: false, error: result.error });
           return;
@@ -327,14 +342,16 @@ export function setupWebSocketHandlers(
             const gameResults = gameInstance.getGameResults();
             io.to(lobby.lobbyId).emit('game:ended', gameResults);
             io.to(lobby.lobbyId).emit('lobby:updated', lobby);
-            
+
             // Clean up game instance
             activeGames.delete(lobby.lobbyId);
             console.log(`Game completed in lobby ${lobby.lobbyId}`);
           }
         }
       } else if (lobby.gameType === 'would-you-rather') {
-        const gameInstance = activeGames.get(lobby.lobbyId) as WouldYouRatherGame;
+        const gameInstance = activeGames.get(
+          lobby.lobbyId
+        ) as WouldYouRatherGame;
         if (!gameInstance) {
           callback({ success: false, error: 'Game instance not found' });
           return;
@@ -342,10 +359,10 @@ export function setupWebSocketHandlers(
 
         const gameAction = action as WouldYouRatherGameAction;
         gameAction.playerId = playerId; // Ensure playerId is set from socket
-        
+
         try {
           const gameState = gameInstance.handleAction(gameAction);
-          
+
           callback({ success: true });
 
           // Broadcast updated game state to all players
@@ -357,10 +374,12 @@ export function setupWebSocketHandlers(
             const gameResults = gameInstance.getFinalResults();
             io.to(lobby.lobbyId).emit('game:ended', gameResults);
             io.to(lobby.lobbyId).emit('lobby:updated', lobby);
-            
+
             // Clean up game instance
             activeGames.delete(lobby.lobbyId);
-            console.log(`Would You Rather game completed in lobby ${lobby.lobbyId}`);
+            console.log(
+              `Would You Rather game completed in lobby ${lobby.lobbyId}`
+            );
           }
         } catch (error: any) {
           callback({ success: false, error: error.message });
@@ -374,10 +393,10 @@ export function setupWebSocketHandlers(
 
         const gameAction = action as QuickDrawGameAction;
         gameAction.playerId = playerId; // Ensure playerId is set from socket
-        
+
         try {
           const gameState = gameInstance.handleAction(gameAction);
-          
+
           callback({ success: true });
 
           // Broadcast updated game state to all players
@@ -389,7 +408,7 @@ export function setupWebSocketHandlers(
             const gameResults = gameInstance.getFinalResults();
             io.to(lobby.lobbyId).emit('game:ended', gameResults);
             io.to(lobby.lobbyId).emit('lobby:updated', lobby);
-            
+
             // Clean up game instance
             gameInstance.cleanup();
             activeGames.delete(lobby.lobbyId);

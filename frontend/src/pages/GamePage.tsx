@@ -10,12 +10,7 @@ export default function GamePage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
   const navigate = useNavigate();
 
-  const {
-    game,
-    user,
-    connectionStatus,
-    leaveGame,
-  } = useGameSession();
+  const { game, user, connectionStatus, leaveGame } = useGameSession();
 
   // Check if we're in the right lobby and game is active
   useEffect(() => {
@@ -129,4 +124,4 @@ export default function GamePage() {
       </div>
     </div>
   );
-} 
+}

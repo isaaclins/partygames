@@ -1,5 +1,9 @@
 import { WouldYouRatherGame } from '../games/WouldYouRather';
-import { GameSession, Player, WouldYouRatherGameAction } from '../../../shared/types';
+import {
+  GameSession,
+  Player,
+  WouldYouRatherGameAction,
+} from '../../../shared/types';
 
 describe('WouldYouRatherGame', () => {
   let gameSession: GameSession;
@@ -37,7 +41,7 @@ describe('WouldYouRatherGame', () => {
   describe('Constructor and Initialization', () => {
     test('should initialize with correct game state', () => {
       const gameState = game.getGameState();
-      
+
       expect(gameState.currentPhase).toBe('submitting');
       expect(gameState.currentRound).toBe(1);
       expect(gameState.maxRounds).toBe(3);
@@ -54,7 +58,7 @@ describe('WouldYouRatherGame', () => {
       const fourPlayerSession = createMockGameSession(4);
       const fourPlayerGame = new WouldYouRatherGame(fourPlayerSession);
       const gameState = fourPlayerGame.getGameState();
-      
+
       expect(Object.keys(gameState.scores)).toHaveLength(4);
     });
 
@@ -62,7 +66,7 @@ describe('WouldYouRatherGame', () => {
       const singlePlayerSession = createMockGameSession(1);
       const singlePlayerGame = new WouldYouRatherGame(singlePlayerSession);
       const gameState = singlePlayerGame.getGameState();
-      
+
       expect(Object.keys(gameState.scores)).toHaveLength(1);
     });
 
@@ -75,9 +79,9 @@ describe('WouldYouRatherGame', () => {
     test('should handle valid scenario submission', () => {
       const action: WouldYouRatherGameAction = {
         type: 'submit_scenario',
-        data: { 
+        data: {
           optionA: 'Have the ability to fly',
-          optionB: 'Have the ability to become invisible'
+          optionB: 'Have the ability to become invisible',
         },
         playerId: 'player-0',
         timestamp: new Date(),
@@ -90,7 +94,9 @@ describe('WouldYouRatherGame', () => {
       const gameState = game.getGameState();
       expect(gameState.scenarios).toHaveLength(1);
       expect(gameState.scenarios[0].optionA).toBe('Have the ability to fly');
-      expect(gameState.scenarios[0].optionB).toBe('Have the ability to become invisible');
+      expect(gameState.scenarios[0].optionB).toBe(
+        'Have the ability to become invisible'
+      );
       expect(gameState.scenarios[0].submittedBy).toBe('player-0');
       expect(gameState.scenarios[0].round).toBe(1);
     });
@@ -100,9 +106,9 @@ describe('WouldYouRatherGame', () => {
       ['player-0', 'player-1', 'player-2'].forEach((playerId, index) => {
         const action: WouldYouRatherGameAction = {
           type: 'submit_scenario',
-          data: { 
+          data: {
             optionA: `Option A${index}`,
-            optionB: `Option B${index}`
+            optionB: `Option B${index}`,
           },
           playerId,
           timestamp: new Date(),
@@ -113,9 +119,9 @@ describe('WouldYouRatherGame', () => {
       // Now game should be in voting phase
       const action: WouldYouRatherGameAction = {
         type: 'submit_scenario',
-        data: { 
+        data: {
           optionA: 'New Option A',
-          optionB: 'New Option B'
+          optionB: 'New Option B',
         },
         playerId: 'player-0',
         timestamp: new Date(),
@@ -129,9 +135,9 @@ describe('WouldYouRatherGame', () => {
     test('should reject submission with missing option A', () => {
       const action: WouldYouRatherGameAction = {
         type: 'submit_scenario',
-        data: { 
+        data: {
           optionA: '',
-          optionB: 'Have the ability to become invisible'
+          optionB: 'Have the ability to become invisible',
         },
         playerId: 'player-0',
         timestamp: new Date(),
@@ -145,9 +151,9 @@ describe('WouldYouRatherGame', () => {
     test('should reject submission with missing option B', () => {
       const action: WouldYouRatherGameAction = {
         type: 'submit_scenario',
-        data: { 
+        data: {
           optionA: 'Have the ability to fly',
-          optionB: ''
+          optionB: '',
         },
         playerId: 'player-0',
         timestamp: new Date(),
@@ -161,9 +167,9 @@ describe('WouldYouRatherGame', () => {
     test('should reject duplicate submission from same player in same round', () => {
       const action: WouldYouRatherGameAction = {
         type: 'submit_scenario',
-        data: { 
+        data: {
           optionA: 'Have the ability to fly',
-          optionB: 'Have the ability to become invisible'
+          optionB: 'Have the ability to become invisible',
         },
         playerId: 'player-0',
         timestamp: new Date(),
@@ -179,9 +185,9 @@ describe('WouldYouRatherGame', () => {
     test('should trim whitespace from options', () => {
       const action: WouldYouRatherGameAction = {
         type: 'submit_scenario',
-        data: { 
+        data: {
           optionA: '  Have the ability to fly  ',
-          optionB: '  Have the ability to become invisible  '
+          optionB: '  Have the ability to become invisible  ',
         },
         playerId: 'player-0',
         timestamp: new Date(),
@@ -189,20 +195,22 @@ describe('WouldYouRatherGame', () => {
 
       game.handleAction(action);
       const gameState = game.getGameState();
-      
+
       expect(gameState.scenarios[0].optionA).toBe('Have the ability to fly');
-      expect(gameState.scenarios[0].optionB).toBe('Have the ability to become invisible');
+      expect(gameState.scenarios[0].optionB).toBe(
+        'Have the ability to become invisible'
+      );
     });
 
     test('should transition to voting phase when all players submit', () => {
       const players = ['player-0', 'player-1', 'player-2'];
-      
+
       players.forEach((playerId, index) => {
         const action: WouldYouRatherGameAction = {
           type: 'submit_scenario',
-          data: { 
+          data: {
             optionA: `Option A${index}`,
-            optionB: `Option B${index}`
+            optionB: `Option B${index}`,
           },
           playerId,
           timestamp: new Date(),
@@ -219,18 +227,18 @@ describe('WouldYouRatherGame', () => {
     test('should generate unique IDs for scenarios', () => {
       const actions = ['player-0', 'player-1'].map((playerId, index) => ({
         type: 'submit_scenario' as const,
-        data: { 
+        data: {
           optionA: `Option A${index}`,
-          optionB: `Option B${index}`
+          optionB: `Option B${index}`,
         },
         playerId,
         timestamp: new Date(),
       }));
 
-      actions.forEach(action => game.handleAction(action));
-      
+      actions.forEach((action) => game.handleAction(action));
+
       const gameState = game.getGameState();
-      const ids = gameState.scenarios.map(s => s.id);
+      const ids = gameState.scenarios.map((s) => s.id);
       expect(new Set(ids).size).toBe(ids.length); // All IDs should be unique
     });
   });
@@ -242,9 +250,9 @@ describe('WouldYouRatherGame', () => {
       players.forEach((playerId, index) => {
         const action: WouldYouRatherGameAction = {
           type: 'submit_scenario',
-          data: { 
+          data: {
             optionA: `Option A${index}`,
-            optionB: `Option B${index}`
+            optionB: `Option B${index}`,
           },
           playerId,
           timestamp: new Date(),
@@ -259,9 +267,9 @@ describe('WouldYouRatherGame', () => {
 
       const action: WouldYouRatherGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           scenarioId: currentScenario.id,
-          choice: 'A'
+          choice: 'A',
         },
         playerId: 'player-1', // Not the scenario creator
         timestamp: new Date(),
@@ -280,12 +288,12 @@ describe('WouldYouRatherGame', () => {
     test('should reject vote when not in voting phase', () => {
       // Create new game in submission phase
       const newGame = new WouldYouRatherGame(gameSession);
-      
+
       const action: WouldYouRatherGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           scenarioId: 'some-id',
-          choice: 'A'
+          choice: 'A',
         },
         playerId: 'player-1',
         timestamp: new Date(),
@@ -302,9 +310,9 @@ describe('WouldYouRatherGame', () => {
 
       const action: WouldYouRatherGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           scenarioId: currentScenario.id,
-          choice: 'C' as any // Invalid choice
+          choice: 'C' as any, // Invalid choice
         },
         playerId: 'player-1',
         timestamp: new Date(),
@@ -318,9 +326,9 @@ describe('WouldYouRatherGame', () => {
     test('should reject vote for non-existent scenario', () => {
       const action: WouldYouRatherGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           scenarioId: 'non-existent-id',
-          choice: 'A'
+          choice: 'A',
         },
         playerId: 'player-1',
         timestamp: new Date(),
@@ -337,9 +345,9 @@ describe('WouldYouRatherGame', () => {
 
       const action: WouldYouRatherGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           scenarioId: currentScenario.id,
-          choice: 'A'
+          choice: 'A',
         },
         playerId: 'player-1',
         timestamp: new Date(),
@@ -355,16 +363,18 @@ describe('WouldYouRatherGame', () => {
     test('should move to next scenario when all eligible players vote', () => {
       const gameState = game.getGameState();
       const currentScenario = gameState.currentScenario!;
-      
+
       // All players except scenario creator should vote
-      const voters = gameSession.players.filter(p => p.id !== currentScenario.submittedBy);
-      
-      voters.forEach(voter => {
+      const voters = gameSession.players.filter(
+        (p) => p.id !== currentScenario.submittedBy
+      );
+
+      voters.forEach((voter) => {
         const action: WouldYouRatherGameAction = {
           type: 'submit_vote',
-          data: { 
+          data: {
             scenarioId: currentScenario.id,
-            choice: 'A'
+            choice: 'A',
           },
           playerId: voter.id,
           timestamp: new Date(),
@@ -391,9 +401,9 @@ describe('WouldYouRatherGame', () => {
       players.forEach((playerId, index) => {
         const action: WouldYouRatherGameAction = {
           type: 'submit_scenario',
-          data: { 
+          data: {
             optionA: `Option A${index}`,
-            optionB: `Option B${index}`
+            optionB: `Option B${index}`,
           },
           playerId,
           timestamp: new Date(),
@@ -404,17 +414,19 @@ describe('WouldYouRatherGame', () => {
 
     test('should complete voting on all scenarios in a round', () => {
       const gameState = game.getGameState();
-      const scenarios = gameState.scenarios.filter(s => s.round === 1);
-      
+      const scenarios = gameState.scenarios.filter((s) => s.round === 1);
+
       // Vote on all scenarios
-      scenarios.forEach(scenario => {
-        const voters = gameSession.players.filter(p => p.id !== scenario.submittedBy);
-        voters.forEach(voter => {
+      scenarios.forEach((scenario) => {
+        const voters = gameSession.players.filter(
+          (p) => p.id !== scenario.submittedBy
+        );
+        voters.forEach((voter) => {
           const action: WouldYouRatherGameAction = {
             type: 'submit_vote',
-            data: { 
+            data: {
               scenarioId: scenario.id,
-              choice: 'A'
+              choice: 'A',
             },
             playerId: voter.id,
             timestamp: new Date(),
@@ -437,9 +449,9 @@ describe('WouldYouRatherGame', () => {
           players.forEach((playerId, index) => {
             const action: WouldYouRatherGameAction = {
               type: 'submit_scenario',
-              data: { 
+              data: {
                 optionA: `Round ${round} Option A${index}`,
-                optionB: `Round ${round} Option B${index}`
+                optionB: `Round ${round} Option B${index}`,
               },
               playerId,
               timestamp: new Date(),
@@ -450,16 +462,18 @@ describe('WouldYouRatherGame', () => {
 
         // Vote on all scenarios in the round
         const gameState = game.getGameState();
-        const scenarios = gameState.scenarios.filter(s => s.round === round);
-        
-        scenarios.forEach(scenario => {
-          const voters = gameSession.players.filter(p => p.id !== scenario.submittedBy);
-          voters.forEach(voter => {
+        const scenarios = gameState.scenarios.filter((s) => s.round === round);
+
+        scenarios.forEach((scenario) => {
+          const voters = gameSession.players.filter(
+            (p) => p.id !== scenario.submittedBy
+          );
+          voters.forEach((voter) => {
             const action: WouldYouRatherGameAction = {
               type: 'submit_vote',
-              data: { 
+              data: {
                 scenarioId: scenario.id,
-                choice: 'A'
+                choice: 'A',
               },
               playerId: voter.id,
               timestamp: new Date(),
@@ -482,9 +496,9 @@ describe('WouldYouRatherGame', () => {
       players.forEach((playerId, index) => {
         const action: WouldYouRatherGameAction = {
           type: 'submit_scenario',
-          data: { 
+          data: {
             optionA: `Option A${index}`,
-            optionB: `Option B${index}`
+            optionB: `Option B${index}`,
           },
           playerId,
           timestamp: new Date(),
@@ -496,15 +510,17 @@ describe('WouldYouRatherGame', () => {
     test('should award points for scenario creation and voting', () => {
       const gameState = game.getGameState();
       const firstScenario = gameState.scenarios[0];
-      
+
       // Vote on first scenario
-      const voters = gameSession.players.filter(p => p.id !== firstScenario.submittedBy);
-      voters.forEach(voter => {
+      const voters = gameSession.players.filter(
+        (p) => p.id !== firstScenario.submittedBy
+      );
+      voters.forEach((voter) => {
         const action: WouldYouRatherGameAction = {
           type: 'submit_vote',
-          data: { 
+          data: {
             scenarioId: firstScenario.id,
-            choice: 'A'
+            choice: 'A',
           },
           playerId: voter.id,
           timestamp: new Date(),
@@ -513,28 +529,30 @@ describe('WouldYouRatherGame', () => {
       });
 
       const newGameState = game.getGameState();
-      
+
       // Scenario creator should get points for votes received
       expect(newGameState.scores[firstScenario.submittedBy]).toBeGreaterThan(0);
-      
+
       // Voters should get points for participating
-      voters.forEach(voter => {
+      voters.forEach((voter) => {
         expect(newGameState.scores[voter.id]).toBeGreaterThan(0);
       });
     });
 
     test('should accumulate scores across multiple scenarios', () => {
       const gameState = game.getGameState();
-      
+
       // Vote on all scenarios
-      gameState.scenarios.forEach(scenario => {
-        const voters = gameSession.players.filter(p => p.id !== scenario.submittedBy);
-        voters.forEach(voter => {
+      gameState.scenarios.forEach((scenario) => {
+        const voters = gameSession.players.filter(
+          (p) => p.id !== scenario.submittedBy
+        );
+        voters.forEach((voter) => {
           const action: WouldYouRatherGameAction = {
             type: 'submit_vote',
-            data: { 
+            data: {
               scenarioId: scenario.id,
-              choice: 'A'
+              choice: 'A',
             },
             playerId: voter.id,
             timestamp: new Date(),
@@ -544,9 +562,9 @@ describe('WouldYouRatherGame', () => {
       });
 
       const finalGameState = game.getGameState();
-      
+
       // All players should have some points
-      Object.values(finalGameState.scores).forEach(score => {
+      Object.values(finalGameState.scores).forEach((score) => {
         expect(score).toBeGreaterThan(0);
       });
     });
@@ -561,9 +579,9 @@ describe('WouldYouRatherGame', () => {
           players.forEach((playerId, index) => {
             const action: WouldYouRatherGameAction = {
               type: 'submit_scenario',
-              data: { 
+              data: {
                 optionA: `Round ${round} Option A${index}`,
-                optionB: `Round ${round} Option B${index}`
+                optionB: `Round ${round} Option B${index}`,
               },
               playerId,
               timestamp: new Date(),
@@ -573,16 +591,18 @@ describe('WouldYouRatherGame', () => {
         }
 
         const gameState = game.getGameState();
-        const scenarios = gameState.scenarios.filter(s => s.round === round);
-        
-        scenarios.forEach(scenario => {
-          const voters = gameSession.players.filter(p => p.id !== scenario.submittedBy);
-          voters.forEach(voter => {
+        const scenarios = gameState.scenarios.filter((s) => s.round === round);
+
+        scenarios.forEach((scenario) => {
+          const voters = gameSession.players.filter(
+            (p) => p.id !== scenario.submittedBy
+          );
+          voters.forEach((voter) => {
             const action: WouldYouRatherGameAction = {
               type: 'submit_vote',
-              data: { 
+              data: {
                 scenarioId: scenario.id,
-                choice: 'A'
+                choice: 'A',
               },
               playerId: voter.id,
               timestamp: new Date(),
@@ -605,10 +625,10 @@ describe('WouldYouRatherGame', () => {
       gameState.scores['player-0'] = 10;
       gameState.scores['player-1'] = 15;
       gameState.scores['player-2'] = 5;
-      
+
       // Force game to complete
       game['gameState'].currentPhase = 'results';
-      
+
       const winner = game.getWinner();
       expect(winner).toBe('player-1');
     });
@@ -639,9 +659,9 @@ describe('WouldYouRatherGame', () => {
       players.forEach((playerId, index) => {
         const action: WouldYouRatherGameAction = {
           type: 'submit_scenario',
-          data: { 
+          data: {
             optionA: `Option A${index}`,
-            optionB: `Option B${index}`
+            optionB: `Option B${index}`,
           },
           playerId,
           timestamp: new Date(),
@@ -651,9 +671,9 @@ describe('WouldYouRatherGame', () => {
 
       const action: WouldYouRatherGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           scenarioId: '',
-          choice: 'A'
+          choice: 'A',
         },
         playerId: 'player-1',
         timestamp: new Date(),
@@ -670,9 +690,9 @@ describe('WouldYouRatherGame', () => {
       players.forEach((playerId, index) => {
         const action: WouldYouRatherGameAction = {
           type: 'submit_scenario',
-          data: { 
+          data: {
             optionA: `Option A${index}`,
-            optionB: `Option B${index}`
+            optionB: `Option B${index}`,
           },
           playerId,
           timestamp: new Date(),
@@ -683,9 +703,9 @@ describe('WouldYouRatherGame', () => {
       const gameState = game.getGameState();
       const action: WouldYouRatherGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           scenarioId: gameState.currentScenario!.id,
-          choice: '' as any
+          choice: '' as any,
         },
         playerId: 'player-1',
         timestamp: new Date(),
@@ -711,7 +731,7 @@ describe('WouldYouRatherGame', () => {
 
       const emptyGame = new WouldYouRatherGame(emptySession);
       const gameState = emptyGame.getGameState();
-      
+
       expect(Object.keys(gameState.scores)).toHaveLength(0);
       expect(gameState.scenarios).toHaveLength(0);
     });
@@ -729,9 +749,9 @@ describe('WouldYouRatherGame', () => {
       players.forEach((playerId, index) => {
         const action: WouldYouRatherGameAction = {
           type: 'submit_scenario',
-          data: { 
+          data: {
             optionA: `Option A${index}`,
-            optionB: `Option B${index}`
+            optionB: `Option B${index}`,
           },
           playerId,
           timestamp: new Date(),
@@ -745,14 +765,16 @@ describe('WouldYouRatherGame', () => {
       expect(gameState.currentScenario).toBeDefined();
 
       // Complete voting on all scenarios
-      gameState.scenarios.forEach(scenario => {
-        const voters = gameSession.players.filter(p => p.id !== scenario.submittedBy);
-        voters.forEach(voter => {
+      gameState.scenarios.forEach((scenario) => {
+        const voters = gameSession.players.filter(
+          (p) => p.id !== scenario.submittedBy
+        );
+        voters.forEach((voter) => {
           const action: WouldYouRatherGameAction = {
             type: 'submit_vote',
-            data: { 
+            data: {
               scenarioId: scenario.id,
-              choice: 'A'
+              choice: 'A',
             },
             playerId: voter.id,
             timestamp: new Date(),
@@ -772,9 +794,9 @@ describe('WouldYouRatherGame', () => {
       players.forEach((playerId, index) => {
         const action: WouldYouRatherGameAction = {
           type: 'submit_scenario',
-          data: { 
+          data: {
             optionA: `Option A${index}`,
-            optionB: `Option B${index}`
+            optionB: `Option B${index}`,
           },
           playerId,
           timestamp: new Date(),
@@ -789,9 +811,9 @@ describe('WouldYouRatherGame', () => {
       // Submit one vote
       const action: WouldYouRatherGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           scenarioId: gameState.currentScenario!.id,
-          choice: 'A'
+          choice: 'A',
         },
         playerId: 'player-1',
         timestamp: new Date(),
@@ -803,4 +825,4 @@ describe('WouldYouRatherGame', () => {
       expect(gameState.votingProgress!.total).toBe(2);
     });
   });
-}); 
+});

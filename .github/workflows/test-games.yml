@@ -23,40 +23,40 @@ jobs:
   test-two-truths:
     name: 🎭 Two Truths and a Lie
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-        
+
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: 🔧 Install dependencies
         run: npm ci
-        
+
       - name: 🎭 Test game initialization
         run: |
           cd backend
           npm test -- --testNamePattern="TwoTruthsAndALie.*initialization"
-          
+
       - name: 📝 Test statement submission
         run: |
           cd backend
           npm test -- --testNamePattern="TwoTruthsAndALie.*statement.*submission"
-          
+
       - name: 🗳️ Test voting mechanics
         run: |
           cd backend
           npm test -- --testNamePattern="TwoTruthsAndALie.*voting"
-          
+
       - name: 🏆 Test scoring system
         run: |
           cd backend
           npm test -- --testNamePattern="TwoTruthsAndALie.*scoring"
-          
+
       - name: 🎯 Test game completion
         run: |
           cd backend
@@ -88,40 +88,40 @@ jobs:
   test-would-you-rather:
     name: 🤔 Would You Rather
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-        
+
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: 🔧 Install dependencies
         run: npm ci
-        
+
       - name: 🤔 Test scenario creation
         run: |
           cd backend
           npm test -- --testNamePattern="WouldYouRather.*scenario.*creation"
-          
+
       - name: 🔄 Test round progression
         run: |
           cd backend
           npm test -- --testNamePattern="WouldYouRather.*round.*progression"
-          
+
       - name: 🗳️ Test voting phases
         run: |
           cd backend
           npm test -- --testNamePattern="WouldYouRather.*voting.*phase"
-          
+
       - name: 📊 Test results calculation
         run: |
           cd backend
           npm test -- --testNamePattern="WouldYouRather.*results"
-          
+
       - name: 🏁 Test multi-round completion
         run: |
           cd backend
@@ -153,45 +153,45 @@ jobs:
   test-quick-draw:
     name: 🎨 Quick Draw
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-        
+
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: 🔧 Install dependencies
         run: npm ci
-        
+
       - name: 🎨 Test drawing mechanics
         run: |
           cd backend
           npm test -- --testNamePattern="QuickDraw.*drawing.*mechanics"
-          
+
       - name: ⏱️ Test round timing
         run: |
           cd backend
           npm test -- --testNamePattern="QuickDraw.*timing"
-          
+
       - name: 🎯 Test guess processing
         run: |
           cd backend
           npm test -- --testNamePattern="QuickDraw.*guess.*processing"
-          
+
       - name: 🖌️ Test canvas operations
         run: |
           cd backend
           npm test -- --testNamePattern="QuickDraw.*canvas"
-          
+
       - name: 📝 Test word prompts
         run: |
           cd backend
           npm test -- --testNamePattern="QuickDraw.*prompt"
-          
+
       - name: 🏆 Test scoring algorithm
         run: |
           cd backend
@@ -225,35 +225,35 @@ jobs:
     name: 🔗 Game Integration
     runs-on: ubuntu-latest
     needs: [test-two-truths, test-would-you-rather, test-quick-draw]
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-        
+
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: 🔧 Install dependencies
         run: npm ci
-        
+
       - name: 🔗 Test lobby system integration
         run: |
           cd backend
           npm test -- --testNamePattern="lobby.*game.*integration"
-          
+
       - name: 📡 Test WebSocket game switching
         run: |
           cd backend
           npm test -- --testNamePattern="websocket.*game.*switching"
-          
+
       - name: 👥 Test multi-player scenarios
         run: |
           cd backend
           npm test -- --testNamePattern="multi.*player.*scenarios"
-          
+
       - name: 🎮 Test game state persistence
         run: |
           cd backend
@@ -301,20 +301,20 @@ jobs:
   test-performance:
     name: ⚡ Performance Tests
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-        
+
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: 🔧 Install dependencies
         run: npm ci
-        
+
       - name: ⚡ Test WebSocket performance
         run: |
           echo "🚀 Testing WebSocket performance..."
@@ -322,25 +322,25 @@ jobs:
           cd backend && npm start &
           BACKEND_PID=$!
           sleep 5
-          
+
           # Install performance testing tools
           npm install -g wscat
-          
+
           # Test concurrent connections (simulate 10 players)
           for i in {1..10}; do
             timeout 5s wscat -c ws://localhost:3001 &
           done
           wait
-          
+
           # Cleanup
           kill $BACKEND_PID
-          
+
       - name: 🎨 Test canvas data throughput
         run: |
           echo "🎨 Testing canvas data throughput..."
           cd backend
           npm test -- --testNamePattern="performance.*canvas.*throughput"
-          
+
       - name: 📊 Test concurrent game sessions
         run: |
           echo "🎲 Testing concurrent game sessions..."
@@ -353,40 +353,40 @@ jobs:
   test-frontend-games:
     name: 🎨 Frontend Game Components
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-        
+
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: 🔧 Install dependencies
         run: npm ci
-        
+
       - name: 🎭 Test Two Truths component
         run: |
           cd frontend
           npm test -- --testNamePattern="TwoTruthsAndALie"
-          
+
       - name: 🤔 Test Would You Rather component
         run: |
           cd frontend
           npm test -- --testNamePattern="WouldYouRather"
-          
+
       - name: 🎨 Test Quick Draw component
         run: |
           cd frontend
           npm test -- --testNamePattern="QuickDraw"
-          
+
       - name: 🖌️ Test Drawing Canvas component
         run: |
           cd frontend
           npm test -- --testNamePattern="DrawingCanvas"
-          
+
       - name: 🎮 Test Game Page routing
         run: |
           cd frontend
@@ -398,9 +398,17 @@ jobs:
   game-test-summary:
     name: 📊 Game Test Summary
     runs-on: ubuntu-latest
-    needs: [test-two-truths, test-would-you-rather, test-quick-draw, test-game-integration, test-performance, test-frontend-games]
+    needs:
+      [
+        test-two-truths,
+        test-would-you-rather,
+        test-quick-draw,
+        test-game-integration,
+        test-performance,
+        test-frontend-games,
+      ]
     if: always()
-    
+
     steps:
       - name: 📊 Generate test summary
         run: |
@@ -413,7 +421,7 @@ jobs:
           echo "⚡ Performance Tests: ${{ needs.test-performance.result }}"
           echo "🎨 Frontend Components: ${{ needs.test-frontend-games.result }}"
           echo "=================================="
-          
+
           if [[ "${{ needs.test-two-truths.result }}" == "success" && 
                 "${{ needs.test-would-you-rather.result }}" == "success" && 
                 "${{ needs.test-quick-draw.result }}" == "success" && 
@@ -424,4 +432,4 @@ jobs:
           else
             echo "❌ Some game tests failed. Check the logs above."
             exit 1
-          fi 
+          fi

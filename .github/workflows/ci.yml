@@ -552,56 +552,56 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Check | Status | Action Required |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|-----------------|" >> $GITHUB_STEP_SUMMARY
-          
+
           # Code Quality
           if [ "${{ needs.code-quality.result }}" = "success" ]; then
             echo "| 🔍 Code Quality | ✅ Passed | None |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| 🔍 Code Quality | ❌ ${{ needs.code-quality.result }} | Fix linting/formatting issues |" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           # Backend
           if [ "${{ needs.backend.result }}" = "success" ]; then
             echo "| 🖥️ Backend Tests | ✅ Passed | None |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| 🖥️ Backend Tests | ❌ ${{ needs.backend.result }} | Fix failing backend tests |" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           # Frontend
           if [ "${{ needs.frontend.result }}" = "success" ]; then
             echo "| 🎨 Frontend Tests | ✅ Passed | None |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| 🎨 Frontend Tests | ❌ ${{ needs.frontend.result }} | Fix failing frontend tests |" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           # Integration
           if [ "${{ needs.integration.result }}" = "success" ]; then
             echo "| 🔗 Integration Tests | ✅ Passed | None |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| 🔗 Integration Tests | ❌ ${{ needs.integration.result }} | Fix API/WebSocket integration |" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           # Game Logic
           if [ "${{ needs.game-logic.result }}" = "success" ]; then
             echo "| 🎲 Game Logic Tests | ✅ Passed | None |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| 🎲 Game Logic Tests | ❌ ${{ needs.game-logic.result }} | Fix game-specific logic |" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           # Security
           if [ "${{ needs.security.result }}" = "success" ]; then
             echo "| 🔒 Security Scan | ✅ Passed | None |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| 🔒 Security Scan | ❌ ${{ needs.security.result }} | Address security vulnerabilities |" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           # E2E Tests
           if [ "${{ needs.e2e-tests.result }}" = "success" ]; then
             echo "| 🎭 E2E Tests | ✅ Passed | None |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| 🎭 E2E Tests | ❌ ${{ needs.e2e-tests.result }} | Fix end-to-end test failures |" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## 🔧 Troubleshooting Steps" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY

@@ -1,5 +1,9 @@
 import { TwoTruthsAndALieGame } from '../games/TwoTruthsAndALie';
-import { GameSession, Player, TwoTruthsGameAction } from '../../../shared/types';
+import {
+  GameSession,
+  Player,
+  TwoTruthsGameAction,
+} from '../../../shared/types';
 
 describe('TwoTruthsAndALieGame', () => {
   let gameSession: GameSession;
@@ -37,7 +41,7 @@ describe('TwoTruthsAndALieGame', () => {
   describe('Constructor and Initialization', () => {
     test('should initialize with correct game state', () => {
       const gameState = game.getCurrentState();
-      
+
       expect(gameState.phase).toBe('submitting');
       expect(gameState.submissions).toHaveLength(0);
       expect(gameState.votes).toHaveLength(0);
@@ -51,7 +55,7 @@ describe('TwoTruthsAndALieGame', () => {
       const fourPlayerSession = createMockGameSession(4);
       const fourPlayerGame = new TwoTruthsAndALieGame(fourPlayerSession);
       const gameState = fourPlayerGame.getCurrentState();
-      
+
       expect(Object.keys(gameState.scores)).toHaveLength(4);
     });
 
@@ -59,7 +63,7 @@ describe('TwoTruthsAndALieGame', () => {
       const singlePlayerSession = createMockGameSession(1);
       const singlePlayerGame = new TwoTruthsAndALieGame(singlePlayerSession);
       const gameState = singlePlayerGame.getCurrentState();
-      
+
       expect(Object.keys(gameState.scores)).toHaveLength(1);
     });
   });
@@ -74,7 +78,7 @@ describe('TwoTruthsAndALieGame', () => {
       };
 
       const result = game.handleAction(action);
-      
+
       expect(result.success).toBe(true);
       expect(result.error).toBeUndefined();
       expect(game.hasPlayerSubmitted('player-0')).toBe(true);
@@ -89,7 +93,7 @@ describe('TwoTruthsAndALieGame', () => {
       };
 
       const result = game.handleAction(action);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Must submit exactly 3 statements');
     });
@@ -103,7 +107,7 @@ describe('TwoTruthsAndALieGame', () => {
       };
 
       const result = game.handleAction(action);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('All statements must be non-empty');
     });
@@ -117,7 +121,7 @@ describe('TwoTruthsAndALieGame', () => {
       };
 
       const result = game.handleAction(action);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('All statements must be non-empty');
     });
@@ -132,7 +136,7 @@ describe('TwoTruthsAndALieGame', () => {
 
       game.handleAction(action);
       const result = game.handleAction(action);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Already submitted statements');
     });
@@ -147,8 +151,10 @@ describe('TwoTruthsAndALieGame', () => {
 
       game.handleAction(action);
       const gameState = game.getCurrentState();
-      const submission = gameState.submissions.find(s => s.playerId === 'player-0');
-      
+      const submission = gameState.submissions.find(
+        (s) => s.playerId === 'player-0'
+      );
+
       expect(submission?.statements[0].text).toBe('Truth 1');
       expect(submission?.statements[1].text).toBe('Truth 2');
       expect(submission?.statements[2].text).toBe('Lie 1');
@@ -156,11 +162,13 @@ describe('TwoTruthsAndALieGame', () => {
 
     test('should transition to voting phase when all players submit', () => {
       const players = ['player-0', 'player-1', 'player-2'];
-      
+
       players.forEach((playerId, index) => {
         const action: TwoTruthsGameAction = {
           type: 'submit_statements',
-          data: { statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`] },
+          data: {
+            statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`],
+          },
           playerId,
           timestamp: new Date(),
         };
@@ -182,10 +190,14 @@ describe('TwoTruthsAndALieGame', () => {
 
       game.handleAction(action);
       const gameState = game.getCurrentState();
-      const submission = gameState.submissions.find(s => s.playerId === 'player-0');
-      
+      const submission = gameState.submissions.find(
+        (s) => s.playerId === 'player-0'
+      );
+
       // In submission phase, isLie should be undefined (hidden)
-      expect(submission?.statements.every(s => s.isLie === undefined)).toBe(true);
+      expect(submission?.statements.every((s) => s.isLie === undefined)).toBe(
+        true
+      );
     });
   });
 
@@ -196,7 +208,9 @@ describe('TwoTruthsAndALieGame', () => {
       players.forEach((playerId, index) => {
         const action: TwoTruthsGameAction = {
           type: 'submit_statements',
-          data: { statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`] },
+          data: {
+            statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`],
+          },
           playerId,
           timestamp: new Date(),
         };
@@ -206,21 +220,23 @@ describe('TwoTruthsAndALieGame', () => {
 
     test('should handle valid vote submission', () => {
       const gameState = game.getCurrentState();
-      const targetSubmission = gameState.submissions.find(s => s.playerId === 'player-0');
+      const targetSubmission = gameState.submissions.find(
+        (s) => s.playerId === 'player-0'
+      );
       const statementId = targetSubmission!.statements[0].id;
 
       const action: TwoTruthsGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           selectedStatementId: statementId,
-          targetPlayerId: 'player-0'
+          targetPlayerId: 'player-0',
         },
         playerId: 'player-1',
         timestamp: new Date(),
       };
 
       const result = game.handleAction(action);
-      
+
       expect(result.success).toBe(true);
       expect(game.hasPlayerVoted('player-1', 'player-0')).toBe(true);
     });
@@ -228,54 +244,58 @@ describe('TwoTruthsAndALieGame', () => {
     test('should reject vote when not in voting phase', () => {
       // Create new game in submission phase
       const newGame = new TwoTruthsAndALieGame(gameSession);
-      
+
       const action: TwoTruthsGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           selectedStatementId: 'some-id',
-          targetPlayerId: 'player-0'
+          targetPlayerId: 'player-0',
         },
         playerId: 'player-1',
         timestamp: new Date(),
       };
 
       const result = newGame.handleAction(action);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Not in voting phase');
     });
 
     test('should reject vote on own statements', () => {
       const gameState = game.getCurrentState();
-      const targetSubmission = gameState.submissions.find(s => s.playerId === 'player-0');
+      const targetSubmission = gameState.submissions.find(
+        (s) => s.playerId === 'player-0'
+      );
       const statementId = targetSubmission!.statements[0].id;
 
       const action: TwoTruthsGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           selectedStatementId: statementId,
-          targetPlayerId: 'player-0'
+          targetPlayerId: 'player-0',
         },
         playerId: 'player-0', // Same player
         timestamp: new Date(),
       };
 
       const result = game.handleAction(action);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Cannot vote on your own statements');
     });
 
     test('should reject duplicate vote from same player on same target', () => {
       const gameState = game.getCurrentState();
-      const targetSubmission = gameState.submissions.find(s => s.playerId === 'player-0');
+      const targetSubmission = gameState.submissions.find(
+        (s) => s.playerId === 'player-0'
+      );
       const statementId = targetSubmission!.statements[0].id;
 
       const action: TwoTruthsGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           selectedStatementId: statementId,
-          targetPlayerId: 'player-0'
+          targetPlayerId: 'player-0',
         },
         playerId: 'player-1',
         timestamp: new Date(),
@@ -283,28 +303,30 @@ describe('TwoTruthsAndALieGame', () => {
 
       game.handleAction(action);
       const result = game.handleAction(action);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Already voted for this player');
     });
 
     test('should reject vote for wrong target player', () => {
       const gameState = game.getCurrentState();
-      const targetSubmission = gameState.submissions.find(s => s.playerId === 'player-1');
+      const targetSubmission = gameState.submissions.find(
+        (s) => s.playerId === 'player-1'
+      );
       const statementId = targetSubmission!.statements[0].id;
 
       const action: TwoTruthsGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           selectedStatementId: statementId,
-          targetPlayerId: 'player-1' // Not current target
+          targetPlayerId: 'player-1', // Not current target
         },
         playerId: 'player-2',
         timestamp: new Date(),
       };
 
       const result = game.handleAction(action);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Not voting on the current player');
     });
@@ -312,31 +334,33 @@ describe('TwoTruthsAndALieGame', () => {
     test('should reject vote with invalid statement ID', () => {
       const action: TwoTruthsGameAction = {
         type: 'submit_vote',
-        data: { 
+        data: {
           selectedStatementId: 'invalid-id',
-          targetPlayerId: 'player-0'
+          targetPlayerId: 'player-0',
         },
         playerId: 'player-1',
         timestamp: new Date(),
       };
 
       const result = game.handleAction(action);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Invalid statement selection');
     });
 
     test('should progress through all voting targets', () => {
       const gameState = game.getCurrentState();
-      
+
       // Vote on player-0 (current target)
-      const submission0 = gameState.submissions.find(s => s.playerId === 'player-0');
-      ['player-1', 'player-2'].forEach(voterId => {
+      const submission0 = gameState.submissions.find(
+        (s) => s.playerId === 'player-0'
+      );
+      ['player-1', 'player-2'].forEach((voterId) => {
         const action: TwoTruthsGameAction = {
           type: 'submit_vote',
-          data: { 
+          data: {
             selectedStatementId: submission0!.statements[0].id,
-            targetPlayerId: 'player-0'
+            targetPlayerId: 'player-0',
           },
           playerId: voterId,
           timestamp: new Date(),
@@ -351,19 +375,21 @@ describe('TwoTruthsAndALieGame', () => {
 
     test('should complete voting and move to results', () => {
       const gameState = game.getCurrentState();
-      
+
       // Vote on all players
       for (let targetIndex = 0; targetIndex < 3; targetIndex++) {
         const targetId = `player-${targetIndex}`;
-        const submission = gameState.submissions.find(s => s.playerId === targetId);
-        
-        const voters = gameSession.players.filter(p => p.id !== targetId);
-        voters.forEach(voter => {
+        const submission = gameState.submissions.find(
+          (s) => s.playerId === targetId
+        );
+
+        const voters = gameSession.players.filter((p) => p.id !== targetId);
+        voters.forEach((voter) => {
           const action: TwoTruthsGameAction = {
             type: 'submit_vote',
-            data: { 
+            data: {
               selectedStatementId: submission!.statements[0].id,
-              targetPlayerId: targetId
+              targetPlayerId: targetId,
             },
             playerId: voter.id,
             timestamp: new Date(),
@@ -385,7 +411,9 @@ describe('TwoTruthsAndALieGame', () => {
       players.forEach((playerId, index) => {
         const action: TwoTruthsGameAction = {
           type: 'submit_statements',
-          data: { statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`] },
+          data: {
+            statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`],
+          },
           playerId,
           timestamp: new Date(),
         };
@@ -395,20 +423,24 @@ describe('TwoTruthsAndALieGame', () => {
 
     test('should award points for correct guesses', () => {
       const gameState = game.getCurrentState();
-      
+
       // Complete all voting with some correct guesses
       for (let targetIndex = 0; targetIndex < 3; targetIndex++) {
         const targetId = `player-${targetIndex}`;
-        const submission = gameState.submissions.find(s => s.playerId === targetId);
-        const lieStatement = submission!.statements.find(s => s.isLie !== undefined);
-        
-        const voters = gameSession.players.filter(p => p.id !== targetId);
-        voters.forEach(voter => {
+        const submission = gameState.submissions.find(
+          (s) => s.playerId === targetId
+        );
+        const lieStatement = submission!.statements.find(
+          (s) => s.isLie !== undefined
+        );
+
+        const voters = gameSession.players.filter((p) => p.id !== targetId);
+        voters.forEach((voter) => {
           const action: TwoTruthsGameAction = {
             type: 'submit_vote',
-            data: { 
+            data: {
               selectedStatementId: lieStatement!.id, // Vote for the lie (correct)
-              targetPlayerId: targetId
+              targetPlayerId: targetId,
             },
             playerId: voter.id,
             timestamp: new Date(),
@@ -419,25 +451,31 @@ describe('TwoTruthsAndALieGame', () => {
 
       const finalGameState = game.getCurrentState();
       // Each player should have some points from correct guesses
-      expect(Object.values(finalGameState.scores).every(score => score >= 0)).toBe(true);
+      expect(
+        Object.values(finalGameState.scores).every((score) => score >= 0)
+      ).toBe(true);
     });
 
     test('should award points for fooling others', () => {
       const gameState = game.getCurrentState();
-      
+
       // Complete voting with some incorrect guesses
       for (let targetIndex = 0; targetIndex < 3; targetIndex++) {
         const targetId = `player-${targetIndex}`;
-        const submission = gameState.submissions.find(s => s.playerId === targetId);
-        const truthStatement = submission!.statements.find(s => s.isLie === undefined);
-        
-        const voters = gameSession.players.filter(p => p.id !== targetId);
-        voters.forEach(voter => {
+        const submission = gameState.submissions.find(
+          (s) => s.playerId === targetId
+        );
+        const truthStatement = submission!.statements.find(
+          (s) => s.isLie === undefined
+        );
+
+        const voters = gameSession.players.filter((p) => p.id !== targetId);
+        voters.forEach((voter) => {
           const action: TwoTruthsGameAction = {
             type: 'submit_vote',
-            data: { 
+            data: {
               selectedStatementId: truthStatement!.id, // Vote for truth (incorrect)
-              targetPlayerId: targetId
+              targetPlayerId: targetId,
             },
             playerId: voter.id,
             timestamp: new Date(),
@@ -447,7 +485,9 @@ describe('TwoTruthsAndALieGame', () => {
       }
 
       const finalGameState = game.getCurrentState();
-      expect(Object.values(finalGameState.scores).every(score => score >= 0)).toBe(true);
+      expect(
+        Object.values(finalGameState.scores).every((score) => score >= 0)
+      ).toBe(true);
     });
   });
 
@@ -458,7 +498,9 @@ describe('TwoTruthsAndALieGame', () => {
       players.forEach((playerId, index) => {
         const action: TwoTruthsGameAction = {
           type: 'submit_statements',
-          data: { statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`] },
+          data: {
+            statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`],
+          },
           playerId,
           timestamp: new Date(),
         };
@@ -469,15 +511,17 @@ describe('TwoTruthsAndALieGame', () => {
       const gameState = game.getCurrentState();
       for (let targetIndex = 0; targetIndex < 3; targetIndex++) {
         const targetId = `player-${targetIndex}`;
-        const submission = gameState.submissions.find(s => s.playerId === targetId);
-        
-        const voters = gameSession.players.filter(p => p.id !== targetId);
-        voters.forEach(voter => {
+        const submission = gameState.submissions.find(
+          (s) => s.playerId === targetId
+        );
+
+        const voters = gameSession.players.filter((p) => p.id !== targetId);
+        voters.forEach((voter) => {
           const action: TwoTruthsGameAction = {
             type: 'submit_vote',
-            data: { 
+            data: {
               selectedStatementId: submission!.statements[0].id,
-              targetPlayerId: targetId
+              targetPlayerId: targetId,
             },
             playerId: voter.id,
             timestamp: new Date(),
@@ -499,7 +543,9 @@ describe('TwoTruthsAndALieGame', () => {
       players.forEach((playerId, index) => {
         const action: TwoTruthsGameAction = {
           type: 'submit_statements',
-          data: { statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`] },
+          data: {
+            statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`],
+          },
           playerId,
           timestamp: new Date(),
         };
@@ -509,15 +555,17 @@ describe('TwoTruthsAndALieGame', () => {
       const gameState = game.getCurrentState();
       for (let targetIndex = 0; targetIndex < 3; targetIndex++) {
         const targetId = `player-${targetIndex}`;
-        const submission = gameState.submissions.find(s => s.playerId === targetId);
-        
-        const voters = gameSession.players.filter(p => p.id !== targetId);
-        voters.forEach(voter => {
+        const submission = gameState.submissions.find(
+          (s) => s.playerId === targetId
+        );
+
+        const voters = gameSession.players.filter((p) => p.id !== targetId);
+        voters.forEach((voter) => {
           const action: TwoTruthsGameAction = {
             type: 'submit_vote',
-            data: { 
+            data: {
               selectedStatementId: submission!.statements[0].id,
-              targetPlayerId: targetId
+              targetPlayerId: targetId,
             },
             playerId: voter.id,
             timestamp: new Date(),
@@ -544,7 +592,7 @@ describe('TwoTruthsAndALieGame', () => {
       } as any;
 
       const result = game.handleAction(action);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Invalid action type');
     });
@@ -558,7 +606,7 @@ describe('TwoTruthsAndALieGame', () => {
       };
 
       const result = game.handleAction(action);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('Must submit exactly 3 statements');
     });
@@ -567,7 +615,7 @@ describe('TwoTruthsAndALieGame', () => {
       expect(game.hasPlayerSubmitted('player-0')).toBe(false);
       expect(game.hasPlayerVoted('player-0', 'player-1')).toBe(false);
       expect(game.isComplete()).toBe(false);
-      
+
       const gameState = game.getCurrentState();
       expect(gameState.phase).toBe('submitting');
     });
@@ -587,7 +635,7 @@ describe('TwoTruthsAndALieGame', () => {
 
       const emptyGame = new TwoTruthsAndALieGame(emptySession);
       const gameState = emptyGame.getCurrentState();
-      
+
       expect(Object.keys(gameState.scores)).toHaveLength(0);
       expect(gameState.submissions).toHaveLength(0);
     });
@@ -605,7 +653,9 @@ describe('TwoTruthsAndALieGame', () => {
       players.forEach((playerId, index) => {
         const action: TwoTruthsGameAction = {
           type: 'submit_statements',
-          data: { statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`] },
+          data: {
+            statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`],
+          },
           playerId,
           timestamp: new Date(),
         };
@@ -620,15 +670,17 @@ describe('TwoTruthsAndALieGame', () => {
       // Complete voting
       for (let targetIndex = 0; targetIndex < 3; targetIndex++) {
         const targetId = `player-${targetIndex}`;
-        const submission = gameState.submissions.find(s => s.playerId === targetId);
-        
-        const voters = gameSession.players.filter(p => p.id !== targetId);
-        voters.forEach(voter => {
+        const submission = gameState.submissions.find(
+          (s) => s.playerId === targetId
+        );
+
+        const voters = gameSession.players.filter((p) => p.id !== targetId);
+        voters.forEach((voter) => {
           const action: TwoTruthsGameAction = {
             type: 'submit_vote',
-            data: { 
+            data: {
               selectedStatementId: submission!.statements[0].id,
-              targetPlayerId: targetId
+              targetPlayerId: targetId,
             },
             playerId: voter.id,
             timestamp: new Date(),
@@ -652,10 +704,14 @@ describe('TwoTruthsAndALieGame', () => {
 
       game.handleAction(action);
       const gameState = game.getCurrentState();
-      const submission = gameState.submissions.find(s => s.playerId === 'player-0');
-      
+      const submission = gameState.submissions.find(
+        (s) => s.playerId === 'player-0'
+      );
+
       // During submission phase, isLie should be undefined
-      expect(submission?.statements.every(s => s.isLie === undefined)).toBe(true);
+      expect(submission?.statements.every((s) => s.isLie === undefined)).toBe(
+        true
+      );
     });
   });
-}); 
+});

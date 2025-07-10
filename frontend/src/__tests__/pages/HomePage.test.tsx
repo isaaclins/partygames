@@ -5,24 +5,36 @@ import HomePage from '../../pages/HomePage';
 
 // Mock the StateTest component since it's only used in development
 vi.mock('../../components/StateTest', () => ({
-  StateTest: () => <div data-testid="state-test">State Test Component</div>,
+  StateTest: () => <div data-testid='state-test'>State Test Component</div>,
 }));
 
 // Mock icons from lucide-react
 vi.mock('lucide-react', () => ({
-  Users: ({ className }: { className?: string }) => <div className={className} data-testid="users-icon">Users</div>,
-  Plus: ({ className }: { className?: string }) => <div className={className} data-testid="plus-icon">Plus</div>,
-  Gamepad2: ({ className }: { className?: string }) => <div className={className} data-testid="gamepad2-icon">Gamepad2</div>,
-  Zap: ({ className }: { className?: string }) => <div className={className} data-testid="zap-icon">Zap</div>,
+  Users: ({ className }: { className?: string }) => (
+    <div className={className} data-testid='users-icon'>
+      Users
+    </div>
+  ),
+  Plus: ({ className }: { className?: string }) => (
+    <div className={className} data-testid='plus-icon'>
+      Plus
+    </div>
+  ),
+  Gamepad2: ({ className }: { className?: string }) => (
+    <div className={className} data-testid='gamepad2-icon'>
+      Gamepad2
+    </div>
+  ),
+  Zap: ({ className }: { className?: string }) => (
+    <div className={className} data-testid='zap-icon'>
+      Zap
+    </div>
+  ),
 }));
 
 // Helper to render with router
 const renderWithRouter = (component: React.ReactElement) => {
-  return render(
-    <BrowserRouter>
-      {component}
-    </BrowserRouter>
-  );
+  return render(<BrowserRouter>{component}</BrowserRouter>);
 };
 
 describe('HomePage Component', () => {
@@ -43,7 +55,11 @@ describe('HomePage Component', () => {
 
     test('renders the hero section with description', () => {
       renderWithRouter(<HomePage />);
-      expect(screen.getByText('Real-time multiplayer games for you and your friends. Create a lobby or join an existing game to get started.')).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          'Real-time multiplayer games for you and your friends. Create a lobby or join an existing game to get started.'
+        )
+      ).toBeInTheDocument();
     });
 
     test('renders the gamepad icon in hero section', () => {
@@ -61,13 +77,27 @@ describe('HomePage Component', () => {
   describe('Hero Section', () => {
     test('displays the main icon with proper styling', () => {
       renderWithRouter(<HomePage />);
-      const iconContainer = screen.getByTestId('gamepad2-icon').closest('.w-20');
-      expect(iconContainer).toHaveClass('w-20', 'h-20', 'bg-primary-600', 'rounded-2xl', 'flex', 'items-center', 'justify-center', 'mx-auto', 'mb-4');
+      const iconContainer = screen
+        .getByTestId('gamepad2-icon')
+        .closest('.w-20');
+      expect(iconContainer).toHaveClass(
+        'w-20',
+        'h-20',
+        'bg-primary-600',
+        'rounded-2xl',
+        'flex',
+        'items-center',
+        'justify-center',
+        'mx-auto',
+        'mb-4'
+      );
     });
 
     test('has centered text layout', () => {
       renderWithRouter(<HomePage />);
-      const heroSection = screen.getByText('Welcome to Party Games!').closest('.text-center');
+      const heroSection = screen
+        .getByText('Welcome to Party Games!')
+        .closest('.text-center');
       expect(heroSection).toHaveClass('text-center', 'py-8');
     });
 
@@ -75,7 +105,12 @@ describe('HomePage Component', () => {
       renderWithRouter(<HomePage />);
       const heading = screen.getByRole('heading', { level: 1 });
       expect(heading).toHaveTextContent('Welcome to Party Games!');
-      expect(heading).toHaveClass('text-2xl', 'font-bold', 'text-slate-900', 'mb-2');
+      expect(heading).toHaveClass(
+        'text-2xl',
+        'font-bold',
+        'text-slate-900',
+        'mb-2'
+      );
     });
 
     test('displays description with proper styling', () => {
@@ -95,40 +130,83 @@ describe('HomePage Component', () => {
       renderWithRouter(<HomePage />);
       const createGameLink = screen.getByRole('link', { name: /Create Game/ });
       expect(createGameLink).toHaveAttribute('href', '/create');
-      expect(screen.getByText('Start a new game lobby for your friends')).toBeInTheDocument();
+      expect(
+        screen.getByText('Start a new game lobby for your friends')
+      ).toBeInTheDocument();
     });
 
     test('renders Join Game link with proper content', () => {
       renderWithRouter(<HomePage />);
       const joinGameLink = screen.getByRole('link', { name: /Join Game/ });
       expect(joinGameLink).toHaveAttribute('href', '/join');
-      expect(screen.getByText('Enter a room code to join a friend\'s game')).toBeInTheDocument();
+      expect(
+        screen.getByText("Enter a room code to join a friend's game")
+      ).toBeInTheDocument();
     });
 
     test('displays proper icons for quick actions', () => {
       renderWithRouter(<HomePage />);
       // Plus icon for Create Game
-      const createSection = screen.getByText('Create Game').closest('.bg-white');
-      expect(createSection?.querySelector('[data-testid="plus-icon"]')).toBeInTheDocument();
-      
+      const createSection = screen
+        .getByText('Create Game')
+        .closest('.bg-white');
+      expect(
+        createSection?.querySelector('[data-testid="plus-icon"]')
+      ).toBeInTheDocument();
+
       // Users icon for Join Game
       const joinSection = screen.getByText('Join Game').closest('.bg-white');
-      expect(joinSection?.querySelector('[data-testid="users-icon"]')).toBeInTheDocument();
+      expect(
+        joinSection?.querySelector('[data-testid="users-icon"]')
+      ).toBeInTheDocument();
     });
 
     test('quick action cards have proper styling', () => {
       renderWithRouter(<HomePage />);
-      const createGameCard = screen.getByText('Create Game').closest('.bg-white');
-      expect(createGameCard).toHaveClass('bg-white', 'rounded-lg', 'p-4', 'shadow-sm', 'border', 'border-slate-200', 'hover:shadow-md', 'transition-shadow');
+      const createGameCard = screen
+        .getByText('Create Game')
+        .closest('.bg-white');
+      expect(createGameCard).toHaveClass(
+        'bg-white',
+        'rounded-lg',
+        'p-4',
+        'shadow-sm',
+        'border',
+        'border-slate-200',
+        'hover:shadow-md',
+        'transition-shadow'
+      );
     });
 
     test('icon containers have proper styling', () => {
       renderWithRouter(<HomePage />);
-      const plusIconContainer = screen.getByText('Create Game').closest('.flex')?.querySelector('.bg-primary-100');
-      expect(plusIconContainer).toHaveClass('w-10', 'h-10', 'bg-primary-100', 'rounded-lg', 'flex', 'items-center', 'justify-center');
-      
-      const usersIconContainer = screen.getByText('Join Game').closest('.flex')?.querySelector('.bg-green-100');
-      expect(usersIconContainer).toHaveClass('w-10', 'h-10', 'bg-green-100', 'rounded-lg', 'flex', 'items-center', 'justify-center');
+      const plusIconContainer = screen
+        .getByText('Create Game')
+        .closest('.flex')
+        ?.querySelector('.bg-primary-100');
+      expect(plusIconContainer).toHaveClass(
+        'w-10',
+        'h-10',
+        'bg-primary-100',
+        'rounded-lg',
+        'flex',
+        'items-center',
+        'justify-center'
+      );
+
+      const usersIconContainer = screen
+        .getByText('Join Game')
+        .closest('.flex')
+        ?.querySelector('.bg-green-100');
+      expect(usersIconContainer).toHaveClass(
+        'w-10',
+        'h-10',
+        'bg-green-100',
+        'rounded-lg',
+        'flex',
+        'items-center',
+        'justify-center'
+      );
     });
   });
 
@@ -160,23 +238,43 @@ describe('HomePage Component', () => {
       renderWithRouter(<HomePage />);
       // Quick Draw has Zap icon
       const quickDrawCard = screen.getByText('Quick Draw').closest('.bg-white');
-      expect(quickDrawCard?.querySelector('[data-testid="zap-icon"]')).toBeInTheDocument();
-      
+      expect(
+        quickDrawCard?.querySelector('[data-testid="zap-icon"]')
+      ).toBeInTheDocument();
+
       // Two Truths has Users icon
-      const twoTruthsCard = screen.getByText('Two Truths and a Lie').closest('.bg-white');
-      expect(twoTruthsCard?.querySelector('[data-testid="users-icon"]')).toBeInTheDocument();
+      const twoTruthsCard = screen
+        .getByText('Two Truths and a Lie')
+        .closest('.bg-white');
+      expect(
+        twoTruthsCard?.querySelector('[data-testid="users-icon"]')
+      ).toBeInTheDocument();
     });
 
     test('game cards have proper layout and styling', () => {
       renderWithRouter(<HomePage />);
       const gameCard = screen.getByText('Quick Draw').closest('.bg-white');
-      expect(gameCard).toHaveClass('bg-white', 'rounded-lg', 'p-4', 'shadow-sm', 'border', 'border-slate-200');
+      expect(gameCard).toHaveClass(
+        'bg-white',
+        'rounded-lg',
+        'p-4',
+        'shadow-sm',
+        'border',
+        'border-slate-200'
+      );
     });
 
     test('coming soon badges have proper styling', () => {
       renderWithRouter(<HomePage />);
       const comingSoonBadge = screen.getAllByText('Coming Soon')[0];
-      expect(comingSoonBadge).toHaveClass('text-xs', 'bg-primary-100', 'text-primary-700', 'px-2', 'py-1', 'rounded');
+      expect(comingSoonBadge).toHaveClass(
+        'text-xs',
+        'bg-primary-100',
+        'text-primary-700',
+        'px-2',
+        'py-1',
+        'rounded'
+      );
     });
   });
 
@@ -192,7 +290,9 @@ describe('HomePage Component', () => {
       process.env.NODE_ENV = 'production';
       renderWithRouter(<HomePage />);
       expect(screen.queryByTestId('state-test')).not.toBeInTheDocument();
-      expect(screen.queryByText('Development: State Test')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Development: State Test')
+      ).not.toBeInTheDocument();
     });
 
     test('hides StateTest component when NODE_ENV is undefined', () => {
@@ -204,7 +304,9 @@ describe('HomePage Component', () => {
     test('StateTest section has proper structure in development', () => {
       process.env.NODE_ENV = 'development';
       renderWithRouter(<HomePage />);
-      const stateTestSection = screen.getByText('Development: State Test').closest('.space-y-4');
+      const stateTestSection = screen
+        .getByText('Development: State Test')
+        .closest('.space-y-4');
       expect(stateTestSection).toBeInTheDocument();
     });
   });
@@ -225,7 +327,7 @@ describe('HomePage Component', () => {
     test('links have proper accessibility attributes', () => {
       renderWithRouter(<HomePage />);
       const links = screen.getAllByRole('link');
-      links.forEach(link => {
+      links.forEach((link) => {
         expect(link).toBeVisible();
       });
     });
@@ -233,10 +335,10 @@ describe('HomePage Component', () => {
     test('links work with keyboard navigation', () => {
       renderWithRouter(<HomePage />);
       const createLink = screen.getByRole('link', { name: /Create Game/ });
-      
+
       createLink.focus();
       expect(createLink).toHaveFocus();
-      
+
       fireEvent.keyDown(createLink, { key: 'Enter' });
       // Navigation would be handled by React Router in real app
     });
@@ -257,13 +359,17 @@ describe('HomePage Component', () => {
 
     test('sections have proper spacing', () => {
       renderWithRouter(<HomePage />);
-      
+
       // Quick actions section
-      const quickActionsSection = screen.getByText('Quick Start').closest('.space-y-4');
+      const quickActionsSection = screen
+        .getByText('Quick Start')
+        .closest('.space-y-4');
       expect(quickActionsSection).toBeInTheDocument();
-      
+
       // Available games section
-      const gamesSection = screen.getByText('Available Games').closest('.space-y-4');
+      const gamesSection = screen
+        .getByText('Available Games')
+        .closest('.space-y-4');
       expect(gamesSection).toBeInTheDocument();
     });
 
@@ -277,39 +383,60 @@ describe('HomePage Component', () => {
   describe('Content and Typography', () => {
     test('has proper heading levels', () => {
       renderWithRouter(<HomePage />);
-      
+
       const mainHeading = screen.getByRole('heading', { level: 1 });
       expect(mainHeading).toHaveTextContent('Welcome to Party Games!');
-      
+
       const sectionHeadings = screen.getAllByRole('heading', { level: 2 });
-      expect(sectionHeadings.some(h => h.textContent === 'Quick Start')).toBe(true);
-      expect(sectionHeadings.some(h => h.textContent === 'Available Games')).toBe(true);
+      expect(sectionHeadings.some((h) => h.textContent === 'Quick Start')).toBe(
+        true
+      );
+      expect(
+        sectionHeadings.some((h) => h.textContent === 'Available Games')
+      ).toBe(true);
     });
 
     test('action items have proper heading level', () => {
       renderWithRouter(<HomePage />);
       const actionHeadings = screen.getAllByRole('heading', { level: 3 });
-      expect(actionHeadings.some(h => h.textContent === 'Create Game')).toBe(true);
-      expect(actionHeadings.some(h => h.textContent === 'Join Game')).toBe(true);
+      expect(actionHeadings.some((h) => h.textContent === 'Create Game')).toBe(
+        true
+      );
+      expect(actionHeadings.some((h) => h.textContent === 'Join Game')).toBe(
+        true
+      );
     });
 
     test('text content is descriptive and helpful', () => {
       renderWithRouter(<HomePage />);
-      
-      expect(screen.getByText('Start a new game lobby for your friends')).toBeInTheDocument();
-      expect(screen.getByText('Enter a room code to join a friend\'s game')).toBeInTheDocument();
+
+      expect(
+        screen.getByText('Start a new game lobby for your friends')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Enter a room code to join a friend's game")
+      ).toBeInTheDocument();
       expect(screen.getByText('Drawing and guessing game')).toBeInTheDocument();
       expect(screen.getByText('Social deduction game')).toBeInTheDocument();
     });
 
     test('headings have proper typography classes', () => {
       renderWithRouter(<HomePage />);
-      
+
       const mainHeading = screen.getByText('Welcome to Party Games!');
-      expect(mainHeading).toHaveClass('text-2xl', 'font-bold', 'text-slate-900', 'mb-2');
-      
+      expect(mainHeading).toHaveClass(
+        'text-2xl',
+        'font-bold',
+        'text-slate-900',
+        'mb-2'
+      );
+
       const sectionHeading = screen.getByText('Quick Start');
-      expect(sectionHeading).toHaveClass('text-lg', 'font-semibold', 'text-slate-900');
+      expect(sectionHeading).toHaveClass(
+        'text-lg',
+        'font-semibold',
+        'text-slate-900'
+      );
     });
   });
 
@@ -317,14 +444,17 @@ describe('HomePage Component', () => {
     test('action cards have hover effects', () => {
       renderWithRouter(<HomePage />);
       const createGameCard = screen.getByText('Create Game').closest('a');
-      expect(createGameCard).toHaveClass('hover:shadow-md', 'transition-shadow');
+      expect(createGameCard).toHaveClass(
+        'hover:shadow-md',
+        'transition-shadow'
+      );
     });
 
     test('links are focusable and accessible', () => {
       renderWithRouter(<HomePage />);
       const links = screen.getAllByRole('link');
-      
-      links.forEach(link => {
+
+      links.forEach((link) => {
         expect(link).not.toHaveAttribute('tabindex', '-1');
       });
     });
@@ -332,9 +462,9 @@ describe('HomePage Component', () => {
     test('action cards have proper interactive states', () => {
       renderWithRouter(<HomePage />);
       const createGameLink = screen.getByRole('link', { name: /Create Game/ });
-      
+
       expect(createGameLink).toHaveClass('transition-shadow');
-      
+
       fireEvent.mouseEnter(createGameLink);
       fireEvent.mouseLeave(createGameLink);
       // Hover effects would be visible in real browser
@@ -344,7 +474,7 @@ describe('HomePage Component', () => {
   describe('Accessibility', () => {
     test('has proper semantic structure', () => {
       renderWithRouter(<HomePage />);
-      
+
       expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
       expect(screen.getAllByRole('heading', { level: 2 })).toHaveLength(2);
       expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(4); // 2 actions + 2 games
@@ -355,7 +485,7 @@ describe('HomePage Component', () => {
       const { container } = renderWithRouter(<HomePage />);
       // Check that the page renders successfully with icons
       expect(container.firstChild).toBeInTheDocument();
-      
+
       // Verify specific components that should have icons
       expect(screen.getByText('Create Game')).toBeInTheDocument();
       expect(screen.getByText('Join Game')).toBeInTheDocument();
@@ -364,21 +494,21 @@ describe('HomePage Component', () => {
 
     test('content is properly labeled', () => {
       renderWithRouter(<HomePage />);
-      
+
       const createGameLink = screen.getByRole('link', { name: /Create Game/ });
       expect(createGameLink).toBeInTheDocument();
-      
+
       const joinGameLink = screen.getByRole('link', { name: /Join Game/ });
       expect(joinGameLink).toBeInTheDocument();
     });
 
     test('keyboard navigation works correctly', () => {
       renderWithRouter(<HomePage />);
-      
+
       const links = screen.getAllByRole('link');
       expect(links.length).toBeGreaterThan(0);
-      
-      links.forEach(link => {
+
+      links.forEach((link) => {
         link.focus();
         expect(link).toHaveFocus();
       });
@@ -397,7 +527,7 @@ describe('HomePage Component', () => {
 
     test('maintains layout with different viewport sizes', () => {
       renderWithRouter(<HomePage />);
-      
+
       // The component should use responsive classes
       const grids = screen.getByText('Create Game').closest('.grid');
       expect(grids).toHaveClass('grid-cols-1'); // Mobile-first approach
@@ -407,21 +537,33 @@ describe('HomePage Component', () => {
   describe('Performance Considerations', () => {
     test('does not cause unnecessary re-renders', () => {
       const { rerender } = renderWithRouter(<HomePage />);
-      
+
       expect(() => {
-        rerender(<BrowserRouter><HomePage /></BrowserRouter>);
-        rerender(<BrowserRouter><HomePage /></BrowserRouter>);
+        rerender(
+          <BrowserRouter>
+            <HomePage />
+          </BrowserRouter>
+        );
+        rerender(
+          <BrowserRouter>
+            <HomePage />
+          </BrowserRouter>
+        );
       }).not.toThrow();
     });
 
     test('renders consistently across multiple renders', () => {
       const { rerender } = renderWithRouter(<HomePage />);
-      
+
       expect(screen.getByText('Welcome to Party Games!')).toBeInTheDocument();
-      
-      rerender(<BrowserRouter><HomePage /></BrowserRouter>);
-      
+
+      rerender(
+        <BrowserRouter>
+          <HomePage />
+        </BrowserRouter>
+      );
+
       expect(screen.getByText('Welcome to Party Games!')).toBeInTheDocument();
     });
   });
-}); 
+});

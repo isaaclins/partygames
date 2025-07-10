@@ -23,7 +23,7 @@ export class WouldYouRatherGame {
     };
 
     // Initialize scores
-    this.lobby.players.forEach(player => {
+    this.lobby.players.forEach((player) => {
       this.scores[player.id] = 0;
     });
   }
@@ -50,7 +50,7 @@ export class WouldYouRatherGame {
 
     // Check if player already submitted for this round
     const hasSubmitted = this.gameState.scenarios.some(
-      s => s.submittedBy === action.playerId && s.round === this.currentRound
+      (s) => s.submittedBy === action.playerId && s.round === this.currentRound
     );
 
     if (hasSubmitted) {
@@ -70,7 +70,7 @@ export class WouldYouRatherGame {
 
     // Check if all players have submitted
     const currentRoundScenarios = this.gameState.scenarios.filter(
-      s => s.round === this.currentRound
+      (s) => s.round === this.currentRound
     );
 
     if (currentRoundScenarios.length === this.lobby.players.length) {
@@ -95,14 +95,17 @@ export class WouldYouRatherGame {
     }
 
     // Check if scenario exists
-    const scenario = this.gameState.scenarios.find(s => s.id === action.data.scenarioId);
+    const scenario = this.gameState.scenarios.find(
+      (s) => s.id === action.data.scenarioId
+    );
     if (!scenario) {
       throw new Error('Scenario not found');
     }
 
     // Check if player already voted for this scenario
     const hasVoted = this.gameState.votes.some(
-      v => v.voterId === action.playerId && v.scenarioId === action.data.scenarioId
+      (v) =>
+        v.voterId === action.playerId && v.scenarioId === action.data.scenarioId
     );
 
     if (hasVoted) {
@@ -123,12 +126,12 @@ export class WouldYouRatherGame {
     const currentScenario = this.getCurrentScenario();
     if (currentScenario) {
       const votesForCurrentScenario = this.gameState.votes.filter(
-        v => v.scenarioId === currentScenario.id
+        (v) => v.scenarioId === currentScenario.id
       );
 
       // Everyone except the scenario creator should vote
       const expectedVotes = this.lobby.players.length - 1;
-      
+
       if (votesForCurrentScenario.length === expectedVotes) {
         this.moveToNextScenario();
       }
@@ -149,7 +152,7 @@ export class WouldYouRatherGame {
     this.gameState.currentScenarioIndex++;
 
     const currentRoundScenarios = this.gameState.scenarios.filter(
-      s => s.round === this.currentRound
+      (s) => s.round === this.currentRound
     );
 
     if (this.gameState.currentScenarioIndex >= currentRoundScenarios.length) {
@@ -163,14 +166,14 @@ export class WouldYouRatherGame {
     if (!currentScenario) return;
 
     const votesForScenario = this.gameState.votes.filter(
-      v => v.scenarioId === currentScenario.id
+      (v) => v.scenarioId === currentScenario.id
     );
 
     // Award 1 point to the scenario creator for each vote
     this.scores[currentScenario.submittedBy] += votesForScenario.length;
 
     // Award 1 point to each voter for participating
-    votesForScenario.forEach(vote => {
+    votesForScenario.forEach((vote) => {
       this.scores[vote.voterId] += 1;
     });
   }
@@ -188,31 +191,40 @@ export class WouldYouRatherGame {
 
   private getCurrentScenario(): WouldYouRatherScenario | undefined {
     const currentRoundScenarios = this.gameState.scenarios.filter(
-      s => s.round === this.currentRound
+      (s) => s.round === this.currentRound
     );
     return currentRoundScenarios[this.gameState.currentScenarioIndex];
   }
 
   public getGameState(): any {
     const currentScenario = this.getCurrentScenario();
-    
+
     return {
       ...this.gameState,
       currentRound: this.currentRound,
       maxRounds: this.maxRounds,
       scores: this.scores,
       currentScenario: currentScenario,
-      votingProgress: currentScenario ? this.getVotingProgress(currentScenario.id) : null,
+      votingProgress: currentScenario
+        ? this.getVotingProgress(currentScenario.id)
+        : null,
     };
   }
 
-  private getVotingProgress(scenarioId: string): { voted: number; total: number } {
-    const votesForScenario = this.gameState.votes.filter(v => v.scenarioId === scenarioId);
-    const scenario = this.gameState.scenarios.find(s => s.id === scenarioId);
-    
+  private getVotingProgress(scenarioId: string): {
+    voted: number;
+    total: number;
+  } {
+    const votesForScenario = this.gameState.votes.filter(
+      (v) => v.scenarioId === scenarioId
+    );
+    const scenario = this.gameState.scenarios.find((s) => s.id === scenarioId);
+
     // Total voters = all players except the scenario creator
-    const totalVoters = scenario ? this.lobby.players.length - 1 : this.lobby.players.length;
-    
+    const totalVoters = scenario
+      ? this.lobby.players.length - 1
+      : this.lobby.players.length;
+
     return {
       voted: votesForScenario.length,
       total: totalVoters,
@@ -226,8 +238,9 @@ export class WouldYouRatherGame {
   public getWinner(): string | null {
     if (!this.isGameComplete()) return null;
 
-    const sortedScores = Object.entries(this.scores)
-      .sort(([,a], [,b]) => b - a);
+    const sortedScores = Object.entries(this.scores).sort(
+      ([, a], [, b]) => b - a
+    );
 
     return sortedScores.length > 0 ? sortedScores[0][0] : null;
   }
@@ -241,4 +254,4 @@ export class WouldYouRatherGame {
       totalVotes: this.gameState.votes.length,
     };
   }
-} 
+}

@@ -29,41 +29,28 @@
     ]
   },
   "quickDraw": {
-    "sampleWords": [
-      "cat",
-      "house",
-      "tree",
-      "car",
-      "sun"
-    ],
+    "sampleWords": ["cat", "house", "tree", "car", "sun"],
     "sampleDrawingPaths": {
       "house": [
-        {"x": 100, "y": 200},
-        {"x": 200, "y": 200},
-        {"x": 200, "y": 100},
-        {"x": 150, "y": 50},
-        {"x": 100, "y": 100},
-        {"x": 100, "y": 200}
+        { "x": 100, "y": 200 },
+        { "x": 200, "y": 200 },
+        { "x": 200, "y": 100 },
+        { "x": 150, "y": 50 },
+        { "x": 100, "y": 100 },
+        { "x": 100, "y": 200 }
       ],
       "cat": [
-        {"x": 150, "y": 150},
-        {"x": 120, "y": 120},
-        {"x": 100, "y": 140},
-        {"x": 120, "y": 160},
-        {"x": 150, "y": 150},
-        {"x": 180, "y": 160},
-        {"x": 200, "y": 140},
-        {"x": 180, "y": 120}
+        { "x": 150, "y": 150 },
+        { "x": 120, "y": 120 },
+        { "x": 100, "y": 140 },
+        { "x": 120, "y": 160 },
+        { "x": 150, "y": 150 },
+        { "x": 180, "y": 160 },
+        { "x": 200, "y": 140 },
+        { "x": 180, "y": 120 }
       ]
     },
-    "sampleGuesses": [
-      "house",
-      "home",
-      "building",
-      "cat",
-      "kitten",
-      "animal"
-    ]
+    "sampleGuesses": ["house", "home", "building", "cat", "kitten", "animal"]
   },
   "players": {
     "testPlayers": [
@@ -72,7 +59,7 @@
         "id": "test-player-1"
       },
       {
-        "name": "TestPlayer2", 
+        "name": "TestPlayer2",
         "id": "test-player-2"
       },
       {
@@ -82,10 +69,6 @@
     ]
   },
   "lobbies": {
-    "testLobbyIds": [
-      "TEST123",
-      "GAME456",
-      "LOBBY789"
-    ]
+    "testLobbyIds": ["TEST123", "GAME456", "LOBBY789"]
   }
-} 
+}

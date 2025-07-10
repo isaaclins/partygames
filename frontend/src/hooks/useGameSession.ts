@@ -216,15 +216,18 @@ export function useGameSession() {
   }, [gameSelectors]);
 
   // Send game action using WebSocket
-  const sendGameAction = useCallback(async (action: GameAction) => {
-    try {
-      await webSocketService.sendGameAction(action);
-    } catch (error: any) {
-      console.error('Failed to send game action:', error);
-      gameSelectors.setConnectionStatus(false, error.message);
-      throw error;
-    }
-  }, [gameSelectors]);
+  const sendGameAction = useCallback(
+    async (action: GameAction) => {
+      try {
+        await webSocketService.sendGameAction(action);
+      } catch (error: any) {
+        console.error('Failed to send game action:', error);
+        gameSelectors.setConnectionStatus(false, error.message);
+        throw error;
+      }
+    },
+    [gameSelectors]
+  );
 
   // Update player name
   const updatePlayerName = useCallback(

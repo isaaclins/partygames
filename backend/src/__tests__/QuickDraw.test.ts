@@ -1,5 +1,10 @@
 import { QuickDrawGame } from '../games/QuickDraw';
-import { GameSession, Player, QuickDrawGameAction, DrawingStroke } from '../../../shared/types';
+import {
+  GameSession,
+  Player,
+  QuickDrawGameAction,
+  DrawingStroke,
+} from '../../../shared/types';
 
 // Mock timer functions
 let mockTimers: any[] = [];
@@ -9,7 +14,7 @@ const mockSetInterval = jest.fn((fn, delay) => {
   return id;
 });
 const mockClearInterval = jest.fn((id) => {
-  mockTimers = mockTimers.filter(timer => timer.id !== id);
+  mockTimers = mockTimers.filter((timer) => timer.id !== id);
 });
 const mockSetTimeout = jest.fn((fn, delay) => {
   const id = Math.random();
@@ -55,7 +60,7 @@ describe('QuickDrawGame', () => {
     points: [
       { x: 100, y: 100, pressure: 1 },
       { x: 150, y: 150, pressure: 1 },
-      { x: 200, y: 200, pressure: 1 }
+      { x: 200, y: 200, pressure: 1 },
     ],
     color: '#000000',
     size: 5,
@@ -79,7 +84,7 @@ describe('QuickDrawGame', () => {
   describe('Constructor and Initialization', () => {
     test('should initialize with correct game state', () => {
       const gameState = game.getGameState();
-      
+
       expect(gameState.currentRound).toBe(0);
       expect(gameState.totalRounds).toBe(6); // min(3 * 2, 8) = 6
       expect(gameState.rounds).toHaveLength(0);
@@ -100,7 +105,7 @@ describe('QuickDrawGame', () => {
         orders.add(JSON.stringify(gameState.playerOrder));
         newGame.cleanup();
       }
-      
+
       // Should have some variation in player order (though not guaranteed with small sample)
       expect(gameState.playerOrder).toContain('player-0');
       expect(gameState.playerOrder).toContain('player-1');
@@ -111,17 +116,17 @@ describe('QuickDrawGame', () => {
       const twoPlayerSession = createMockGameSession(2);
       const twoPlayerGame = new QuickDrawGame(twoPlayerSession);
       const twoPlayerState = twoPlayerGame.getGameState();
-      
+
       expect(twoPlayerState.totalRounds).toBe(4); // 2 * 2 = 4
       expect(Object.keys(twoPlayerState.scores)).toHaveLength(2);
-      
+
       const sixPlayerSession = createMockGameSession(6);
       const sixPlayerGame = new QuickDrawGame(sixPlayerSession);
       const sixPlayerState = sixPlayerGame.getGameState();
-      
+
       expect(sixPlayerState.totalRounds).toBe(8); // min(6 * 2, 8) = 8
       expect(Object.keys(sixPlayerState.scores)).toHaveLength(6);
-      
+
       twoPlayerGame.cleanup();
       sixPlayerGame.cleanup();
     });
@@ -145,7 +150,7 @@ describe('QuickDrawGame', () => {
 
     test('should start new round when drawing begins', () => {
       const gameState = game.getGameState();
-      
+
       expect(gameState.currentRound).toBe(1);
       expect(gameState.gamePhase).toBe('playing');
       expect(gameState.rounds).toHaveLength(1);
@@ -157,7 +162,7 @@ describe('QuickDrawGame', () => {
     test('should assign drawer and prompt for round', () => {
       const gameState = game.getGameState();
       const currentRound = gameState.currentRoundData!;
-      
+
       expect(currentRound.drawerId).toBeDefined();
       expect(gameState.playerOrder).toContain(currentRound.drawerId);
       expect(currentRound.prompt).toBeDefined();
@@ -190,7 +195,7 @@ describe('QuickDrawGame', () => {
     test('should reject stroke addition by non-drawer', () => {
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      const nonDrawer = gameSession.players.find(p => p.id !== drawerId)!.id;
+      const nonDrawer = gameSession.players.find((p) => p.id !== drawerId)!.id;
       const stroke = createMockStroke();
 
       const action: QuickDrawGameAction = {
@@ -208,7 +213,7 @@ describe('QuickDrawGame', () => {
     test('should handle canvas clearing by drawer', () => {
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      
+
       // Add some strokes first
       const stroke = createMockStroke();
       game.handleAction({
@@ -234,18 +239,18 @@ describe('QuickDrawGame', () => {
     test('should handle undo stroke by drawer', () => {
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      
+
       // Add multiple strokes
       const stroke1 = createMockStroke();
       const stroke2 = { ...createMockStroke(), id: 'stroke-2' };
-      
+
       game.handleAction({
         type: 'add_stroke',
         data: { stroke: stroke1 },
         playerId: drawerId,
         timestamp: new Date(),
       });
-      
+
       game.handleAction({
         type: 'add_stroke',
         data: { stroke: stroke2 },
@@ -264,13 +269,15 @@ describe('QuickDrawGame', () => {
       game.handleAction(action);
       const newGameState = game.getGameState();
       expect(newGameState.currentRoundData!.canvas.strokes).toHaveLength(1);
-      expect(newGameState.currentRoundData!.canvas.strokes[0].id).toBe('stroke-1');
+      expect(newGameState.currentRoundData!.canvas.strokes[0].id).toBe(
+        'stroke-1'
+      );
     });
 
     test('should reject canvas operations by non-drawer', () => {
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      const nonDrawer = gameSession.players.find(p => p.id !== drawerId)!.id;
+      const nonDrawer = gameSession.players.find((p) => p.id !== drawerId)!.id;
 
       const clearAction: QuickDrawGameAction = {
         type: 'clear_canvas',
@@ -306,7 +313,7 @@ describe('QuickDrawGame', () => {
         timestamp: new Date(),
       };
       game.handleAction(action);
-      
+
       // Manually set to guessing phase for testing
       const gameState = game.getGameState();
       gameState.currentRoundData!.phase = 'guessing';
@@ -315,7 +322,7 @@ describe('QuickDrawGame', () => {
     test('should handle guess submission by non-drawer', () => {
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      const guesser = gameSession.players.find(p => p.id !== drawerId)!.id;
+      const guesser = gameSession.players.find((p) => p.id !== drawerId)!.id;
       const correctWord = gameState.currentRoundData!.prompt.word;
 
       const action: QuickDrawGameAction = {
@@ -339,7 +346,7 @@ describe('QuickDrawGame', () => {
     test('should handle incorrect guess', () => {
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      const guesser = gameSession.players.find(p => p.id !== drawerId)!.id;
+      const guesser = gameSession.players.find((p) => p.id !== drawerId)!.id;
 
       const action: QuickDrawGameAction = {
         type: 'submit_guess',
@@ -372,8 +379,8 @@ describe('QuickDrawGame', () => {
     test('should reject guess when not in guessing phase', () => {
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      const guesser = gameSession.players.find(p => p.id !== drawerId)!.id;
-      
+      const guesser = gameSession.players.find((p) => p.id !== drawerId)!.id;
+
       // Set back to drawing phase
       gameState.currentRoundData!.phase = 'drawing';
 
@@ -392,7 +399,7 @@ describe('QuickDrawGame', () => {
     test('should reject duplicate correct guess from same player', () => {
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      const guesser = gameSession.players.find(p => p.id !== drawerId)!.id;
+      const guesser = gameSession.players.find((p) => p.id !== drawerId)!.id;
       const correctWord = gameState.currentRoundData!.prompt.word;
 
       // Submit first correct guess
@@ -420,7 +427,7 @@ describe('QuickDrawGame', () => {
     test('should handle case-insensitive guess matching', () => {
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      const guesser = gameSession.players.find(p => p.id !== drawerId)!.id;
+      const guesser = gameSession.players.find((p) => p.id !== drawerId)!.id;
       const correctWord = gameState.currentRoundData!.prompt.word;
 
       const action: QuickDrawGameAction = {
@@ -438,7 +445,7 @@ describe('QuickDrawGame', () => {
     test('should trim whitespace from guesses', () => {
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      const guesser = gameSession.players.find(p => p.id !== drawerId)!.id;
+      const guesser = gameSession.players.find((p) => p.id !== drawerId)!.id;
       const correctWord = gameState.currentRoundData!.prompt.word;
 
       const action: QuickDrawGameAction = {
@@ -465,7 +472,7 @@ describe('QuickDrawGame', () => {
         timestamp: new Date(),
       };
       game.handleAction(action);
-      
+
       const gameState = game.getGameState();
       gameState.currentRoundData!.phase = 'guessing';
     });
@@ -473,7 +480,7 @@ describe('QuickDrawGame', () => {
     test('should award points for correct guesses based on order', () => {
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      const guessers = gameSession.players.filter(p => p.id !== drawerId);
+      const guessers = gameSession.players.filter((p) => p.id !== drawerId);
       const correctWord = gameState.currentRoundData!.prompt.word;
 
       // Submit correct guesses in order
@@ -488,12 +495,14 @@ describe('QuickDrawGame', () => {
       });
 
       const newGameState = game.getGameState();
-      
+
       // First guesser should get most points
       const firstGuesser = guessers[0].id;
       const secondGuesser = guessers[1].id;
-      
-      expect(newGameState.scores[firstGuesser]).toBeGreaterThan(newGameState.scores[secondGuesser]);
+
+      expect(newGameState.scores[firstGuesser]).toBeGreaterThan(
+        newGameState.scores[secondGuesser]
+      );
       expect(newGameState.scores[firstGuesser]).toBeGreaterThan(0);
       expect(newGameState.scores[secondGuesser]).toBeGreaterThan(0);
     });
@@ -501,7 +510,7 @@ describe('QuickDrawGame', () => {
     test('should award speed bonus for quick guesses', () => {
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      const guesser = gameSession.players.find(p => p.id !== drawerId)!.id;
+      const guesser = gameSession.players.find((p) => p.id !== drawerId)!.id;
       const correctWord = gameState.currentRoundData!.prompt.word;
 
       // Set high time remaining for speed bonus
@@ -516,7 +525,7 @@ describe('QuickDrawGame', () => {
 
       game.handleAction(action);
       const newGameState = game.getGameState();
-      
+
       // Should get base points plus speed bonus
       expect(newGameState.scores[guesser]).toBeGreaterThan(10); // Base + bonus
     });
@@ -524,7 +533,7 @@ describe('QuickDrawGame', () => {
     test('should award points to drawer when players guess correctly', () => {
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      const guesser = gameSession.players.find(p => p.id !== drawerId)!.id;
+      const guesser = gameSession.players.find((p) => p.id !== drawerId)!.id;
       const correctWord = gameState.currentRoundData!.prompt.word;
 
       const initialDrawerScore = gameState.scores[drawerId];
@@ -537,7 +546,7 @@ describe('QuickDrawGame', () => {
       };
 
       game.handleAction(action);
-      
+
       // Force round completion to award drawer points
       const currentRound = game.getGameState().currentRoundData!;
       game['endRound'](currentRound);
@@ -600,7 +609,7 @@ describe('QuickDrawGame', () => {
 
       // Each player should have been drawer exactly once
       expect(new Set(rounds).size).toBe(playerOrder.length);
-      playerOrder.forEach(playerId => {
+      playerOrder.forEach((playerId) => {
         expect(rounds).toContain(playerId);
       });
     });
@@ -640,10 +649,10 @@ describe('QuickDrawGame', () => {
       };
 
       game.handleAction(action);
-      
+
       // Should have created an interval timer
       expect(mockSetInterval).toHaveBeenCalledWith(expect.any(Function), 1000);
-      expect(mockTimers.filter(t => t.type === 'interval')).toHaveLength(1);
+      expect(mockTimers.filter((t) => t.type === 'interval')).toHaveLength(1);
     });
 
     test('should clear timer on game cleanup', () => {
@@ -655,7 +664,7 @@ describe('QuickDrawGame', () => {
       };
 
       game.handleAction(action);
-      expect(mockTimers.filter(t => t.type === 'interval')).toHaveLength(1);
+      expect(mockTimers.filter((t) => t.type === 'interval')).toHaveLength(1);
 
       game.cleanup();
       expect(mockClearInterval).toHaveBeenCalled();
@@ -670,16 +679,16 @@ describe('QuickDrawGame', () => {
       };
 
       game.handleAction(action);
-      
+
       // Get the timer function and simulate time passing
-      const timer = mockTimers.find(t => t.type === 'interval');
+      const timer = mockTimers.find((t) => t.type === 'interval');
       const gameState = game.getGameState();
       const currentRound = gameState.currentRoundData!;
-      
+
       // Simulate timer ticks
       currentRound.timeRemaining = 31;
       timer.fn(); // 30 seconds remaining
-      
+
       expect(currentRound.phase).toBe('guessing');
     });
   });
@@ -687,7 +696,7 @@ describe('QuickDrawGame', () => {
   describe('Word Prompt Management', () => {
     test('should select random prompts for rounds', () => {
       const prompts = new Set();
-      
+
       // Start multiple rounds to collect prompts
       for (let i = 0; i < 5; i++) {
         const newGame = new QuickDrawGame(gameSession);
@@ -697,12 +706,12 @@ describe('QuickDrawGame', () => {
           playerId: 'player-0',
           timestamp: new Date(),
         });
-        
+
         const gameState = newGame.getGameState();
         prompts.add(gameState.currentRoundData!.prompt.word);
         newGame.cleanup();
       }
-      
+
       // Should have some variety in prompts
       expect(prompts.size).toBeGreaterThan(1);
     });
@@ -734,10 +743,10 @@ describe('QuickDrawGame', () => {
       gameState.scores['player-0'] = 25;
       gameState.scores['player-1'] = 30;
       gameState.scores['player-2'] = 15;
-      
+
       // Force game completion
       game['gameState'].gamePhase = 'finished';
-      
+
       const winner = game.getWinner();
       expect(winner).toBe('player-1');
     });
@@ -797,7 +806,7 @@ describe('QuickDrawGame', () => {
 
       const gameState = game.getGameState();
       const drawerId = gameState.currentRoundData!.drawerId;
-      const guesser = gameSession.players.find(p => p.id !== drawerId)!.id;
+      const guesser = gameSession.players.find((p) => p.id !== drawerId)!.id;
       gameState.currentRoundData!.phase = 'guessing';
 
       const action: QuickDrawGameAction = {
@@ -814,7 +823,7 @@ describe('QuickDrawGame', () => {
 
     test('should handle actions when no active round', () => {
       const stroke = createMockStroke();
-      
+
       const strokeAction: QuickDrawGameAction = {
         type: 'add_stroke',
         data: { stroke },
@@ -853,11 +862,11 @@ describe('QuickDrawGame', () => {
 
       const emptyGame = new QuickDrawGame(emptySession);
       const gameState = emptyGame.getGameState();
-      
+
       expect(Object.keys(gameState.scores)).toHaveLength(0);
       expect(gameState.playerOrder).toHaveLength(0);
       expect(gameState.totalRounds).toBe(0);
-      
+
       emptyGame.cleanup();
     });
   });
@@ -887,7 +896,7 @@ describe('QuickDrawGame', () => {
 
       // Submit a guess
       const drawerId = gameState.currentRoundData!.drawerId;
-      const guesser = gameSession.players.find(p => p.id !== drawerId)!.id;
+      const guesser = gameSession.players.find((p) => p.id !== drawerId)!.id;
       const correctWord = gameState.currentRoundData!.prompt.word;
 
       game.handleAction({
@@ -928,4 +937,4 @@ describe('QuickDrawGame', () => {
       expect(gameState.canGuess).toBe(false);
     });
   });
-}); 
+});

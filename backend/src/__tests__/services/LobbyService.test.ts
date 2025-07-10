@@ -19,7 +19,7 @@ describe('LobbyService', () => {
   beforeEach(() => {
     lobbyService = new LobbyService();
     jest.clearAllMocks();
-    
+
     // Mock Math.random for consistent lobby codes
     jest.spyOn(Math, 'random').mockReturnValue(0.123456789);
   });
@@ -58,7 +58,7 @@ describe('LobbyService', () => {
 
     test('should generate unique lobby codes', () => {
       const { lobby: lobby1 } = lobbyService.createLobby(mockCreateData);
-      
+
       // Change the random value to generate a different code
       jest.spyOn(Math, 'random').mockReturnValue(0.987654321);
       const { lobby: lobby2 } = lobbyService.createLobby(mockCreateData);
@@ -128,7 +128,7 @@ describe('LobbyService', () => {
       expect(lobby.players).toHaveLength(2);
       expect(playerId).toBeDefined();
 
-      const newPlayer = lobby.players.find(p => p.id === playerId);
+      const newPlayer = lobby.players.find((p) => p.id === playerId);
       expect(newPlayer).toBeDefined();
       expect(newPlayer!.name).toBe('Test Player');
       expect(newPlayer!.isHost).toBe(false);
@@ -249,13 +249,13 @@ describe('LobbyService', () => {
     test('should delete lobby when last player leaves', () => {
       // Remove non-host player first
       lobbyService.leaveLobby(playerPlayerId);
-      
+
       // Remove host (last player)
       const { lobby, wasHost } = lobbyService.leaveLobby(hostPlayerId);
 
       expect(wasHost).toBe(true);
       expect(lobby).toBeNull();
-      
+
       // Verify lobby was deleted
       const retrievedLobby = lobbyService.getLobby(existingLobby.lobbyId);
       expect(retrievedLobby).toBeNull();
@@ -297,7 +297,7 @@ describe('LobbyService', () => {
       };
 
       const lobby = lobbyService.updatePlayer(playerId, updates);
-      const player = lobby.players.find(p => p.id === playerId);
+      const player = lobby.players.find((p) => p.id === playerId);
 
       expect(player!.name).toBe('Updated Name');
       expect(player!.isReady).toBe(true); // Should remain unchanged
@@ -307,27 +307,27 @@ describe('LobbyService', () => {
 
     test('should toggle player ready status', () => {
       const lobby = lobbyService.togglePlayerReady(playerId);
-      const player = lobby.players.find(p => p.id === playerId);
+      const player = lobby.players.find((p) => p.id === playerId);
 
       expect(player!.isReady).toBe(false); // Was true, now false
-      
+
       // Toggle again
       const lobby2 = lobbyService.togglePlayerReady(playerId);
-      const player2 = lobby2.players.find(p => p.id === playerId);
-      
+      const player2 = lobby2.players.find((p) => p.id === playerId);
+
       expect(player2!.isReady).toBe(true); // Back to true
     });
 
     test('should set player connection status', () => {
       const lobby = lobbyService.setPlayerConnection(playerId, false);
-      const player = lobby!.players.find(p => p.id === playerId);
+      const player = lobby!.players.find((p) => p.id === playerId);
 
       expect(player!.isConnected).toBe(false);
-      
+
       // Set back to connected
       const lobby2 = lobbyService.setPlayerConnection(playerId, true);
-      const player2 = lobby2!.players.find(p => p.id === playerId);
-      
+      const player2 = lobby2!.players.find((p) => p.id === playerId);
+
       expect(player2!.isConnected).toBe(true);
     });
 
@@ -575,7 +575,7 @@ describe('LobbyService', () => {
     test('should handle concurrent lobby creation with same random values', () => {
       // This test simulates the rare case where Math.random returns the same value
       const mockRandom = jest.spyOn(Math, 'random');
-      
+
       // First call returns same value
       mockRandom.mockReturnValueOnce(0.123);
       const { lobby: lobby1 } = lobbyService.createLobby({
@@ -639,14 +639,16 @@ describe('LobbyService', () => {
       const finalLobby = lobbyService.getLobby(lobby.lobbyId);
       expect(finalLobby!.players).toHaveLength(3);
       expect(finalLobby!.hostId).toBe(hostId);
-      
-      const updatedPlayer1 = finalLobby!.players.find(p => p.id === player1Id);
+
+      const updatedPlayer1 = finalLobby!.players.find(
+        (p) => p.id === player1Id
+      );
       expect(updatedPlayer1!.name).toBe('Updated Player 1');
       expect(updatedPlayer1!.isReady).toBe(true);
-      
-      const player2 = finalLobby!.players.find(p => p.id === player2Id);
+
+      const player2 = finalLobby!.players.find((p) => p.id === player2Id);
       expect(player2!.isReady).toBe(true);
       expect(player2!.isConnected).toBe(true);
     });
   });
-}); 
+});

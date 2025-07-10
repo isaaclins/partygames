@@ -10,7 +10,10 @@ import {
   setupWebSocketHandlers,
   cleanupInactiveLobbies,
 } from './websockets/handlers.js';
-import { ServerToClientEvents, ClientToServerEvents } from '../../shared/types/index.js';
+import {
+  ServerToClientEvents,
+  ClientToServerEvents,
+} from '../../shared/types/index.js';
 
 // Load environment variables
 config();

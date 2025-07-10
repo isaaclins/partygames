@@ -21,16 +21,16 @@ vi.mock('../hooks/useGameSession', () => ({
 
 // Mock Lucide React icons
 vi.mock('lucide-react', () => ({
-  Users: () => <div data-testid="users-icon" />,
-  Timer: () => <div data-testid="timer-icon" />,
-  Trophy: () => <div data-testid="trophy-icon" />,
-  CheckCircle: () => <div data-testid="check-circle-icon" />,
-  Clock: () => <div data-testid="clock-icon" />,
-  Brush: () => <div data-testid="brush-icon" />,
-  Eraser: () => <div data-testid="eraser-icon" />,
-  Undo: () => <div data-testid="undo-icon" />,
-  Trash2: () => <div data-testid="trash-icon" />,
-  Palette: () => <div data-testid="palette-icon" />,
+  Users: () => <div data-testid='users-icon' />,
+  Timer: () => <div data-testid='timer-icon' />,
+  Trophy: () => <div data-testid='trophy-icon' />,
+  CheckCircle: () => <div data-testid='check-circle-icon' />,
+  Clock: () => <div data-testid='clock-icon' />,
+  Brush: () => <div data-testid='brush-icon' />,
+  Eraser: () => <div data-testid='eraser-icon' />,
+  Undo: () => <div data-testid='undo-icon' />,
+  Trash2: () => <div data-testid='trash-icon' />,
+  Palette: () => <div data-testid='palette-icon' />,
 }));
 
 // Import components after mocking
@@ -138,24 +138,26 @@ describe('Frontend Performance', () => {
     render(<WouldYouRather />);
     render(<QuickDraw />);
     const end = performance.now();
-    
+
     // Components should render quickly
     expect(end - start).toBeLessThan(100);
   });
 
   test('should handle rapid canvas updates', () => {
     const mockOnStrokeAdded = vi.fn();
-    render(<DrawingCanvas 
-      width={800} 
-      height={600} 
-      strokes={[]} 
-      canDraw={true}
-      onStrokeAdded={mockOnStrokeAdded}
-      onClearCanvas={vi.fn()}
-      onUndoStroke={vi.fn()}
-    />);
-    
+    render(
+      <DrawingCanvas
+        width={800}
+        height={600}
+        strokes={[]}
+        canDraw={true}
+        onStrokeAdded={mockOnStrokeAdded}
+        onClearCanvas={vi.fn()}
+        onUndoStroke={vi.fn()}
+      />
+    );
+
     // Component should be stable with rapid updates
     expect(mockOnStrokeAdded).toBeDefined();
   });
-}); 
+});

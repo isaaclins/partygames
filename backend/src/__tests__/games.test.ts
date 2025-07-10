@@ -39,7 +39,7 @@ describe('TwoTruthsAndALie Game', () => {
   describe('TwoTruthsAndALie initialization', () => {
     test('should initialize with correct game state', () => {
       const gameState = game.getGameState();
-      
+
       expect(gameState.currentPhase).toBe('submission');
       expect(gameState.currentRound).toBe(1);
       expect(gameState.maxRounds).toBe(3);
@@ -50,7 +50,7 @@ describe('TwoTruthsAndALie Game', () => {
   describe('TwoTruthsAndALie statement submission', () => {
     test('should handle statement submission correctly', () => {
       const statements = ['Truth 1', 'Truth 2', 'Lie 1'];
-      
+
       expect(() => {
         game.handleAction({
           type: 'submit_statements',
@@ -68,7 +68,9 @@ describe('TwoTruthsAndALie Game', () => {
       gameSession.players.forEach((player, index) => {
         game.handleAction({
           type: 'submit_statements',
-          data: { statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`] },
+          data: {
+            statements: [`Truth ${index}1`, `Truth ${index}2`, `Lie ${index}`],
+          },
           playerId: player.id,
           timestamp: new Date(),
         });
@@ -298,7 +300,7 @@ describe('Performance Tests', () => {
     test('should handle canvas operations efficiently', () => {
       const session = createMockGameSession(3);
       const game = new QuickDrawGame(session);
-      
+
       // Start the game
       game.handleAction({
         type: 'start_drawing',
@@ -326,7 +328,7 @@ describe('Performance Tests', () => {
         });
       }
       const end = Date.now();
-      
+
       expect(end - start).toBeLessThan(1000); // Should complete in under 1 second
     });
   });
@@ -339,11 +341,11 @@ describe('Performance Tests', () => {
         session.lobbyId = `lobby-${i}`;
         games.push(new TwoTruthsAndALieGame(session));
       }
-      
+
       expect(games).toHaveLength(10);
-      games.forEach(game => {
+      games.forEach((game) => {
         expect(game.getGameState()).toBeDefined();
       });
     });
   });
-}); 
+});

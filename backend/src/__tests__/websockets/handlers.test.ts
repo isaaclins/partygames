@@ -23,7 +23,9 @@ jest.mock('../../games/QuickDraw');
 
 describe('WebSocket Handlers', () => {
   let mockIo: jest.Mocked<Server<ClientToServerEvents, ServerToClientEvents>>;
-  let mockSocket: jest.Mocked<Socket<ClientToServerEvents, ServerToClientEvents>>;
+  let mockSocket: jest.Mocked<
+    Socket<ClientToServerEvents, ServerToClientEvents>
+  >;
   let mockLobbyService: jest.Mocked<typeof lobbyService>;
 
   // Mock event callbacks
@@ -60,15 +62,39 @@ describe('WebSocket Handlers', () => {
 
   describe('Connection Setup', () => {
     test('should register all event handlers', () => {
-      expect(mockSocket.on).toHaveBeenCalledWith('lobby:create', expect.any(Function));
-      expect(mockSocket.on).toHaveBeenCalledWith('lobby:join', expect.any(Function));
-      expect(mockSocket.on).toHaveBeenCalledWith('lobby:leave', expect.any(Function));
-      expect(mockSocket.on).toHaveBeenCalledWith('lobby:updatePlayer', expect.any(Function));
-      expect(mockSocket.on).toHaveBeenCalledWith('lobby:toggleReady', expect.any(Function));
-      expect(mockSocket.on).toHaveBeenCalledWith('game:start', expect.any(Function));
-      expect(mockSocket.on).toHaveBeenCalledWith('game:action', expect.any(Function));
+      expect(mockSocket.on).toHaveBeenCalledWith(
+        'lobby:create',
+        expect.any(Function)
+      );
+      expect(mockSocket.on).toHaveBeenCalledWith(
+        'lobby:join',
+        expect.any(Function)
+      );
+      expect(mockSocket.on).toHaveBeenCalledWith(
+        'lobby:leave',
+        expect.any(Function)
+      );
+      expect(mockSocket.on).toHaveBeenCalledWith(
+        'lobby:updatePlayer',
+        expect.any(Function)
+      );
+      expect(mockSocket.on).toHaveBeenCalledWith(
+        'lobby:toggleReady',
+        expect.any(Function)
+      );
+      expect(mockSocket.on).toHaveBeenCalledWith(
+        'game:start',
+        expect.any(Function)
+      );
+      expect(mockSocket.on).toHaveBeenCalledWith(
+        'game:action',
+        expect.any(Function)
+      );
       expect(mockSocket.on).toHaveBeenCalledWith('ping', expect.any(Function));
-      expect(mockSocket.on).toHaveBeenCalledWith('disconnect', expect.any(Function));
+      expect(mockSocket.on).toHaveBeenCalledWith(
+        'disconnect',
+        expect.any(Function)
+      );
     });
   });
 
@@ -88,7 +114,7 @@ describe('WebSocket Handlers', () => {
           name: 'Test Host',
           isHost: true,
           isReady: true,
-        }
+        },
       ],
       gameType: 'two-truths-and-a-lie' as const,
       status: 'waiting' as const,
@@ -105,7 +131,9 @@ describe('WebSocket Handlers', () => {
 
       await eventHandlers['lobby:create'](mockCreateLobbyData, mockCallback);
 
-      expect(mockLobbyService.createLobby).toHaveBeenCalledWith(mockCreateLobbyData);
+      expect(mockLobbyService.createLobby).toHaveBeenCalledWith(
+        mockCreateLobbyData
+      );
       expect(mockSocket.join).toHaveBeenCalledWith('TEST123');
       expect(mockCallback).toHaveBeenCalledWith({
         success: true,
@@ -155,7 +183,7 @@ describe('WebSocket Handlers', () => {
           name: 'Test Player',
           isHost: false,
           isReady: false,
-        }
+        },
       ],
       gameType: 'two-truths-and-a-lie' as const,
       status: 'waiting' as const,
@@ -172,7 +200,9 @@ describe('WebSocket Handlers', () => {
 
       await eventHandlers['lobby:join'](mockJoinLobbyData, mockCallback);
 
-      expect(mockLobbyService.joinLobby).toHaveBeenCalledWith(mockJoinLobbyData);
+      expect(mockLobbyService.joinLobby).toHaveBeenCalledWith(
+        mockJoinLobbyData
+      );
       expect(mockSocket.join).toHaveBeenCalledWith('TEST123');
       expect(mockCallback).toHaveBeenCalledWith({
         success: true,
@@ -180,7 +210,10 @@ describe('WebSocket Handlers', () => {
         playerId: 'new-player-id',
       });
       expect(mockSocket.to).toHaveBeenCalledWith('TEST123');
-      expect(mockSocket.emit).toHaveBeenCalledWith('lobby:playerJoined', mockLobby.players[1]);
+      expect(mockSocket.emit).toHaveBeenCalledWith(
+        'lobby:playerJoined',
+        mockLobby.players[1]
+      );
       expect(mockIo.to).toHaveBeenCalledWith('TEST123');
       expect(mockIo.emit).toHaveBeenCalledWith('lobby:updated', mockLobby);
     });
@@ -205,7 +238,10 @@ describe('WebSocket Handlers', () => {
   describe('Lobby Leaving', () => {
     beforeEach(() => {
       // Setup socket-to-player mapping
-      require('../../websockets/handlers').__setSocketToPlayer('test-socket-id', 'test-player-id');
+      require('../../websockets/handlers').__setSocketToPlayer(
+        'test-socket-id',
+        'test-player-id'
+      );
     });
 
     test('should handle successful lobby leaving', async () => {
@@ -227,11 +263,16 @@ describe('WebSocket Handlers', () => {
 
       await eventHandlers['lobby:leave'](mockCallback);
 
-      expect(mockLobbyService.leaveLobby).toHaveBeenCalledWith('test-player-id');
+      expect(mockLobbyService.leaveLobby).toHaveBeenCalledWith(
+        'test-player-id'
+      );
       expect(mockSocket.leave).toHaveBeenCalledWith('TEST123');
       expect(mockCallback).toHaveBeenCalledWith({ success: true });
       expect(mockSocket.to).toHaveBeenCalledWith('TEST123');
-      expect(mockSocket.emit).toHaveBeenCalledWith('lobby:playerLeft', 'test-player-id');
+      expect(mockSocket.emit).toHaveBeenCalledWith(
+        'lobby:playerLeft',
+        'test-player-id'
+      );
       expect(mockIo.to).toHaveBeenCalledWith('TEST123');
       expect(mockIo.emit).toHaveBeenCalledWith('lobby:updated', mockLobbyAfter);
     });
@@ -253,7 +294,10 @@ describe('WebSocket Handlers', () => {
 
       expect(mockCallback).toHaveBeenCalledWith({ success: true });
       expect(mockIo.to).toHaveBeenCalledWith('TEST123');
-      expect(mockIo.emit).toHaveBeenCalledWith('lobby:disbanded', 'Host left and lobby is empty');
+      expect(mockIo.emit).toHaveBeenCalledWith(
+        'lobby:disbanded',
+        'Host left and lobby is empty'
+      );
     });
 
     test('should handle leaving error when player not found', async () => {
@@ -271,7 +315,10 @@ describe('WebSocket Handlers', () => {
 
   describe('Player Updates', () => {
     beforeEach(() => {
-      require('../../websockets/handlers').__setSocketToPlayer('test-socket-id', 'test-player-id');
+      require('../../websockets/handlers').__setSocketToPlayer(
+        'test-socket-id',
+        'test-player-id'
+      );
     });
 
     test('should handle successful player update', async () => {
@@ -280,7 +327,12 @@ describe('WebSocket Handlers', () => {
       const mockLobby = {
         lobbyId: 'TEST123',
         players: [
-          { id: 'test-player-id', name: 'Updated Name', isHost: false, isReady: false }
+          {
+            id: 'test-player-id',
+            name: 'Updated Name',
+            isHost: false,
+            isReady: false,
+          },
         ],
       };
 
@@ -288,10 +340,16 @@ describe('WebSocket Handlers', () => {
 
       await eventHandlers['lobby:updatePlayer'](updates, mockCallback);
 
-      expect(mockLobbyService.updatePlayer).toHaveBeenCalledWith('test-player-id', updates);
+      expect(mockLobbyService.updatePlayer).toHaveBeenCalledWith(
+        'test-player-id',
+        updates
+      );
       expect(mockCallback).toHaveBeenCalledWith({ success: true });
       expect(mockIo.to).toHaveBeenCalledWith('TEST123');
-      expect(mockIo.emit).toHaveBeenCalledWith('lobby:playerUpdated', mockLobby.players[0]);
+      expect(mockIo.emit).toHaveBeenCalledWith(
+        'lobby:playerUpdated',
+        mockLobby.players[0]
+      );
       expect(mockIo.emit).toHaveBeenCalledWith('lobby:updated', mockLobby);
     });
 
@@ -300,7 +358,12 @@ describe('WebSocket Handlers', () => {
       const mockLobby = {
         lobbyId: 'TEST123',
         players: [
-          { id: 'test-player-id', name: 'Test Player', isHost: false, isReady: true }
+          {
+            id: 'test-player-id',
+            name: 'Test Player',
+            isHost: false,
+            isReady: true,
+          },
         ],
       };
 
@@ -309,17 +372,25 @@ describe('WebSocket Handlers', () => {
 
       await eventHandlers['lobby:toggleReady'](mockCallback);
 
-      expect(mockLobbyService.togglePlayerReady).toHaveBeenCalledWith('test-player-id');
+      expect(mockLobbyService.togglePlayerReady).toHaveBeenCalledWith(
+        'test-player-id'
+      );
       expect(mockCallback).toHaveBeenCalledWith({ success: true });
       expect(mockIo.to).toHaveBeenCalledWith('TEST123');
-      expect(mockIo.emit).toHaveBeenCalledWith('lobby:playerUpdated', mockLobby.players[0]);
+      expect(mockIo.emit).toHaveBeenCalledWith(
+        'lobby:playerUpdated',
+        mockLobby.players[0]
+      );
       expect(mockIo.emit).toHaveBeenCalledWith('lobby:updated', mockLobby);
     });
   });
 
   describe('Game Starting', () => {
     beforeEach(() => {
-      require('../../websockets/handlers').__setSocketToPlayer('test-socket-id', 'host-player-id');
+      require('../../websockets/handlers').__setSocketToPlayer(
+        'test-socket-id',
+        'host-player-id'
+      );
       jest.useFakeTimers();
     });
 
@@ -350,9 +421,12 @@ describe('WebSocket Handlers', () => {
 
       expect(TwoTruthsAndALieGame).toHaveBeenCalledWith(mockLobby);
       expect(mockIo.emit).toHaveBeenCalledWith('game:started');
-      expect(mockIo.emit).toHaveBeenCalledWith('lobby:updated', expect.objectContaining({
-        status: 'playing'
-      }));
+      expect(mockIo.emit).toHaveBeenCalledWith(
+        'lobby:updated',
+        expect.objectContaining({
+          status: 'playing',
+        })
+      );
     });
 
     test('should handle game start for Would You Rather', async () => {
@@ -367,7 +441,9 @@ describe('WebSocket Handlers', () => {
       const mockGameInstance = {
         getGameState: jest.fn().mockReturnValue({ phase: 'submitting' }),
       };
-      (WouldYouRatherGame as jest.Mock).mockImplementation(() => mockGameInstance);
+      (WouldYouRatherGame as jest.Mock).mockImplementation(
+        () => mockGameInstance
+      );
 
       mockLobbyService.startGame.mockReturnValue(mockLobby as any);
 
@@ -377,7 +453,9 @@ describe('WebSocket Handlers', () => {
       jest.advanceTimersByTime(3000);
 
       expect(WouldYouRatherGame).toHaveBeenCalledWith(mockLobby);
-      expect(mockIo.emit).toHaveBeenCalledWith('game:stateUpdate', { phase: 'submitting' });
+      expect(mockIo.emit).toHaveBeenCalledWith('game:stateUpdate', {
+        phase: 'submitting',
+      });
     });
 
     test('should handle game start for Quick Draw', async () => {
@@ -402,7 +480,9 @@ describe('WebSocket Handlers', () => {
       jest.advanceTimersByTime(3000);
 
       expect(QuickDrawGame).toHaveBeenCalledWith(mockLobby);
-      expect(mockIo.emit).toHaveBeenCalledWith('game:stateUpdate', { gamePhase: 'setup' });
+      expect(mockIo.emit).toHaveBeenCalledWith('game:stateUpdate', {
+        gamePhase: 'setup',
+      });
     });
 
     test('should handle game start error', async () => {
@@ -423,7 +503,10 @@ describe('WebSocket Handlers', () => {
 
   describe('Game Actions', () => {
     beforeEach(() => {
-      require('../../websockets/handlers').__setSocketToPlayer('test-socket-id', 'test-player-id');
+      require('../../websockets/handlers').__setSocketToPlayer(
+        'test-socket-id',
+        'test-player-id'
+      );
     });
 
     test('should handle Two Truths and a Lie game action', async () => {
@@ -450,7 +533,10 @@ describe('WebSocket Handlers', () => {
       };
 
       mockLobbyService.getLobbyByPlayer.mockReturnValue(mockLobby as any);
-      require('../../websockets/handlers').__setActiveGame('TEST123', mockGameInstance);
+      require('../../websockets/handlers').__setActiveGame(
+        'TEST123',
+        mockGameInstance
+      );
 
       await eventHandlers['game:action'](mockAction, mockCallback);
 
@@ -460,7 +546,9 @@ describe('WebSocket Handlers', () => {
       });
       expect(mockCallback).toHaveBeenCalledWith({ success: true });
       expect(mockIo.to).toHaveBeenCalledWith('TEST123');
-      expect(mockIo.emit).toHaveBeenCalledWith('game:stateUpdate', { phase: 'submitting' });
+      expect(mockIo.emit).toHaveBeenCalledWith('game:stateUpdate', {
+        phase: 'submitting',
+      });
     });
 
     test('should handle game action error', async () => {
@@ -479,14 +567,17 @@ describe('WebSocket Handlers', () => {
       };
 
       const mockGameInstance = {
-        handleAction: jest.fn().mockReturnValue({ 
-          success: false, 
-          error: 'Must submit exactly 3 statements' 
+        handleAction: jest.fn().mockReturnValue({
+          success: false,
+          error: 'Must submit exactly 3 statements',
         }),
       };
 
       mockLobbyService.getLobbyByPlayer.mockReturnValue(mockLobby as any);
-      require('../../websockets/handlers').__setActiveGame('TEST123', mockGameInstance);
+      require('../../websockets/handlers').__setActiveGame(
+        'TEST123',
+        mockGameInstance
+      );
 
       await eventHandlers['game:action'](mockAction, mockCallback);
 
@@ -517,7 +608,10 @@ describe('WebSocket Handlers', () => {
       };
 
       mockLobbyService.getLobbyByPlayer.mockReturnValue(mockLobby as any);
-      require('../../websockets/handlers').__setActiveGame('TEST123', mockGameInstance);
+      require('../../websockets/handlers').__setActiveGame(
+        'TEST123',
+        mockGameInstance
+      );
 
       await eventHandlers['game:action'](mockAction, mockCallback);
 
@@ -527,7 +621,9 @@ describe('WebSocket Handlers', () => {
       });
       expect(mockCallback).toHaveBeenCalledWith({ success: true });
       expect(mockIo.to).toHaveBeenCalledWith('TEST123');
-      expect(mockIo.emit).toHaveBeenCalledWith('game:stateUpdate', { phase: 'submitting' });
+      expect(mockIo.emit).toHaveBeenCalledWith('game:stateUpdate', {
+        phase: 'submitting',
+      });
     });
 
     test('should handle Quick Draw game action', async () => {
@@ -552,7 +648,10 @@ describe('WebSocket Handlers', () => {
       };
 
       mockLobbyService.getLobbyByPlayer.mockReturnValue(mockLobby as any);
-      require('../../websockets/handlers').__setActiveGame('TEST123', mockGameInstance);
+      require('../../websockets/handlers').__setActiveGame(
+        'TEST123',
+        mockGameInstance
+      );
 
       await eventHandlers['game:action'](mockAction, mockCallback);
 
@@ -562,7 +661,9 @@ describe('WebSocket Handlers', () => {
       });
       expect(mockCallback).toHaveBeenCalledWith({ success: true });
       expect(mockIo.to).toHaveBeenCalledWith('TEST123');
-      expect(mockIo.emit).toHaveBeenCalledWith('game:stateUpdate', { gamePhase: 'playing' });
+      expect(mockIo.emit).toHaveBeenCalledWith('game:stateUpdate', {
+        gamePhase: 'playing',
+      });
     });
 
     test('should handle game completion', async () => {
@@ -586,20 +687,36 @@ describe('WebSocket Handlers', () => {
         handleAction: jest.fn().mockReturnValue({ success: true }),
         getCurrentState: jest.fn().mockReturnValue({ phase: 'results' }),
         isComplete: jest.fn().mockReturnValue(true),
-        getRoundResults: jest.fn().mockReturnValue({ roundNumber: 1, scores: {} }),
-        getGameResults: jest.fn().mockReturnValue({ finalScores: {}, winner: 'player-1' }),
+        getRoundResults: jest
+          .fn()
+          .mockReturnValue({ roundNumber: 1, scores: {} }),
+        getGameResults: jest
+          .fn()
+          .mockReturnValue({ finalScores: {}, winner: 'player-1' }),
       };
 
       mockLobbyService.getLobbyByPlayer.mockReturnValue(mockLobby as any);
-      require('../../websockets/handlers').__setActiveGame('TEST123', mockGameInstance);
+      require('../../websockets/handlers').__setActiveGame(
+        'TEST123',
+        mockGameInstance
+      );
 
       await eventHandlers['game:action'](mockAction, mockCallback);
 
-      expect(mockIo.emit).toHaveBeenCalledWith('game:roundEnded', { roundNumber: 1, scores: {} });
-      expect(mockIo.emit).toHaveBeenCalledWith('game:ended', { finalScores: {}, winner: 'player-1' });
-      expect(mockIo.emit).toHaveBeenCalledWith('lobby:updated', expect.objectContaining({
-        status: 'finished'
-      }));
+      expect(mockIo.emit).toHaveBeenCalledWith('game:roundEnded', {
+        roundNumber: 1,
+        scores: {},
+      });
+      expect(mockIo.emit).toHaveBeenCalledWith('game:ended', {
+        finalScores: {},
+        winner: 'player-1',
+      });
+      expect(mockIo.emit).toHaveBeenCalledWith(
+        'lobby:updated',
+        expect.objectContaining({
+          status: 'finished',
+        })
+      );
     });
 
     test('should handle unsupported game type', async () => {
@@ -675,7 +792,10 @@ describe('WebSocket Handlers', () => {
   describe('Disconnect Handler', () => {
     beforeEach(() => {
       jest.useFakeTimers();
-      require('../../websockets/handlers').__setSocketToPlayer('test-socket-id', 'test-player-id');
+      require('../../websockets/handlers').__setSocketToPlayer(
+        'test-socket-id',
+        'test-player-id'
+      );
     });
 
     afterEach(() => {
@@ -686,7 +806,7 @@ describe('WebSocket Handlers', () => {
       const mockLobby = {
         lobbyId: 'TEST123',
         players: [
-          { id: 'test-player-id', name: 'Test Player', isConnected: false }
+          { id: 'test-player-id', name: 'Test Player', isConnected: false },
         ],
       };
 
@@ -695,23 +815,31 @@ describe('WebSocket Handlers', () => {
 
       await eventHandlers['disconnect']();
 
-      expect(mockLobbyService.setPlayerConnection).toHaveBeenCalledWith('test-player-id', false);
+      expect(mockLobbyService.setPlayerConnection).toHaveBeenCalledWith(
+        'test-player-id',
+        false
+      );
       expect(mockSocket.to).toHaveBeenCalledWith('TEST123');
-      expect(mockSocket.emit).toHaveBeenCalledWith('lobby:playerUpdated', mockLobby.players[0]);
+      expect(mockSocket.emit).toHaveBeenCalledWith(
+        'lobby:playerUpdated',
+        mockLobby.players[0]
+      );
       expect(mockIo.to).toHaveBeenCalledWith('TEST123');
       expect(mockIo.emit).toHaveBeenCalledWith('lobby:updated', mockLobby);
 
       // Fast-forward timeout
       jest.advanceTimersByTime(30000);
 
-      expect(mockLobbyService.leaveLobby).toHaveBeenCalledWith('test-player-id');
+      expect(mockLobbyService.leaveLobby).toHaveBeenCalledWith(
+        'test-player-id'
+      );
     });
 
     test('should not remove player if they reconnected within timeout', async () => {
       const mockLobby = {
         lobbyId: 'TEST123',
         players: [
-          { id: 'test-player-id', name: 'Test Player', isConnected: true } // Reconnected
+          { id: 'test-player-id', name: 'Test Player', isConnected: true }, // Reconnected
         ],
       };
 
@@ -732,7 +860,10 @@ describe('WebSocket Handlers', () => {
 
       await eventHandlers['disconnect']();
 
-      expect(mockLobbyService.setPlayerConnection).toHaveBeenCalledWith('test-player-id', false);
+      expect(mockLobbyService.setPlayerConnection).toHaveBeenCalledWith(
+        'test-player-id',
+        false
+      );
       expect(mockSocket.to).not.toHaveBeenCalled();
       expect(mockSocket.emit).not.toHaveBeenCalled();
     });
@@ -740,15 +871,23 @@ describe('WebSocket Handlers', () => {
 
   describe('Error Handling', () => {
     beforeEach(() => {
-      require('../../websockets/handlers').__setSocketToPlayer('test-socket-id', 'test-player-id');
+      require('../../websockets/handlers').__setSocketToPlayer(
+        'test-socket-id',
+        'test-player-id'
+      );
     });
 
     test('should handle errors when player not found', async () => {
       const mockCallback = jest.fn();
       // Clear socket-to-player mapping
-      require('../../websockets/handlers').__clearSocketToPlayer('test-socket-id');
+      require('../../websockets/handlers').__clearSocketToPlayer(
+        'test-socket-id'
+      );
 
-      await eventHandlers['lobby:updatePlayer']({ name: 'New Name' }, mockCallback);
+      await eventHandlers['lobby:updatePlayer'](
+        { name: 'New Name' },
+        mockCallback
+      );
 
       expect(mockCallback).toHaveBeenCalledWith({
         success: false,
@@ -800,4 +939,4 @@ declare module '../../websockets/handlers' {
   export function __setSocketToPlayer(socketId: string, playerId: string): void;
   export function __clearSocketToPlayer(socketId: string): void;
   export function __setActiveGame(lobbyId: string, gameInstance: any): void;
-} 
+}

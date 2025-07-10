@@ -1,4 +1,4 @@
-import { defineConfig } from 'cypress'
+import { defineConfig } from 'cypress';
 
 export default defineConfig({
   e2e: {
@@ -18,22 +18,22 @@ export default defineConfig({
     pageLoadTimeout: 30000,
     setupNodeEvents(on, config) {
       // implement node event listeners here
-      require('@cypress/code-coverage/task')(on, config)
-      return config
+      require('@cypress/code-coverage/task')(on, config);
+      return config;
     },
     env: {
       backendUrl: 'http://localhost:3001',
       codeCoverage: {
-        url: 'http://localhost:3001/__coverage__'
-      }
-    }
+        url: 'http://localhost:3001/__coverage__',
+      },
+    },
   },
   component: {
     devServer: {
       framework: 'vite',
-      bundler: 'vite'
+      bundler: 'vite',
     },
     specPattern: 'cypress/component/**/*.cy.{js,jsx,ts,tsx}',
-    supportFile: 'cypress/support/component.ts'
-  }
-}) 
+    supportFile: 'cypress/support/component.ts',
+  },
+});

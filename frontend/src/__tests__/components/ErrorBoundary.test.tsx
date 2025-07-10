@@ -7,7 +7,13 @@ import { ErrorBoundary } from '../../components/ErrorBoundary';
 const originalConsoleError = console.error;
 
 // Component that throws an error when shouldThrow is true
-const ThrowError = ({ shouldThrow = false, message = 'Test error' }: { shouldThrow?: boolean; message?: string }) => {
+const ThrowError = ({
+  shouldThrow = false,
+  message = 'Test error',
+}: {
+  shouldThrow?: boolean;
+  message?: string;
+}) => {
   if (shouldThrow) {
     throw new Error(message);
   }
@@ -52,29 +58,27 @@ describe('ErrorBoundary Component', () => {
 
       expect(screen.getByText('First child')).toBeInTheDocument();
       expect(screen.getByText('Second child')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Action button' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Action button' })
+      ).toBeInTheDocument();
     });
 
     test('handles null children gracefully', () => {
-      render(
-        <ErrorBoundary>
-          {null}
-        </ErrorBoundary>
-      );
+      render(<ErrorBoundary>{null}</ErrorBoundary>);
 
       // Should not throw and render nothing
-      expect(screen.queryByText('Oops! Something went wrong')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Oops! Something went wrong')
+      ).not.toBeInTheDocument();
     });
 
     test('handles undefined children gracefully', () => {
-      render(
-        <ErrorBoundary>
-          {undefined}
-        </ErrorBoundary>
-      );
+      render(<ErrorBoundary>{undefined}</ErrorBoundary>);
 
       // Should not throw and render nothing
-      expect(screen.queryByText('Oops! Something went wrong')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Oops! Something went wrong')
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -86,26 +90,36 @@ describe('ErrorBoundary Component', () => {
         </ErrorBoundary>
       );
 
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
-      expect(screen.getByText("We encountered an unexpected error. Don't worry, it's not your fault!")).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "We encountered an unexpected error. Don't worry, it's not your fault!"
+        )
+      ).toBeInTheDocument();
     });
 
     test('catches errors with custom error messages', () => {
       render(
         <ErrorBoundary>
-          <ThrowError shouldThrow={true} message="Custom error message" />
+          <ThrowError shouldThrow={true} message='Custom error message' />
         </ErrorBoundary>
       );
 
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
       // Error boundary should show generic message, not the specific error
-      expect(screen.queryByText('Custom error message')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Custom error message')
+      ).not.toBeInTheDocument();
     });
 
     test('logs error to console in componentDidCatch', () => {
       render(
         <ErrorBoundary>
-          <ThrowError shouldThrow={true} message="Console test error" />
+          <ThrowError shouldThrow={true} message='Console test error' />
         </ErrorBoundary>
       );
 
@@ -133,7 +147,9 @@ describe('ErrorBoundary Component', () => {
         </ErrorBoundary>
       );
 
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
     });
 
     test('catches errors from deeply nested components', () => {
@@ -153,7 +169,9 @@ describe('ErrorBoundary Component', () => {
         </ErrorBoundary>
       );
 
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
     });
   });
 
@@ -168,31 +186,57 @@ describe('ErrorBoundary Component', () => {
 
     test('displays error icon', () => {
       // Check for AlertTriangle icon (Lucide icon)
-      const icon = screen.getByRole('button', { name: 'Try Again' }).parentElement?.parentElement?.querySelector('svg');
+      const icon = screen
+        .getByRole('button', { name: 'Try Again' })
+        .parentElement?.parentElement?.querySelector('svg');
       expect(icon).toBeInTheDocument();
     });
 
     test('displays error title', () => {
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
     });
 
     test('displays error description', () => {
-      expect(screen.getByText("We encountered an unexpected error. Don't worry, it's not your fault!")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "We encountered an unexpected error. Don't worry, it's not your fault!"
+        )
+      ).toBeInTheDocument();
     });
 
     test('displays action buttons', () => {
-      expect(screen.getByRole('button', { name: 'Try Again' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Reload Page' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Try Again' })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Reload Page' })
+      ).toBeInTheDocument();
     });
 
     test('has proper styling classes', () => {
-      const container = screen.getByText('Oops! Something went wrong').closest('.bg-white');
-      expect(container).toHaveClass('bg-white', 'rounded-lg', 'shadow-lg', 'p-6');
+      const container = screen
+        .getByText('Oops! Something went wrong')
+        .closest('.bg-white');
+      expect(container).toHaveClass(
+        'bg-white',
+        'rounded-lg',
+        'shadow-lg',
+        'p-6'
+      );
     });
 
     test('centers the error UI', () => {
-      const wrapper = screen.getByText('Oops! Something went wrong').closest('.min-h-screen');
-      expect(wrapper).toHaveClass('min-h-screen', 'flex', 'items-center', 'justify-center');
+      const wrapper = screen
+        .getByText('Oops! Something went wrong')
+        .closest('.min-h-screen');
+      expect(wrapper).toHaveClass(
+        'min-h-screen',
+        'flex',
+        'items-center',
+        'justify-center'
+      );
     });
   });
 
@@ -204,19 +248,23 @@ describe('ErrorBoundary Component', () => {
         </ErrorBoundary>
       );
 
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
 
       const tryAgainButton = screen.getByRole('button', { name: 'Try Again' });
       fireEvent.click(tryAgainButton);
 
       // Note: The error boundary reset functionality needs to be implemented properly
       // For now, we'll just verify the button works and error UI is still present
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
     });
 
     test('try again button shows children again if error is resolved', () => {
       let shouldThrow = true;
-      
+
       const TestComponent = () => {
         if (shouldThrow) {
           throw new Error('Test error');
@@ -230,11 +278,13 @@ describe('ErrorBoundary Component', () => {
         </ErrorBoundary>
       );
 
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
 
       // Resolve the error condition
       shouldThrow = false;
-      
+
       const tryAgainButton = screen.getByRole('button', { name: 'Try Again' });
       fireEvent.click(tryAgainButton);
 
@@ -276,9 +326,10 @@ describe('ErrorBoundary Component', () => {
 
     test('shows error details in development mode', () => {
       process.env.NODE_ENV = 'development';
-      
+
       const error = new Error('Development test error');
-      error.stack = 'Error: Development test error\n    at TestComponent\n    at ErrorBoundary';
+      error.stack =
+        'Error: Development test error\n    at TestComponent\n    at ErrorBoundary';
 
       // We need to trigger an actual error to see the development details
       const ErrorComponent = () => {
@@ -292,14 +343,17 @@ describe('ErrorBoundary Component', () => {
       );
 
       // Check for development details
-      expect(screen.getByText('Error Details (Development)')).toBeInTheDocument();
+      expect(
+        screen.getByText('Error Details (Development)')
+      ).toBeInTheDocument();
     });
 
     test('shows error stack trace in development', () => {
       process.env.NODE_ENV = 'development';
-      
+
       const error = new Error('Stack trace test');
-      error.stack = 'Error: Stack trace test\n    at Component (file.tsx:10:5)\n    at ErrorBoundary';
+      error.stack =
+        'Error: Stack trace test\n    at Component (file.tsx:10:5)\n    at ErrorBoundary';
 
       const ErrorComponent = () => {
         throw error;
@@ -327,7 +381,9 @@ describe('ErrorBoundary Component', () => {
         </ErrorBoundary>
       );
 
-      expect(screen.queryByText('Error Details (Development)')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Error Details (Development)')
+      ).not.toBeInTheDocument();
     });
 
     test('error details are collapsible in development', () => {
@@ -341,7 +397,7 @@ describe('ErrorBoundary Component', () => {
 
       const details = screen.getByText('Error Details (Development)');
       expect(details.tagName.toLowerCase()).toBe('summary');
-      
+
       // Should be inside a details element
       expect(details.closest('details')).toBeInTheDocument();
     });
@@ -351,7 +407,7 @@ describe('ErrorBoundary Component', () => {
     test('returns correct state when error occurs', () => {
       const error = new Error('Test error');
       const newState = ErrorBoundary.getDerivedStateFromError(error);
-      
+
       expect(newState).toEqual({
         hasError: true,
         error: error,
@@ -361,7 +417,7 @@ describe('ErrorBoundary Component', () => {
     test('preserves error object in state', () => {
       const specificError = new Error('Specific error message');
       const newState = ErrorBoundary.getDerivedStateFromError(specificError);
-      
+
       expect(newState.error).toBe(specificError);
       expect(newState.error?.message).toBe('Specific error message');
     });
@@ -375,7 +431,9 @@ describe('ErrorBoundary Component', () => {
         </ErrorBoundary>
       );
 
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
 
       const tryAgainButton = screen.getByRole('button', { name: 'Try Again' });
       fireEvent.click(tryAgainButton);
@@ -389,7 +447,9 @@ describe('ErrorBoundary Component', () => {
 
       // Currently the error boundary remains in error state after reset
       // This is expected behavior until reset functionality is fully implemented
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
     });
 
     test('handles multiple error/recovery cycles', () => {
@@ -406,14 +466,18 @@ describe('ErrorBoundary Component', () => {
           <ThrowError shouldThrow={true} />
         </ErrorBoundary>
       );
-      
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
-      
+
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
+
       // Click try again
       fireEvent.click(screen.getByRole('button', { name: 'Try Again' }));
-      
+
       // Error state should persist as reset functionality needs proper implementation
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
     });
   });
 
@@ -429,7 +493,9 @@ describe('ErrorBoundary Component', () => {
         </ErrorBoundary>
       );
 
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
     });
 
     test('handles TypeError', () => {
@@ -444,7 +510,9 @@ describe('ErrorBoundary Component', () => {
         </ErrorBoundary>
       );
 
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
     });
 
     test('handles ReferenceError', () => {
@@ -459,7 +527,9 @@ describe('ErrorBoundary Component', () => {
         </ErrorBoundary>
       );
 
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
     });
 
     test('handles errors in useEffect (does not catch)', () => {
@@ -481,7 +551,9 @@ describe('ErrorBoundary Component', () => {
 
       // Should render normally since no render errors occurred
       expect(screen.getByText('Effect component')).toBeInTheDocument();
-      expect(screen.queryByText('Oops! Something went wrong')).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Oops! Something went wrong')
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -500,8 +572,12 @@ describe('ErrorBoundary Component', () => {
     });
 
     test('buttons are properly labeled', () => {
-      expect(screen.getByRole('button', { name: 'Try Again' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Reload Page' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Try Again' })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Reload Page' })
+      ).toBeInTheDocument();
     });
 
     test('buttons are keyboard accessible', () => {
@@ -517,7 +593,9 @@ describe('ErrorBoundary Component', () => {
     });
 
     test('icon has proper accessibility attributes', () => {
-      const icon = screen.getByRole('button', { name: 'Try Again' }).parentElement?.querySelector('svg');
+      const icon = screen
+        .getByRole('button', { name: 'Try Again' })
+        .parentElement?.querySelector('svg');
       expect(icon).toBeInTheDocument();
     });
   });
@@ -552,17 +630,21 @@ describe('ErrorBoundary Component', () => {
         </ErrorBoundary>
       );
 
-      // Since reset functionality isn't fully implemented, 
+      // Since reset functionality isn't fully implemented,
       // we'll test that the error boundary remains stable
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
-      
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
+
       // Rapid button clicks
       for (let i = 0; i < 5; i++) {
         fireEvent.click(screen.getByRole('button', { name: 'Try Again' }));
       }
 
       // Error state should persist
-      expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Oops! Something went wrong')
+      ).toBeInTheDocument();
     });
   });
-}); 
+});
