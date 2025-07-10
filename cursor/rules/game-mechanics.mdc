@@ -1,0 +1,296 @@
+---
+description: Game mechanics and patterns for party games implementation
+---
+
+# Game Mechanics & Patterns
+
+## Core Game Flow
+
+### Lobby States
+
+```typescript
+enum LobbyState {
+  WAITING = "waiting", // Players joining
+  STARTING = "starting", // Game setup phase
+  PLAYING = "playing", // Active game
+  FINISHED = "finished", // Game completed
+}
+```
+
+### Player Management
+
+```typescript
+interface Player {
+  id: string;
+  name: string;
+  isHost: boolean;
+  isConnected: boolean;
+  joinedAt: Date;
+  role?: string; // Game-specific role
+  score?: number; // Current score
+}
+```
+
+## Game Type Patterns
+
+### Spyfall Implementation
+
+```typescript
+interface SpyfallState extends GameState {
+  location: string;
+  spyId: string;
+  timeRemaining: number;
+  currentPlayer: string;
+  phase: "questioning" | "voting" | "reveal";
+  votes: Record<string, string>;
+}
+
+class SpyfallGame implements Game {
+  readonly type = "spyfall";
+  readonly minPlayers = 3;
+  readonly maxPlayers = 10;
+
+  initialize(players: Player[]): SpyfallState {
+    const spy = players[Math.floor(Math.random() * players.length)];
+    const location = this.selectRandomLocation();
+
+    return {
+      players,
+      location,
+      spyId: spy.id,
+      timeRemaining: 8 * 60, // 8 minutes
+      currentPlayer: players[0].id,
+      phase: "questioning",
+      votes: {},
+    };
+  }
+
+  getPublicState(state: SpyfallState, playerId: string): Partial<SpyfallState> {
+    return {
+      ...state,
+      location: playerId === state.spyId ? undefined : state.location,
+      spyId: undefined, // Never reveal spy until game ends
+    };
+  }
+}
+```
+
+### Mafia Implementation
+
+```typescript
+interface MafiaState extends GameState {
+  phase: "day" | "night" | "voting" | "trial";
+  dayNumber: number;
+  mafiaMembers: string[];
+  alivePlayers: string[];
+  votes: Record<string, string>;
+  onTrial?: string;
+  nightActions: Record<string, string>;
+}
+
+class MafiaGame implements Game {
+  readonly type = "mafia";
+  readonly minPlayers = 4;
+  readonly maxPlayers = 12;
+
+  assignRoles(players: Player[]): void {
+    const mafiaCount = Math.floor(players.length / 3);
+    // Role assignment logic
+  }
+}
+```
+
+## Common Game Components
+
+### Timer Management
+
+```typescript
+class GameTimer {
+  private timers = new Map<string, NodeJS.Timeout>();
+
+  startTimer(lobbyCode: string, duration: number, onExpire: () => void) {
+    this.clearTimer(lobbyCode);
+    const timer = setTimeout(onExpire, duration * 1000);
+    this.timers.set(lobbyCode, timer);
+  }
+
+  clearTimer(lobbyCode: string) {
+    const timer = this.timers.get(lobbyCode);
+    if (timer) {
+      clearTimeout(timer);
+      this.timers.delete(lobbyCode);
+    }
+  }
+}
+```
+
+### Voting System
+
+```typescript
+interface VotingResult {
+  winner?: string;
+  isTie: boolean;
+  votes: Record<string, number>;
+  abstentions: number;
+}
+
+class VotingManager {
+  processVotes(
+    votes: Record<string, string>,
+    eligibleVoters: string[]
+  ): VotingResult {
+    const tally = new Map<string, number>();
+    let abstentions = 0;
+
+    eligibleVoters.forEach((voterId) => {
+      const vote = votes[voterId];
+      if (!vote) {
+        abstentions++;
+      } else {
+        tally.set(vote, (tally.get(vote) || 0) + 1);
+      }
+    });
+
+    // Determine winner logic
+    return this.calculateWinner(tally, abstentions);
+  }
+}
+```
+
+## Real-Time Features
+
+### Turn Management
+
+```typescript
+class TurnManager {
+  private turnOrder: string[] = [];
+  private currentIndex = 0;
+
+  initializeTurns(playerIds: string[], shuffle = true) {
+    this.turnOrder = shuffle ? this.shuffleArray(playerIds) : [...playerIds];
+    this.currentIndex = 0;
+  }
+
+  getCurrentPlayer(): string {
+    return this.turnOrder[this.currentIndex];
+  }
+
+  nextTurn(): string {
+    this.currentIndex = (this.currentIndex + 1) % this.turnOrder.length;
+    return this.getCurrentPlayer();
+  }
+}
+```
+
+### Action Validation
+
+```typescript
+interface GameAction {
+  type: string;
+  playerId: string;
+  data: unknown;
+  timestamp: Date;
+}
+
+abstract class ActionValidator {
+  abstract validate(action: GameAction, state: GameState): boolean;
+
+  protected isPlayersTurn(playerId: string, state: GameState): boolean {
+    return state.currentPlayer === playerId;
+  }
+
+  protected isPlayerAlive(playerId: string, state: GameState): boolean {
+    return state.alivePlayers?.includes(playerId) ?? true;
+  }
+}
+```
+
+## Event Broadcasting
+
+### State Change Events
+
+```typescript
+interface GameEvent {
+  type:
+    | "player-joined"
+    | "player-left"
+    | "game-started"
+    | "state-updated"
+    | "game-ended";
+  lobbyCode: string;
+  data: unknown;
+  timestamp: Date;
+}
+
+class EventBroadcaster {
+  broadcastToLobby(lobbyCode: string, event: GameEvent) {
+    const lobby = gameState.getLobby(lobbyCode);
+    lobby.players.forEach((player) => {
+      const personalizedEvent = this.personalizeEvent(event, player.id);
+      this.sendToPlayer(player.id, personalizedEvent);
+    });
+  }
+
+  private personalizeEvent(event: GameEvent, playerId: string): GameEvent {
+    // Filter sensitive information based on player
+    return event;
+  }
+}
+```
+
+## Scoring System
+
+### Universal Scoring
+
+```typescript
+interface GameResult {
+  winners: string[];
+  scores: Record<string, number>;
+  duration: number;
+  gameType: string;
+}
+
+class ScoreCalculator {
+  calculateSpyfallScore(state: SpyfallState): GameResult {
+    const spyWon = this.didSpyWin(state);
+    return {
+      winners: spyWon
+        ? [state.spyId]
+        : state.players.filter((p) => p.id !== state.spyId).map((p) => p.id),
+      scores: this.generateScores(state.players, spyWon, state.spyId),
+      duration: 8 * 60 - state.timeRemaining,
+      gameType: "spyfall",
+    };
+  }
+}
+```
+
+## Game Extensions
+
+### Spectator Mode
+
+```typescript
+interface SpectatorConnection {
+  id: string;
+  lobbyCode: string;
+  joinedAt: Date;
+}
+
+// Allow spectators to watch ongoing games
+// Provide spectator-safe game state (no secret information)
+```
+
+### Game History
+
+```typescript
+interface GameSummary {
+  id: string;
+  gameType: string;
+  players: string[];
+  winner: string[];
+  duration: number;
+  endedAt: Date;
+}
+
+// Store recent game summaries in memory for lobby history
+```

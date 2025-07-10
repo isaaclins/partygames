@@ -1,0 +1,62 @@
+---
+alwaysApply: true
+description: Project architecture and technology stack guidelines
+---
+
+# Party Games PWA Architecture
+
+## Project Structure
+
+```
+partygames/
+├── frontend/          # React PWA (deployed to GitHub Pages)
+│   ├── src/
+│   │   ├── components/    # Reusable UI components
+│   │   ├── pages/        # Route-based page components
+│   │   ├── games/        # Game-specific components
+│   │   ├── hooks/        # Custom React hooks
+│   │   ├── services/     # API communication layer
+│   │   ├── utils/        # Helper functions
+│   │   └── types/        # TypeScript type definitions
+│   ├── public/
+│   │   ├── manifest.json # PWA manifest
+│   │   └── sw.js        # Service worker
+│   └── package.json
+├── backend/           # Node.js/Express server (deployed to Render)
+│   ├── src/
+│   │   ├── routes/       # Express route handlers
+│   │   ├── services/     # Business logic services
+│   │   ├── games/        # Game-specific logic
+│   │   ├── websockets/   # WebSocket handlers
+│   │   └── types/        # Shared TypeScript types
+│   └── package.json
+└── shared/            # Shared types and utilities
+    └── types/
+```
+
+## Technology Stack
+
+### Frontend
+
+- **Framework**: React 18+ with TypeScript
+- **Styling**: Tailwind CSS for mobile-first responsive design
+- **PWA**: Service Workers for offline capability and installability
+- **State Management**: React Context API or Zustand for simplicity
+- **Build Tool**: Vite for fast development and optimized builds
+- **Deployment**: GitHub Pages via GitHub Actions
+
+### Backend
+
+- **Runtime**: Node.js with TypeScript
+- **Framework**: Express.js with WebSocket support (ws or socket.io)
+- **Memory Store**: In-memory Maps for lobby and game state
+- **CORS**: Configured for GitHub Pages origin
+- **Deployment**: Render with auto-deploy from main branch
+
+## Core Principles
+
+1. **Mobile-First**: All UI components designed for touch interfaces
+2. **Real-Time**: WebSocket connections for live game updates
+3. **Stateless**: No persistent storage, all data in memory
+4. **Modular Games**: Easy to add new party games
+5. **PWA Standards**: Installable, offline-capable, app-like experience

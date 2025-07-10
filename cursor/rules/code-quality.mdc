@@ -1,0 +1,412 @@
+---
+alwaysApply: true
+description: Comprehensive code quality guidelines for party games PWA
+---
+
+# Code Quality Guidelines
+
+## TypeScript Standards
+
+### Type Safety
+
+```typescript
+// ✅ Use explicit interfaces for complex objects
+interface GameState {
+  readonly id: string;
+  readonly phase: GamePhase;
+  readonly players: readonly Player[];
+  readonly timeRemaining?: number;
+}
+
+// ✅ Use union types for controlled values
+type GamePhase = "lobby" | "playing" | "voting" | "finished";
+
+// ❌ Avoid any types
+const gameData: any = {}; // Bad
+
+// ✅ Use proper typing
+const gameData: GameState = {
+  id: generateId(),
+  phase: "lobby",
+  players: [],
+};
+```
+
+### Error Handling
+
+```typescript
+// ✅ Use Result pattern for operations that can fail
+type Result<T, E = Error> =
+  | { success: true; data: T }
+  | { success: false; error: E };
+
+// ✅ Explicit error handling
+const joinLobby = async (code: string): Promise<Result<LobbyState>> => {
+  try {
+    const lobby = await lobbyService.join(code);
+    return { success: true, data: lobby };
+  } catch (error) {
+    return { success: false, error: error as Error };
+  }
+};
+
+// ❌ Avoid throwing in business logic
+const badJoinLobby = (code: string) => {
+  if (!isValidCode(code)) throw new Error("Invalid code"); // Bad
+};
+```
+
+## React Component Quality
+
+### Component Structure
+
+```typescript
+// ✅ Proper component interface
+interface PlayerListProps {
+  readonly players: readonly Player[];
+  readonly currentPlayerId?: string;
+  readonly onPlayerSelect?: (playerId: string) => void;
+}
+
+// ✅ Use React.memo for performance
+export const PlayerList = React.memo<PlayerListProps>(
+  ({ players, currentPlayerId, onPlayerSelect }) => {
+    // Component logic
+  }
+);
+
+// ✅ Custom hooks for complex logic
+const useGameConnection = (lobbyCode: string) => {
+  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<
+    "connecting" | "connected" | "disconnected"
+  >("connecting");
+
+  // WebSocket logic
+  return { gameState, connectionStatus };
+};
+```
+
+### State Management
+
+```typescript
+// ✅ Use useCallback for event handlers
+const PlayerCard: React.FC<PlayerCardProps> = ({ player, onVote }) => {
+  const handleVote = useCallback(() => {
+    onVote(player.id);
+  }, [player.id, onVote]);
+
+  return <button onClick={handleVote}>Vote for {player.name}</button>;
+};
+
+// ✅ Proper dependency arrays
+useEffect(() => {
+  const cleanup = setupWebSocket(lobbyCode);
+  return cleanup;
+}, [lobbyCode]); // Only lobbyCode dependency
+
+// ❌ Missing dependencies or incorrect arrays
+useEffect(() => {
+  fetchGameState(lobbyCode, playerId);
+}, []); // Bad - missing dependencies
+```
+
+## Backend Code Quality
+
+### API Design
+
+```typescript
+// ✅ Consistent error responses
+interface ApiError {
+  readonly error: string;
+  readonly message: string;
+  readonly code?: string;
+  readonly timestamp: string;
+}
+
+// ✅ Input validation middleware
+const validateLobbyCode = (req: Request, res: Response, next: NextFunction) => {
+  const { code } = req.params;
+  if (!isValidLobbyCode(code)) {
+    return res.status(400).json({
+      error: "INVALID_LOBBY_CODE",
+      message: "Lobby code must be 4 alphanumeric characters",
+      timestamp: new Date().toISOString(),
+    });
+  }
+  next();
+};
+
+// ✅ Async error handling
+const asyncHandler =
+  (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+```
+
+### Memory Management
+
+```typescript
+// ✅ Proper cleanup for in-memory stores
+class LobbyManager {
+  private lobbies = new Map<string, LobbyState>();
+  private cleanupInterval: NodeJS.Timeout;
+
+  constructor() {
+    this.cleanupInterval = setInterval(() => {
+      this.cleanupInactiveLobbies();
+    }, 5 * 60 * 1000); // 5 minutes
+  }
+
+  destroy() {
+    clearInterval(this.cleanupInterval);
+    this.lobbies.clear();
+  }
+
+  private cleanupInactiveLobbies() {
+    const cutoff = Date.now() - 30 * 60 * 1000; // 30 minutes
+    for (const [code, lobby] of this.lobbies.entries()) {
+      if (lobby.lastActivity < cutoff) {
+        this.lobbies.delete(code);
+      }
+    }
+  }
+}
+```
+
+## WebSocket Quality
+
+### Connection Management
+
+```typescript
+// ✅ Robust WebSocket handling
+class GameWebSocket {
+  private ws: WebSocket | null = null;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 5;
+
+  connect(url: string) {
+    this.ws = new WebSocket(url);
+
+    this.ws.onopen = () => {
+      this.reconnectAttempts = 0;
+    };
+
+    this.ws.onclose = (event) => {
+      if (
+        !event.wasClean &&
+        this.reconnectAttempts < this.maxReconnectAttempts
+      ) {
+        setTimeout(
+          () => this.reconnect(url),
+          1000 * Math.pow(2, this.reconnectAttempts)
+        );
+        this.reconnectAttempts++;
+      }
+    };
+
+    this.ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+  }
+
+  private reconnect(url: string) {
+    this.connect(url);
+  }
+}
+```
+
+## Security Standards
+
+### Input Validation
+
+```typescript
+// ✅ Sanitize all user inputs
+import DOMPurify from "isomorphic-dompurify";
+import { z } from "zod";
+
+const PlayerNameSchema = z
+  .string()
+  .min(1, "Name cannot be empty")
+  .max(20, "Name too long")
+  .regex(/^[a-zA-Z0-9\s]+$/, "Name contains invalid characters");
+
+const sanitizePlayerName = (name: string): string => {
+  const sanitized = DOMPurify.sanitize(name.trim());
+  const validated = PlayerNameSchema.parse(sanitized);
+  return validated;
+};
+
+// ✅ Rate limiting
+const rateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP",
+});
+```
+
+### WebSocket Security
+
+```typescript
+// ✅ Validate WebSocket messages
+interface WebSocketMessage {
+  readonly type: string;
+  readonly data: unknown;
+  readonly timestamp: number;
+}
+
+const validateMessage = (raw: string): WebSocketMessage | null => {
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed.type || typeof parsed.type !== "string") return null;
+    if (!parsed.timestamp || typeof parsed.timestamp !== "number") return null;
+    return parsed as WebSocketMessage;
+  } catch {
+    return null;
+  }
+};
+```
+
+## Performance Standards
+
+### Optimization Patterns
+
+```typescript
+// ✅ Lazy loading for routes
+const GamePage = React.lazy(() => import("./pages/GamePage"));
+const LobbyPage = React.lazy(() => import("./pages/LobbyPage"));
+
+// ✅ Memoization for expensive calculations
+const useGameScore = (gameState: GameState) => {
+  return useMemo(() => {
+    return calculateComplexScore(gameState);
+  }, [gameState.phase, gameState.votes, gameState.players.length]);
+};
+
+// ✅ Debouncing user inputs
+const useDebounce = <T>(value: T, delay: number): T => {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+```
+
+## Testing Standards
+
+### Component Testing
+
+```typescript
+// ✅ Comprehensive component tests
+describe("LobbyCode Component", () => {
+  it("displays the lobby code correctly", () => {
+    render(<LobbyCode code="ABC123" />);
+    expect(screen.getByText("ABC123")).toBeInTheDocument();
+  });
+
+  it("handles share functionality", async () => {
+    const mockShare = jest.fn();
+    render(<LobbyCode code="ABC123" onShare={mockShare} />);
+
+    await user.click(screen.getByRole("button", { name: /share/i }));
+    expect(mockShare).toHaveBeenCalledWith();
+  });
+
+  it("meets accessibility standards", async () => {
+    const { container } = render(<LobbyCode code="ABC123" />);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});
+```
+
+### Integration Testing
+
+```typescript
+// ✅ Test real-time features
+describe("Game Integration", () => {
+  it("synchronizes game state across players", async () => {
+    const lobby = await createTestLobby();
+    const player1 = await joinLobby(lobby.code);
+    const player2 = await joinLobby(lobby.code);
+
+    await player1.startGame();
+
+    await waitFor(() => {
+      expect(player2.gameState.phase).toBe("playing");
+    });
+  });
+});
+```
+
+## Code Organization
+
+### File Structure
+
+```typescript
+// ✅ Clear exports and imports
+// services/gameService.ts
+export class GameService {
+  // Implementation
+}
+
+export const gameService = new GameService();
+
+// ✅ Barrel exports for clean imports
+// components/index.ts
+export { LobbyCode } from "./LobbyCode";
+export { PlayerList } from "./PlayerList";
+export { GameTimer } from "./GameTimer";
+
+// ✅ Type-only imports when needed
+import type { GameState, Player } from "../types";
+import { gameService } from "../services";
+```
+
+### Documentation
+
+```typescript
+// ✅ Document complex business logic
+/**
+ * Calculates the winner of a Spyfall game based on voting results
+ * @param votes - Record of player votes (voterId -> targetId)
+ * @param spyId - ID of the spy player
+ * @param threshold - Minimum percentage needed to eliminate spy (default: 0.5)
+ * @returns Game result with winners and score breakdown
+ */
+const calculateSpyfallWinner = (
+  votes: Record<string, string>,
+  spyId: string,
+  threshold = 0.5
+): GameResult => {
+  // Implementation
+};
+```
+
+## General Principles
+
+### Code Style
+
+- Use consistent naming: camelCase for variables/functions, PascalCase for components/classes
+- Prefer const over let, avoid var completely
+- Use meaningful variable names that describe intent
+- Keep functions small and focused (max 20-30 lines)
+- Avoid deep nesting (max 3-4 levels)
+
+### Error Boundaries
+
+- Implement error boundaries for all route components
+- Log errors appropriately in production
+- Provide meaningful fallback UI for users
+- Never expose sensitive error details to end users
+
+### Performance
+
+- Avoid premature optimization but measure what matters
+- Use React DevTools Profiler to identify bottlenecks
+- Implement proper loading states for all async operations
+- Cache expensive computations and API responses appropriately

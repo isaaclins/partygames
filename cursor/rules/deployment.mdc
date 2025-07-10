@@ -1,0 +1,439 @@
+---
+description: Deployment and build configuration for PWA project
+---
+
+# Deployment & Build Configuration
+
+## Frontend Deployment (GitHub Pages)
+
+### Build Configuration
+
+```json
+// package.json scripts
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  }
+}
+```
+
+### Vite Configuration
+
+```typescript
+// vite.config.ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { VitePWA } from "vite-plugin-pwa";
+
+export default defineConfig({
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: "autoUpdate",
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/api\.yourdomain\.com\//,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "api-cache",
+              networkTimeoutSeconds: 10,
+            },
+          },
+        ],
+      },
+      manifest: {
+        name: "Party Games",
+        short_name: "PartyGames",
+        description: "Mobile-first PWA for party games",
+        theme_color: "#ffffff",
+        icons: [
+          {
+            src: "pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+      },
+    }),
+  ],
+  base: "/partygames/", // GitHub Pages subdirectory
+  build: {
+    outDir: "dist",
+    sourcemap: true,
+  },
+});
+```
+
+### GitHub Actions Workflow
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["frontend/**"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build application
+        run: |
+          cd frontend
+          npm run build
+        env:
+          VITE_API_URL: ${{ secrets.API_URL }}
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/dist
+```
+
+## Backend Deployment (Render)
+
+### Render Configuration
+
+```yaml
+# render.yaml
+services:
+  - type: web
+    name: partygames-api
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: CORS_ORIGIN
+        value: https://your-username.github.io
+```
+
+### Backend Package Configuration
+
+```json
+// backend/package.json
+{
+  "name": "partygames-backend",
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "postinstall": "npm run build"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+```
+
+### TypeScript Build Configuration
+
+```json
+// backend/tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+## Environment Configuration
+
+### Environment Variables
+
+```typescript
+// shared/config.ts
+export const config = {
+  // Frontend
+  API_URL: import.meta.env.VITE_API_URL || "ws://localhost:3001",
+
+  // Backend
+  PORT: process.env.PORT || 3001,
+  NODE_ENV: process.env.NODE_ENV || "development",
+  CORS_ORIGIN: process.env.CORS_ORIGIN || "http://localhost:3000",
+
+  // Game settings
+  LOBBY_TIMEOUT: 30 * 60 * 1000, // 30 minutes
+  MAX_PLAYERS_PER_LOBBY: 12,
+  CLEANUP_INTERVAL: 5 * 60 * 1000, // 5 minutes
+};
+```
+
+### Development Environment
+
+```bash
+# .env.local (frontend)
+VITE_API_URL=ws://localhost:3001
+VITE_DEBUG=true
+
+# .env (backend)
+NODE_ENV=development
+PORT=3001
+CORS_ORIGIN=http://localhost:3000
+```
+
+## PWA Optimization
+
+### Service Worker Strategy
+
+```typescript
+// Custom service worker additions
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
+// Cache API responses with custom strategy
+self.addEventListener("fetch", (event) => {
+  if (event.request.url.includes("/api/")) {
+    event.respondWith(
+      caches.open("api-cache").then((cache) => {
+        return fetch(event.request)
+          .then((response) => {
+            // Only cache successful responses
+            if (response.status === 200) {
+              cache.put(event.request, response.clone());
+            }
+            return response;
+          })
+          .catch(() => {
+            // Fallback to cache if network fails
+            return cache.match(event.request);
+          });
+      })
+    );
+  }
+});
+```
+
+### Manifest Optimization
+
+```json
+// public/manifest.json
+{
+  "name": "Party Games",
+  "short_name": "PartyGames",
+  "description": "Play party games with friends - no signup required!",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#3B82F6",
+  "background_color": "#FFFFFF",
+  "categories": ["games", "entertainment", "social"],
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ]
+}
+```
+
+## Monitoring & Analytics
+
+### Error Tracking
+
+```typescript
+// Error boundary for production
+class ErrorBoundary extends React.Component {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    if (import.meta.env.PROD) {
+      // Log to external service in production
+      console.error("App crashed:", error, errorInfo);
+    }
+  }
+}
+```
+
+### Performance Monitoring
+
+```typescript
+// Performance metrics
+const reportWebVitals = (metric: any) => {
+  if (import.meta.env.PROD) {
+    // Send to analytics service
+    console.log(metric);
+  }
+};
+
+// Measure game-specific metrics
+const trackGameEvent = (event: string, data: any) => {
+  if (import.meta.env.PROD) {
+    // Track user interactions
+    console.log("Game event:", event, data);
+  }
+};
+```
+
+## Development Workflow
+
+### Local Development Setup
+
+```bash
+# Start both frontend and backend
+npm run dev:all
+
+# Or separately
+cd frontend && npm run dev
+cd backend && npm run dev
+```
+
+### Testing Strategy
+
+```typescript
+// Component testing with React Testing Library
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
+test("lobby code display", async () => {
+  render(<LobbyCode code="ABC123" />);
+
+  expect(screen.getByText("ABC123")).toBeInTheDocument();
+
+  const shareButton = screen.getByRole("button", { name: /share/i });
+  await userEvent.click(shareButton);
+
+  // Test share functionality
+});
+```
+
+### Pre-commit Hooks
+
+```json
+// package.json
+{
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": ["eslint --fix", "prettier --write"]
+  }
+}
+```
+
+## Security Considerations
+
+### CORS Configuration
+
+```typescript
+// Backend CORS setup
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV === "production"
+        ? ["https://your-username.github.io"]
+        : ["http://localhost:3000", "http://127.0.0.1:3000"],
+    credentials: false, // No credentials needed for this app
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+```
+
+### Input Sanitization
+
+```typescript
+import DOMPurify from "isomorphic-dompurify";
+
+// Sanitize user inputs
+const sanitizePlayerName = (name: string): string => {
+  return DOMPurify.sanitize(name.trim().slice(0, 20));
+};
+
+// Validate lobby codes
+const isValidLobbyCode = (code: string): boolean => {
+  return /^[A-Z0-9]{4}$/.test(code);
+};
+```
