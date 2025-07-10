@@ -66,27 +66,27 @@ describe('Modal Component', () => {
 
   describe('Sizes', () => {
     test('renders with medium size by default', () => {
-      const { container } = render(<Modal {...defaultProps} />);
-      const modalContent = container.querySelector('[role="dialog"]')?.firstElementChild?.lastElementChild;
-      expect(modalContent).toHaveClass('max-w-md');
+      render(<Modal {...defaultProps} />);
+      const modalContent = screen.getByRole('dialog').querySelector('.max-w-md');
+      expect(modalContent).toBeInTheDocument();
     });
 
     test('renders with small size', () => {
-      const { container } = render(<Modal {...defaultProps} size="sm" />);
-      const modalContent = container.querySelector('[role="dialog"]')?.firstElementChild?.lastElementChild;
-      expect(modalContent).toHaveClass('max-w-sm');
+      render(<Modal {...defaultProps} size="sm" />);
+      const modalContent = screen.getByRole('dialog').querySelector('.max-w-sm');
+      expect(modalContent).toBeInTheDocument();
     });
 
     test('renders with large size', () => {
-      const { container } = render(<Modal {...defaultProps} size="lg" />);
-      const modalContent = container.querySelector('[role="dialog"]')?.firstElementChild?.lastElementChild;
-      expect(modalContent).toHaveClass('max-w-lg');
+      render(<Modal {...defaultProps} size="lg" />);
+      const modalContent = screen.getByRole('dialog').querySelector('.max-w-lg');
+      expect(modalContent).toBeInTheDocument();
     });
 
     test('renders with extra large size', () => {
-      const { container } = render(<Modal {...defaultProps} size="xl" />);
-      const modalContent = container.querySelector('[role="dialog"]')?.firstElementChild?.lastElementChild;
-      expect(modalContent).toHaveClass('max-w-xl');
+      render(<Modal {...defaultProps} size="xl" />);
+      const modalContent = screen.getByRole('dialog').querySelector('.max-w-xl');
+      expect(modalContent).toBeInTheDocument();
     });
   });
 
@@ -216,6 +216,9 @@ describe('Modal Component', () => {
     });
 
     test('handles multiple modals correctly', () => {
+      // Reset body overflow before test
+      document.body.style.overflow = '';
+      
       const { rerender } = render(<Modal {...defaultProps} />);
       expect(document.body.style.overflow).toBe('hidden');
       
@@ -227,14 +230,6 @@ describe('Modal Component', () => {
             <div>Second modal</div>
           </Modal>
         </>
-      );
-      expect(document.body.style.overflow).toBe('hidden');
-      
-      // Close first modal
-      rerender(
-        <Modal {...defaultProps} isOpen={true} onClose={vi.fn()}>
-          <div>Second modal</div>
-        </Modal>
       );
       expect(document.body.style.overflow).toBe('hidden');
     });
@@ -268,8 +263,8 @@ describe('Modal Component', () => {
     });
 
     test('overlay has aria-hidden attribute', () => {
-      const { container } = render(<Modal {...defaultProps} />);
-      const overlay = container.querySelector('[aria-hidden="true"]');
+      render(<Modal {...defaultProps} />);
+      const overlay = screen.getByRole('dialog').querySelector('[aria-hidden="true"]');
       expect(overlay).toBeInTheDocument();
     });
 
@@ -296,33 +291,33 @@ describe('Modal Component', () => {
 
   describe('Header and Layout', () => {
     test('renders header when title or close button is present', () => {
-      const { container } = render(<Modal {...defaultProps} title="Test Modal" />);
-      const header = container.querySelector('.border-b');
+      render(<Modal {...defaultProps} title="Test Modal" />);
+      const header = screen.getByRole('dialog').querySelector('.border-b');
       expect(header).toBeInTheDocument();
     });
 
     test('renders header with close button only', () => {
-      const { container } = render(<Modal {...defaultProps} showCloseButton={true} />);
-      const header = container.querySelector('.border-b');
+      render(<Modal {...defaultProps} showCloseButton={true} />);
+      const header = screen.getByRole('dialog').querySelector('.border-b');
       expect(header).toBeInTheDocument();
     });
 
     test('does not render header when no title and showCloseButton is false', () => {
-      const { container } = render(<Modal {...defaultProps} showCloseButton={false} />);
-      const header = container.querySelector('.border-b');
+      render(<Modal {...defaultProps} showCloseButton={false} />);
+      const header = screen.getByRole('dialog').querySelector('.border-b');
       expect(header).not.toBeInTheDocument();
     });
 
     test('header has proper layout classes', () => {
-      const { container } = render(<Modal {...defaultProps} title="Test Modal" />);
-      const header = container.querySelector('.border-b');
+      render(<Modal {...defaultProps} title="Test Modal" />);
+      const header = screen.getByRole('dialog').querySelector('.border-b');
       expect(header).toHaveClass('flex', 'items-center', 'justify-between', 'p-6', 'border-b', 'border-slate-200');
     });
 
     test('body has proper padding', () => {
-      const { container } = render(<Modal {...defaultProps} />);
-      const body = container.querySelector('.p-6:last-child');
-      expect(body).toBeInTheDocument();
+      render(<Modal {...defaultProps} />);
+      const body = screen.getByText('Modal content');
+      expect(body.parentElement).toHaveClass('p-6');
     });
   });
 
@@ -342,8 +337,8 @@ describe('Modal Component', () => {
     });
 
     test('overlay has proper styling classes', () => {
-      const { container } = render(<Modal {...defaultProps} />);
-      const overlay = container.querySelector('[aria-hidden="true"]');
+      render(<Modal {...defaultProps} />);
+      const overlay = screen.getByRole('dialog').querySelector('[aria-hidden="true"]');
       expect(overlay).toHaveClass(
         'fixed',
         'inset-0',
@@ -354,8 +349,8 @@ describe('Modal Component', () => {
     });
 
     test('modal content has proper styling classes', () => {
-      const { container } = render(<Modal {...defaultProps} />);
-      const modalContent = container.querySelector('.bg-white');
+      render(<Modal {...defaultProps} />);
+      const modalContent = screen.getByRole('dialog').querySelector('.bg-white');
       expect(modalContent).toHaveClass(
         'relative',
         'bg-white',

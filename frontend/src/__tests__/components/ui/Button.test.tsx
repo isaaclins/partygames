@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
 import { Button } from '../../../components/ui/Button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import userEvent from '@testing-library/user-event';
 
 describe('Button Component', () => {
   describe('Basic Rendering', () => {
@@ -219,22 +220,30 @@ describe('Button Component', () => {
       expect(handleClick).not.toHaveBeenCalled();
     });
 
-    test('handles keyboard navigation', () => {
+    test('handles keyboard navigation', async () => {
+      const user = userEvent.setup();
       const handleClick = vi.fn();
       render(<Button onClick={handleClick}>Test</Button>);
       
       const button = screen.getByRole('button');
-      fireEvent.keyDown(button, { key: 'Enter', code: 'Enter' });
+      button.focus();
+      
+      // Use userEvent to simulate proper keyboard interaction
+      await user.keyboard('{Enter}');
       
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
 
-    test('handles space key activation', () => {
+    test('handles space key activation', async () => {
+      const user = userEvent.setup();
       const handleClick = vi.fn();
       render(<Button onClick={handleClick}>Test</Button>);
       
       const button = screen.getByRole('button');
-      fireEvent.keyDown(button, { key: ' ', code: 'Space' });
+      button.focus();
+      
+      // Use userEvent to simulate proper keyboard interaction
+      await user.keyboard(' ');
       
       expect(handleClick).toHaveBeenCalledTimes(1);
     });

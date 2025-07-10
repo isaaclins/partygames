@@ -90,8 +90,8 @@ describe('DrawingCanvas Component', () => {
   };
 
   test('should render canvas element', () => {
-    render(<DrawingCanvas {...defaultProps} />);
-    const canvas = screen.getByRole('img', { hidden: true }); // Canvas has img role
+    const { container } = render(<DrawingCanvas {...defaultProps} />);
+    const canvas = container.querySelector('canvas');
     expect(canvas).toBeInTheDocument();
   });
 
