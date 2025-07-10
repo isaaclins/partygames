@@ -15,6 +15,24 @@ interface GameType {
 
 const gameTypes: GameType[] = [
   {
+    id: 'two-truths-and-a-lie',
+    name: 'Two Truths and a Lie',
+    description: 'Social deduction game where players guess the lies',
+    minPlayers: 3,
+    maxPlayers: 10,
+    icon: Users,
+    available: true,
+  },
+  {
+    id: 'would-you-rather',
+    name: 'Would You Rather',
+    description: 'Choose between challenging scenarios and see what others pick',
+    minPlayers: 3,
+    maxPlayers: 8,
+    icon: Plus,
+    available: true,
+  },
+  {
     id: 'quick-draw',
     name: 'Quick Draw',
     description: 'Drawing and guessing game with real-time canvas sharing',
@@ -22,15 +40,6 @@ const gameTypes: GameType[] = [
     maxPlayers: 8,
     icon: Zap,
     available: false,
-  },
-  {
-    id: 'two-truths-lie',
-    name: 'Two Truths and a Lie',
-    description: 'Social deduction with voting mechanics',
-    minPlayers: 3,
-    maxPlayers: 10,
-    icon: Users,
-    available: true, // Enable this one for testing
   },
 ];
 

@@ -7,16 +7,18 @@ import {
   LobbyResponse,
   GameAction,
   TwoTruthsGameAction,
+  WouldYouRatherGameAction,
 } from '../../../shared/types/index.js';
 import { lobbyService } from '../services/LobbyService.js';
 import { TwoTruthsAndALieGame } from '../games/TwoTruthsAndALie.js';
+import { WouldYouRatherGame } from '../games/WouldYouRather.js';
 
 // Track socket to player mapping
 const socketToPlayer = new Map<string, string>(); // socketId -> playerId
 const playerToSocket = new Map<string, string>(); // playerId -> socketId
 
 // Track active game instances
-const activeGames = new Map<string, TwoTruthsAndALieGame>(); // lobbyId -> gameInstance
+const activeGames = new Map<string, TwoTruthsAndALieGame | WouldYouRatherGame>(); // lobbyId -> gameInstance
 
 export function setupWebSocketHandlers(
   io: Server<ClientToServerEvents, ServerToClientEvents>,
@@ -225,7 +227,7 @@ export function setupWebSocketHandlers(
           // Update lobby status and emit game started
           lobby.status = 'playing';
           
-          // Create game instance for Two Truths and a Lie
+          // Create game instance based on game type
           if (lobby.gameType === 'two-truths-and-a-lie') {
             const gameInstance = new TwoTruthsAndALieGame(lobby);
             activeGames.set(lobby.lobbyId, gameInstance);
@@ -235,6 +237,16 @@ export function setupWebSocketHandlers(
             io.to(lobby.lobbyId).emit('lobby:updated', lobby);
             
             console.log(`Two Truths and a Lie game started in lobby ${lobby.lobbyId}`);
+          } else if (lobby.gameType === 'would-you-rather') {
+            const gameInstance = new WouldYouRatherGame(lobby);
+            activeGames.set(lobby.lobbyId, gameInstance);
+            
+            // Emit game started with initial game state
+            io.to(lobby.lobbyId).emit('game:started');
+            io.to(lobby.lobbyId).emit('lobby:updated', lobby);
+            io.to(lobby.lobbyId).emit('game:stateUpdate', gameInstance.getGameState());
+            
+            console.log(`Would You Rather game started in lobby ${lobby.lobbyId}`);
           } else {
             io.to(lobby.lobbyId).emit('game:started');
             io.to(lobby.lobbyId).emit('lobby:updated', lobby);
@@ -268,9 +280,9 @@ export function setupWebSocketHandlers(
         return;
       }
 
-      // Handle Two Truths and a Lie actions
+      // Handle game actions based on game type
       if (lobby.gameType === 'two-truths-and-a-lie') {
-        const gameInstance = activeGames.get(lobby.lobbyId);
+        const gameInstance = activeGames.get(lobby.lobbyId) as TwoTruthsAndALieGame;
         if (!gameInstance) {
           callback({ success: false, error: 'Game instance not found' });
           return;
@@ -308,6 +320,38 @@ export function setupWebSocketHandlers(
             activeGames.delete(lobby.lobbyId);
             console.log(`Game completed in lobby ${lobby.lobbyId}`);
           }
+        }
+      } else if (lobby.gameType === 'would-you-rather') {
+        const gameInstance = activeGames.get(lobby.lobbyId) as WouldYouRatherGame;
+        if (!gameInstance) {
+          callback({ success: false, error: 'Game instance not found' });
+          return;
+        }
+
+        const gameAction = action as WouldYouRatherGameAction;
+        gameAction.playerId = playerId; // Ensure playerId is set from socket
+        
+        try {
+          const gameState = gameInstance.handleAction(gameAction);
+          
+          callback({ success: true });
+
+          // Broadcast updated game state to all players
+          io.to(lobby.lobbyId).emit('game:stateUpdate', gameState);
+
+          // Check if game is complete
+          if (gameInstance.isGameComplete()) {
+            lobby.status = 'finished';
+            const gameResults = gameInstance.getFinalResults();
+            io.to(lobby.lobbyId).emit('game:ended', gameResults);
+            io.to(lobby.lobbyId).emit('lobby:updated', lobby);
+            
+            // Clean up game instance
+            activeGames.delete(lobby.lobbyId);
+            console.log(`Would You Rather game completed in lobby ${lobby.lobbyId}`);
+          }
+        } catch (error: any) {
+          callback({ success: false, error: error.message });
         }
       } else {
         callback({ success: false, error: 'Unsupported game type' });

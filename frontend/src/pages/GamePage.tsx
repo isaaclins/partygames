@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { useGameSession } from '../hooks/useGameSession';
 import { TwoTruthsAndALie } from '../games/TwoTruthsAndALie';
+import { WouldYouRather } from '../games/WouldYouRather';
 
 export default function GamePage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
@@ -68,6 +69,8 @@ export default function GamePage() {
     switch (game.gameType) {
       case 'two-truths-and-a-lie':
         return <TwoTruthsAndALie />;
+      case 'would-you-rather':
+        return <WouldYouRather />;
       default:
         return (
           <div className='text-center py-12'>

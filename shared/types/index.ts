@@ -171,6 +171,39 @@ export interface TwoTruthsGameAction extends GameAction {
   };
 }
 
+// Would You Rather specific types
+export interface WouldYouRatherScenario {
+  id: string;
+  optionA: string;
+  optionB: string;
+  submittedBy: string;
+  round: number;
+}
+
+export interface WouldYouRatherVote {
+  voterId: string;
+  scenarioId: string;
+  choice: 'A' | 'B';
+  submittedAt: Date;
+}
+
+export interface WouldYouRatherRoundData {
+  scenarios: WouldYouRatherScenario[];
+  votes: WouldYouRatherVote[];
+  currentPhase: 'submitting' | 'voting' | 'results';
+  currentScenarioIndex: number;
+}
+
+export interface WouldYouRatherGameAction extends GameAction {
+  type: 'submit_scenario' | 'submit_vote';
+  data: {
+    optionA?: string; // For submit_scenario
+    optionB?: string; // For submit_scenario
+    scenarioId?: string; // For submit_vote
+    choice?: 'A' | 'B'; // For submit_vote
+  };
+}
+
 export interface RoundResults {
   roundNumber: number;
   scores: Record<string, number>;
