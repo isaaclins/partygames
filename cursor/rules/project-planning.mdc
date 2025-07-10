@@ -1,0 +1,62 @@
+---
+description: Project planning and task breakdown methodology
+alwaysApply: false
+---
+
+# Project Planning Procedure
+
+## Overview
+
+When creating project documentation and task breakdowns, follow this structured approach to ensure comprehensive planning and execution.
+
+## Step-by-Step Process
+
+### 1. Surface-Level Description
+
+First, provide a high-level overview of all major steps required for the finished product. This should be:
+
+- **Broad strokes**: Focus on main phases/milestones
+- **Sequential**: Present steps in logical order
+- **Goal-oriented**: Each step should have a clear deliverable
+- **Manageable**: 5-10 major steps maximum
+
+### 2. Detailed Task Breakdown
+
+For each surface-level step, create detailed subtasks that include:
+
+- **Granular actions**: Break down into specific, actionable items
+- **Implementation details**: Technical specifics and requirements
+- **Check points**: Clear criteria for completion/validation
+- **Dependencies**: What must be completed before this task
+- **Stopping points**: Natural breakpoints for review and validation
+
+### 3. Implementation Guidelines
+
+Each subtask should:
+
+- Be completable in a single focused session
+- Have clear success criteria
+- Include validation/testing steps
+- Stop after each check/implementation for review
+- Allow for iterative feedback and adjustment
+
+## Documentation Format
+
+Use markdown with:
+
+- Clear hierarchical structure (H1 for major steps, H2 for subtasks)
+- Numbered lists for sequential tasks
+- Checkboxes for actionable items
+- Code blocks for technical specifications
+- Clear separation between planning and implementation phases
+
+## Quality Standards
+
+Every project plan should:
+
+- Be immediately actionable
+- Include all necessary context
+- Account for testing and validation
+- Consider error handling and edge cases
+- Plan for user feedback integration
+- Include deployment and maintenance considerations
