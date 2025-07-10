@@ -67,10 +67,14 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 
   const redrawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas) {return;}
+    if (!canvas) {
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) {return;}
+    if (!ctx) {
+      return;
+    }
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -91,7 +95,9 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
   }, [strokes, currentStroke]);
 
   const drawStroke = (ctx: CanvasRenderingContext2D, stroke: DrawingStroke) => {
-    if (stroke.points.length < 2) {return;}
+    if (stroke.points.length < 2) {
+      return;
+    }
 
     ctx.beginPath();
     ctx.strokeStyle = stroke.color;
@@ -119,7 +125,9 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 
   const getCanvasCoordinates = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
-    if (!canvas) {return { x: 0, y: 0 };}
+    if (!canvas) {
+      return { x: 0, y: 0 };
+    }
 
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -132,7 +140,9 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
   };
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!canDraw) {return;}
+    if (!canDraw) {
+      return;
+    }
 
     const coords = getCanvasCoordinates(e);
     const strokeColor = tool === 'eraser' ? '#ffffff' : selectedColor;
@@ -151,7 +161,9 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
   };
 
   const continueDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing || !currentStroke || !canDraw) {return;}
+    if (!isDrawing || !currentStroke || !canDraw) {
+      return;
+    }
 
     const coords = getCanvasCoordinates(e);
     const updatedStroke = {
@@ -163,7 +175,9 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
   };
 
   const stopDrawing = () => {
-    if (!isDrawing || !currentStroke) {return;}
+    if (!isDrawing || !currentStroke) {
+      return;
+    }
 
     // Only add stroke if it has at least 2 points
     if (currentStroke.points.length >= 2) {

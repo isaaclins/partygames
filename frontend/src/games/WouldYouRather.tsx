@@ -68,7 +68,9 @@ export const WouldYouRatherGame: React.FC = () => {
   };
 
   const handleSubmitVote = async (choice: 'A' | 'B') => {
-    if (!gameState?.currentScenario) {return;}
+    if (!gameState?.currentScenario) {
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -96,14 +98,18 @@ export const WouldYouRatherGame: React.FC = () => {
   };
 
   const hasPlayerSubmittedScenario = () => {
-    if (!gameState) {return false;}
+    if (!gameState) {
+      return false;
+    }
     return gameState.scenarios.some(
       (s) => s.submittedBy === playerId && s.round === gameState.currentRound
     );
   };
 
   const hasPlayerVotedForCurrentScenario = () => {
-    if (!gameState?.currentScenario) {return false;}
+    if (!gameState?.currentScenario) {
+      return false;
+    }
     return gameState.votes.some(
       (v) =>
         v.voterId === playerId && v.scenarioId === gameState.currentScenario!.id

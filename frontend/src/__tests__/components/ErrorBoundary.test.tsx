@@ -20,10 +20,10 @@ const ThrowError = ({
   return <div>No error</div>;
 };
 
-  // Mock component that throws during componentDidCatch
-  // const _ThrowOnMount = () => {
-  //   throw new Error('Mount error');
-  // };
+// Mock component that throws during componentDidCatch
+// const _ThrowOnMount = () => {
+//   throw new Error('Mount error');
+// };
 
 describe('ErrorBoundary Component', () => {
   beforeEach(() => {
@@ -624,7 +624,7 @@ describe('ErrorBoundary Component', () => {
     });
 
     test('handles rapid error/reset cycles', () => {
-      const { rerender: _rerender } = render(
+      render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
         </ErrorBoundary>

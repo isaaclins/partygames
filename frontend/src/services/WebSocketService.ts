@@ -52,7 +52,9 @@ export class WebSocketService {
    * Set up WebSocket event listeners
    */
   private setupEventListeners() {
-    if (!this.socket) {return;}
+    if (!this.socket) {
+      return;
+    }
 
     this.socket.on('connect', () => {
       console.log('✅ Connected to server');
@@ -199,7 +201,9 @@ export class WebSocketService {
    * Unsubscribe from internal events
    */
   off(event: string, callback: Function) {
-    if (!this.eventCallbacks[event]) {return;}
+    if (!this.eventCallbacks[event]) {
+      return;
+    }
     const index = this.eventCallbacks[event].indexOf(callback);
     if (index > -1) {
       this.eventCallbacks[event].splice(index, 1);

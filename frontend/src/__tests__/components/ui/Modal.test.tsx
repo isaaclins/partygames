@@ -5,7 +5,7 @@ import { Modal } from '../../../components/ui/Modal';
 
 // Mock createPortal to render in the same container for testing
 vi.mock('react-dom', async () => {
-  const actual = await vi.importActual('react-dom') as any;
+  const actual = (await vi.importActual('react-dom')) as any;
   return {
     ...actual,
     createPortal: (children: React.ReactNode) => children,

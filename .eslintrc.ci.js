@@ -10,13 +10,13 @@ module.exports = {
     '@typescript-eslint/no-namespace': 'warn',
     'react/no-unescaped-entities': 'warn',
     'no-console': 'warn',
-    'curly': 'warn',
+    curly: 'warn',
     'react-hooks/exhaustive-deps': 'warn',
-    
+
     // Keep these as errors (critical issues)
     '@typescript-eslint/no-unused-expressions': 'error',
     'no-unreachable': 'error',
     'no-unused-labels': 'error',
     'no-constant-condition': 'error',
-  }
-}; 
+  },
+};

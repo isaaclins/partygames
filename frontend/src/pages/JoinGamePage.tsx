@@ -14,7 +14,9 @@ export default function JoinGamePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!roomCode.trim() || !playerName.trim()) {return;}
+    if (!roomCode.trim() || !playerName.trim()) {
+      return;
+    }
 
     setIsLoading(true);
     setError(null);

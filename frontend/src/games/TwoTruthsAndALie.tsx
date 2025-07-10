@@ -82,7 +82,9 @@ export const TwoTruthsAndALieGame: React.FC = () => {
   };
 
   const getCurrentTargetSubmission = () => {
-    if (!gameState?.currentTargetPlayer) {return null;}
+    if (!gameState?.currentTargetPlayer) {
+      return null;
+    }
     return gameState.submissions.find(
       (s) => s.playerId === gameState.currentTargetPlayer
     );

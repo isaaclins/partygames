@@ -218,11 +218,12 @@ describe('QuickDraw Game', () => {
       if (gameState.currentRoundData) {
         // Set phase to guessing to allow guess submissions
         gameState.currentRoundData.phase = 'guessing';
-        
+
         // Use a non-drawer player for the guess
         const drawerId = gameState.currentRoundData.drawerId;
-        const guesser = gameSession.players.find(p => p.id !== drawerId)?.id || 'player-1';
-        
+        const guesser =
+          gameSession.players.find((p) => p.id !== drawerId)?.id || 'player-1';
+
         expect(() => {
           game.handleAction({
             type: 'submit_guess',
