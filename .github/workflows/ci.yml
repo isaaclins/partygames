@@ -113,7 +113,14 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
 
       - name: 🏗️ Build backend
-        run: npm run build --workspace=backend
+        run: |
+          cd backend
+          npx tsc -p tsconfig.ci.json
+          # Move compiled files to the correct location for npm start
+          if [ -d "dist/backend/src" ]; then
+            cp -r dist/backend/src/* dist/
+            rm -rf dist/backend
+          fi
 
       - name: 📦 Generate Backend Build Summary
         if: always()
@@ -241,6 +248,16 @@ jobs:
         with:
           name: frontend-build-node18
           path: frontend/dist
+
+      - name: 🏗️ Build backend
+        run: |
+          cd backend
+          npx tsc -p tsconfig.ci.json
+          # Move compiled files to the correct location for npm start
+          if [ -d "dist/backend/src" ]; then
+            cp -r dist/backend/src/* dist/
+            rm -rf dist/backend
+          fi
 
       - name: 🚀 Start servers
         run: |
@@ -395,6 +412,16 @@ jobs:
         with:
           name: frontend-build-node18
           path: frontend/dist
+
+      - name: 🏗️ Build backend for E2E
+        run: |
+          cd backend
+          npx tsc -p tsconfig.ci.json
+          # Move compiled files to the correct location for npm start
+          if [ -d "dist/backend/src" ]; then
+            cp -r dist/backend/src/* dist/
+            rm -rf dist/backend
+          fi
 
       - name: 🚀 Start servers for E2E testing
         run: |

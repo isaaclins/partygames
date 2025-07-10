@@ -315,6 +315,16 @@ jobs:
       - name: 🔧 Install dependencies
         run: npm ci
 
+      - name: 🏗️ Build backend
+        run: |
+          cd backend
+          npx tsc -p tsconfig.ci.json
+          # Move compiled files to the correct location for npm start
+          if [ -d "dist/backend/src" ]; then
+            cp -r dist/backend/src/* dist/
+            rm -rf dist/backend
+          fi
+
       - name: ⚡ Test WebSocket performance
         run: |
           echo "🚀 Testing WebSocket performance..."
