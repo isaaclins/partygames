@@ -5,10 +5,7 @@ import {
   QuickDrawPrompt,
   QuickDrawGuess,
   QuickDrawGameAction,
-  DrawingCanvas,
-  DrawingStroke,
 } from '../../../shared/types/index.js';
-import { v4 as uuidv4 } from 'uuid';
 
 // Word prompts for drawing challenges
 const WORD_PROMPTS: QuickDrawPrompt[] = [
@@ -229,7 +226,7 @@ export class QuickDrawGame {
     }
   }
 
-  private handleStartDrawing(action: QuickDrawGameAction): any {
+  private handleStartDrawing(_action: QuickDrawGameAction): any {
     if (
       this.gameState.gamePhase !== 'setup' &&
       this.gameState.gamePhase !== 'playing'
@@ -357,6 +354,10 @@ export class QuickDrawGame {
     const drawerIndex =
       (this.gameState.currentRound - 1) % this.gameState.playerOrder.length;
     const drawerId = this.gameState.playerOrder[drawerIndex];
+
+    if (!drawerId) {
+      throw new Error('No drawer found for current round');
+    }
     const prompt = this.getRandomPrompt();
 
     const newRound: QuickDrawRound = {
@@ -414,8 +415,10 @@ export class QuickDrawGame {
 
     // Award points to drawer if anyone guessed correctly
     const correctGuesses = round.guesses.filter((g) => g.isCorrect);
-    if (correctGuesses.length > 0) {
-      this.gameState.scores[round.drawerId] += correctGuesses.length * 2; // 2 points per correct guess
+    if (correctGuesses.length > 0 && round.drawerId) {
+      const drawerId = round.drawerId;
+      this.gameState.scores[drawerId] =
+        (this.gameState.scores[drawerId] || 0) + correctGuesses.length * 2; // 2 points per correct guess
     }
 
     // Move to next round after a delay
@@ -456,7 +459,10 @@ export class QuickDrawGame {
       points += 1;
     }
 
-    this.gameState.scores[playerId] += points;
+    if (playerId) {
+      this.gameState.scores[playerId] =
+        (this.gameState.scores[playerId] || 0) + points;
+    }
   }
 
   private endGame(): void {
@@ -477,13 +483,22 @@ export class QuickDrawGame {
     // If all prompts used, reset the pool
     if (availablePrompts.length === 0) {
       this.usedPrompts.clear();
-      return WORD_PROMPTS[Math.floor(Math.random() * WORD_PROMPTS.length)];
+      const fallbackPrompt =
+        WORD_PROMPTS[Math.floor(Math.random() * WORD_PROMPTS.length)];
+      if (!fallbackPrompt) {
+        throw new Error('No prompts available');
+      }
+      return fallbackPrompt;
     }
 
     const selectedPrompt =
       availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
-    this.usedPrompts.add(selectedPrompt.id);
 
+    if (!selectedPrompt) {
+      throw new Error('No available prompts found');
+    }
+
+    this.usedPrompts.add(selectedPrompt.id);
     return selectedPrompt;
   }
 
@@ -494,7 +509,12 @@ export class QuickDrawGame {
   private shuffleArray<T>(array: T[]): void {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+      const temp = array[i];
+      const swapItem = array[j];
+      if (temp !== undefined && swapItem !== undefined) {
+        array[i] = swapItem;
+        array[j] = temp;
+      }
     }
   }
 
@@ -523,7 +543,9 @@ export class QuickDrawGame {
       ([, a], [, b]) => b - a
     );
 
-    return sortedScores.length > 0 ? sortedScores[0][0] : null;
+    return sortedScores.length > 0 && sortedScores[0]
+      ? sortedScores[0][0]
+      : null;
   }
 
   public getFinalResults(): any {

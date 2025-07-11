@@ -1,7 +1,6 @@
 import { randomUUID } from 'crypto';
 import {
   GameSession,
-  Player,
   TwoTruthsStatement,
   TwoTruthsPlayerSubmission,
   TwoTruthsVote,
@@ -179,7 +178,10 @@ export class TwoTruthsAndALieGame {
 
   private startVotingPhase(): void {
     this.gameData.currentPhase = 'voting';
-    this.gameData.currentTargetPlayerId = this.gameSession.players[0].id;
+    const firstPlayer = this.gameSession.players[0];
+    if (firstPlayer) {
+      this.gameData.currentTargetPlayerId = firstPlayer.id;
+    }
   }
 
   private moveToNextVotingTarget(): void {
@@ -189,8 +191,10 @@ export class TwoTruthsAndALieGame {
     const nextIndex = currentIndex + 1;
 
     if (nextIndex < this.gameSession.players.length) {
-      this.gameData.currentTargetPlayerId =
-        this.gameSession.players[nextIndex].id;
+      const nextPlayer = this.gameSession.players[nextIndex];
+      if (nextPlayer) {
+        this.gameData.currentTargetPlayerId = nextPlayer.id;
+      }
     } else {
       this.endRound();
     }
@@ -211,9 +215,10 @@ export class TwoTruthsAndALieGame {
         const selectedStatement = targetSubmission.statements.find(
           (s) => s.id === vote.selectedStatementId
         );
-        if (selectedStatement && selectedStatement.isLie) {
+        if (selectedStatement && selectedStatement.isLie && vote.voterId) {
           // Correct guess - award points to voter
-          this.scores[vote.voterId] += this.POINTS_FOR_CORRECT_GUESS;
+          this.scores[vote.voterId] =
+            (this.scores[vote.voterId] || 0) + this.POINTS_FOR_CORRECT_GUESS;
         }
       }
     });
@@ -230,8 +235,11 @@ export class TwoTruthsAndALieGame {
           (v) => v.selectedStatementId === truthStatement.id
         );
         // Award points for each player who incorrectly guessed a truth as the lie
-        this.scores[submission.playerId] +=
-          votesForTruth.length * this.POINTS_FOR_FOOLING_OTHERS;
+        if (submission.playerId) {
+          this.scores[submission.playerId] =
+            (this.scores[submission.playerId] || 0) +
+            votesForTruth.length * this.POINTS_FOR_FOOLING_OTHERS;
+        }
       });
     });
   }
@@ -249,9 +257,13 @@ export class TwoTruthsAndALieGame {
   }
 
   public getGameResults(): GameResults {
-    const winner = Object.entries(this.scores).reduce((a, b) =>
-      this.scores[a[0]] > this.scores[b[0]] ? a : b
-    )[0];
+    const scores = Object.entries(this.scores);
+    const winner =
+      scores.length > 0
+        ? scores.reduce((a, b) =>
+            (this.scores[a[0]] || 0) > (this.scores[b[0]] || 0) ? a : b
+          )[0]
+        : 'No winner';
 
     return {
       finalScores: { ...this.scores },
@@ -273,7 +285,7 @@ export class TwoTruthsAndALieGame {
         const selectedStatement = targetSubmission.statements.find(
           (s) => s.id === vote.selectedStatementId
         );
-        return selectedStatement && selectedStatement.isLie;
+        return selectedStatement?.isLie ?? false;
       }
       return false;
     }).length;
@@ -282,8 +294,13 @@ export class TwoTruthsAndALieGame {
   }
 
   private generateGameSummary(): string {
-    const winner = Object.entries(this.scores).reduce((a, b) =>
-      this.scores[a[0]] > this.scores[b[0]] ? a : b
+    const scores = Object.entries(this.scores);
+    if (scores.length === 0) {
+      return 'Game complete! No scores recorded.';
+    }
+
+    const winner = scores.reduce((a, b) =>
+      (this.scores[a[0]] || 0) > (this.scores[b[0]] || 0) ? a : b
     );
     const winnerPlayer = this.gameSession.players.find(
       (p) => p.id === winner[0]

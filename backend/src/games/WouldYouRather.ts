@@ -1,5 +1,4 @@
 import {
-  GameAction,
   GameSession,
   WouldYouRatherScenario,
   WouldYouRatherVote,
@@ -172,11 +171,17 @@ export class WouldYouRatherGame {
     );
 
     // Award 1 point to the scenario creator for each vote
-    this.scores[currentScenario.submittedBy] += votesForScenario.length;
+    if (currentScenario.submittedBy) {
+      this.scores[currentScenario.submittedBy] =
+        (this.scores[currentScenario.submittedBy] || 0) +
+        votesForScenario.length;
+    }
 
     // Award 1 point to each voter for participating
     votesForScenario.forEach((vote) => {
-      this.scores[vote.voterId] += 1;
+      if (vote.voterId) {
+        this.scores[vote.voterId] = (this.scores[vote.voterId] || 0) + 1;
+      }
     });
   }
 
@@ -246,7 +251,9 @@ export class WouldYouRatherGame {
       ([, a], [, b]) => b - a
     );
 
-    return sortedScores.length > 0 ? sortedScores[0][0] : null;
+    return sortedScores.length > 0 && sortedScores[0]
+      ? sortedScores[0][0]
+      : null;
   }
 
   public getFinalResults(): any {
