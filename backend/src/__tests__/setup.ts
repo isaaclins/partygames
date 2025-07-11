@@ -21,9 +21,18 @@ jest.setTimeout(10000);
 beforeEach(() => {
   jest.clearAllTimers();
   jest.clearAllMocks();
+  // Force garbage collection if available (for Node.js)
+  if (global.gc) {
+    global.gc();
+  }
 });
 
 afterEach(() => {
   jest.runOnlyPendingTimers();
   jest.useRealTimers();
+  jest.clearAllMocks();
+  // Force garbage collection if available (for Node.js)
+  if (global.gc) {
+    global.gc();
+  }
 });

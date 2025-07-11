@@ -20,11 +20,14 @@ export default {
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
-  // Memory and performance options
+  // Memory and performance options for CI stability
   maxWorkers: 1,
+  maxConcurrency: 1,
   logHeapUsage: true,
   detectOpenHandles: true,
   forceExit: true,
+  // Reduce memory usage significantly
+  workerIdleMemoryLimit: '512MB',
   // Increase test timeout
-  testTimeout: 30000,
+  testTimeout: 60000,
 };

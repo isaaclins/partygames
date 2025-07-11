@@ -184,6 +184,11 @@ describe('QuickDraw Game', () => {
     game = new QuickDrawGame(gameSession);
   });
 
+  afterEach(() => {
+    // Clean up any timers to prevent memory leaks
+    game.cleanup();
+  });
+
   describe('QuickDraw drawing mechanics', () => {
     test('should handle drawing initialization', () => {
       expect(() => {
@@ -346,6 +351,9 @@ describe('Performance Tests', () => {
       const end = Date.now();
 
       expect(end - start).toBeLessThan(1000); // Should complete in under 1 second
+
+      // Clean up timers
+      game.cleanup();
     });
   });
 

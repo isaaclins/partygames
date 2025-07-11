@@ -187,6 +187,7 @@ const WORD_PROMPTS: QuickDrawPrompt[] = [
 export class QuickDrawGame {
   private gameState: QuickDrawGameState;
   private roundTimer: NodeJS.Timeout | null = null;
+  private revealTimer: NodeJS.Timeout | null = null;
   private usedPrompts: Set<string> = new Set();
 
   constructor(private lobby: GameSession) {
@@ -351,6 +352,12 @@ export class QuickDrawGame {
       return;
     }
 
+    // Clean up any existing timers
+    if (this.revealTimer) {
+      clearTimeout(this.revealTimer);
+      this.revealTimer = null;
+    }
+
     const drawerIndex =
       (this.gameState.currentRound - 1) % this.gameState.playerOrder.length;
     const drawerId = this.gameState.playerOrder[drawerIndex];
@@ -422,7 +429,8 @@ export class QuickDrawGame {
     }
 
     // Move to next round after a delay
-    setTimeout(() => {
+    this.revealTimer = setTimeout(() => {
+      this.revealTimer = null;
       if (this.gameState.currentRound >= this.gameState.totalRounds) {
         this.endGame();
       } else {
@@ -471,6 +479,11 @@ export class QuickDrawGame {
     if (this.roundTimer) {
       clearInterval(this.roundTimer);
       this.roundTimer = null;
+    }
+
+    if (this.revealTimer) {
+      clearTimeout(this.revealTimer);
+      this.revealTimer = null;
     }
   }
 
@@ -562,6 +575,11 @@ export class QuickDrawGame {
     if (this.roundTimer) {
       clearInterval(this.roundTimer);
       this.roundTimer = null;
+    }
+
+    if (this.revealTimer) {
+      clearTimeout(this.revealTimer);
+      this.revealTimer = null;
     }
   }
 }

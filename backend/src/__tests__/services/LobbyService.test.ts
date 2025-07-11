@@ -26,6 +26,20 @@ describe('LobbyService', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
+    // Clear all lobbies to prevent memory leaks
+    // Force cleanup by disconnecting all players first
+    const allLobbies = lobbyService.getAllLobbies();
+    allLobbies.forEach((lobby) => {
+      lobby.players.forEach((player) => {
+        lobbyService.setPlayerConnection(player.id, false);
+      });
+    });
+    lobbyService.cleanupInactiveLobbies();
+
+    // Force garbage collection if available
+    if (global.gc) {
+      global.gc();
+    }
   });
 
   describe('Lobby Creation', () => {
