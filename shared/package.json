@@ -12,7 +12,8 @@
     "dev": "tsc --watch"
   },
   "devDependencies": {
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.2",
+    "vitest": "^3.2.4"
   },
   "files": [
     "dist/**/*"

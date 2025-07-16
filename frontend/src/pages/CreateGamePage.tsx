@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Users, ArrowRight, AlertCircle, Plus } from 'lucide-react';
 import { useGameSession } from '../hooks/useGameSession';
 
@@ -32,11 +32,29 @@ export default function CreateGamePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { createGame, connectionStatus } = useGameSession();
+
+  // Handle state from mode selection
+  useEffect(() => {
+    if (location.state?.selectedGame && location.state?.fromModeSelection) {
+      setSelectedGame(location.state.selectedGame);
+    }
+  }, [location.state]);
 
   const handleCreateGame = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!hostName.trim() || !selectedGame) {
+    if (!selectedGame) {
+      return;
+    }
+
+    // For Spyfall, navigate to mode selection instead of creating game directly
+    if (selectedGame === 'spyfall') {
+      navigate('/spyfall/mode-select');
+      return;
+    }
+
+    if (!hostName.trim()) {
       return;
     }
 
@@ -222,11 +240,10 @@ export default function CreateGamePage() {
           <button
             type='submit'
             disabled={
-              !hostName.trim() ||
               !selectedGame ||
               isLoading ||
               !selectedGameType?.available ||
-              !connectionStatus.isConnected
+              (selectedGame !== 'spyfall' && (!hostName.trim() || !connectionStatus.isConnected))
             }
             className='btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
           >
@@ -234,7 +251,9 @@ export default function CreateGamePage() {
               <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full spinner' />
             ) : (
               <>
-                <span>Create Game Lobby</span>
+                <span>
+                  {selectedGame === 'spyfall' ? 'Choose Game Mode' : 'Create Game Lobby'}
+                </span>
                 <ArrowRight className='w-4 h-4' />
               </>
             )}

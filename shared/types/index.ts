@@ -221,6 +221,38 @@ export const ERROR_CODES = {
 } as const;
 
 // Spyfall locations and roles
+// Offline Spyfall specific types
+export interface OfflinePlayerRole {
+  playerName: string;
+  location: string | null; // null for spy
+  role: string | null; // null for spy
+  isSpy: boolean;
+}
+
+export interface OfflineVote {
+  voterName: string;
+  targetName: string;
+}
+
+export interface OfflineGameResults {
+  votedOutPlayer: string;
+  voteCounts: Record<string, number>;
+  spyName: string;
+  location: string;
+  winner: 'spy' | 'non-spies';
+  isTie: boolean;
+}
+
+export interface OfflineGameState {
+  phase: 'setup' | 'role-reveal' | 'discussion' | 'voting' | 'results';
+  players: string[];
+  roles: OfflinePlayerRole[];
+  currentCardIndex: number;
+  votes: OfflineVote[];
+  currentVoterIndex: number;
+  gameResults?: OfflineGameResults;
+}
+
 export const SPYFALL_LOCATIONS: SpyfallLocation[] = [
   {
     name: 'Pirate Ship',

@@ -7,6 +7,8 @@ import CreateGamePage from './pages/CreateGamePage';
 import GameLobbyPage from './pages/GameLobbyPage';
 import GamePage from './pages/GamePage';
 import NotFoundPage from './pages/NotFoundPage';
+import SpyfallModeSelection from './games/SpyfallModeSelection';
+import OfflineSpyfallGame from './games/OfflineSpyfallGame';
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
           <Route path='/' element={<HomePage />} />
           <Route path='/join' element={<JoinGamePage />} />
           <Route path='/create' element={<CreateGamePage />} />
+          <Route path='/spyfall/mode-select' element={<SpyfallModeSelection />} />
+          <Route path='/spyfall/offline' element={<OfflineSpyfallGame />} />
           <Route path='/lobby/:lobbyId' element={<GameLobbyPage />} />
           <Route path='/game/:lobbyId' element={<GamePage />} />
           <Route path='*' element={<NotFoundPage />} />
