@@ -6,24 +6,17 @@ import {
   JoinLobbyData,
   LobbyResponse,
   GameAction,
-  TwoTruthsGameAction,
-  WouldYouRatherGameAction,
-  QuickDrawGameAction,
+  SpyfallGameAction,
 } from '../../../shared/types/index.js';
 import { lobbyService } from '../services/LobbyService.js';
-import { TwoTruthsAndALieGame } from '../games/TwoTruthsAndALie.js';
-import { WouldYouRatherGame } from '../games/WouldYouRather.js';
-import { QuickDrawGame } from '../games/QuickDraw.js';
+import { SpyfallGame } from '../games/Spyfall.js';
 
 // Track socket to player mapping
 const socketToPlayer = new Map<string, string>(); // socketId -> playerId
 const playerToSocket = new Map<string, string>(); // playerId -> socketId
 
 // Track active game instances
-const activeGames = new Map<
-  string,
-  TwoTruthsAndALieGame | WouldYouRatherGame | QuickDrawGame
->(); // lobbyId -> gameInstance
+const activeGames = new Map<string, SpyfallGame>(); // lobbyId -> gameInstance
 
 export function setupWebSocketHandlers(
   io: Server<ClientToServerEvents, ServerToClientEvents>,
@@ -233,45 +226,24 @@ export function setupWebSocketHandlers(
           lobby.status = 'playing';
 
           // Create game instance based on game type
-          if (lobby.gameType === 'two-truths-and-a-lie') {
-            const gameInstance = new TwoTruthsAndALieGame(lobby);
+          if (lobby.gameType === 'spyfall') {
+            const gameInstance = new SpyfallGame(lobby);
             activeGames.set(lobby.lobbyId, gameInstance);
 
-            // Emit game started with initial game state
+            // Emit game started with initial game state for each player
+            lobby.players.forEach(player => {
+              const playerSocket = playerToSocket.get(player.id);
+              if (playerSocket) {
+                const playerSpecificState = gameInstance.getPlayerSpecificState(player.id);
+                io.to(playerSocket).emit('game:stateUpdate', playerSpecificState);
+              }
+            });
+
+            // Emit general game started events
             io.to(lobby.lobbyId).emit('game:started');
             io.to(lobby.lobbyId).emit('lobby:updated', lobby);
 
-            console.log(
-              `Two Truths and a Lie game started in lobby ${lobby.lobbyId}`
-            );
-          } else if (lobby.gameType === 'would-you-rather') {
-            const gameInstance = new WouldYouRatherGame(lobby);
-            activeGames.set(lobby.lobbyId, gameInstance);
-
-            // Emit game started with initial game state
-            io.to(lobby.lobbyId).emit('game:started');
-            io.to(lobby.lobbyId).emit('lobby:updated', lobby);
-            io.to(lobby.lobbyId).emit(
-              'game:stateUpdate',
-              gameInstance.getGameState()
-            );
-
-            console.log(
-              `Would You Rather game started in lobby ${lobby.lobbyId}`
-            );
-          } else if (lobby.gameType === 'quick-draw') {
-            const gameInstance = new QuickDrawGame(lobby);
-            activeGames.set(lobby.lobbyId, gameInstance);
-
-            // Emit game started with initial game state
-            io.to(lobby.lobbyId).emit('game:started');
-            io.to(lobby.lobbyId).emit('lobby:updated', lobby);
-            io.to(lobby.lobbyId).emit(
-              'game:stateUpdate',
-              gameInstance.getGameState()
-            );
-
-            console.log(`Quick Draw game started in lobby ${lobby.lobbyId}`);
+            console.log(`Spyfall game started in lobby ${lobby.lobbyId}`);
           } else {
             io.to(lobby.lobbyId).emit('game:started');
             io.to(lobby.lobbyId).emit('lobby:updated', lobby);
@@ -306,16 +278,14 @@ export function setupWebSocketHandlers(
       }
 
       // Handle game actions based on game type
-      if (lobby.gameType === 'two-truths-and-a-lie') {
-        const gameInstance = activeGames.get(
-          lobby.lobbyId
-        ) as TwoTruthsAndALieGame;
+      if (lobby.gameType === 'spyfall') {
+        const gameInstance = activeGames.get(lobby.lobbyId) as SpyfallGame;
         if (!gameInstance) {
           callback({ success: false, error: 'Game instance not found' });
           return;
         }
 
-        const gameAction = action as TwoTruthsGameAction;
+        const gameAction = action as SpyfallGameAction;
         gameAction.playerId = playerId; // Ensure playerId is set from socket
 
         const result = gameInstance.handleAction(gameAction);
@@ -327,95 +297,27 @@ export function setupWebSocketHandlers(
 
         callback({ success: true });
 
-        // Broadcast updated game state to all players
-        const gameState = gameInstance.getCurrentState();
-        io.to(lobby.lobbyId).emit('game:stateUpdate', gameState);
+        // If there's a game state update, send player-specific states
+        if (result.gameStateUpdate) {
+          lobby.players.forEach(player => {
+            const playerSocket = playerToSocket.get(player.id);
+            if (playerSocket) {
+              const playerSpecificState = gameInstance.getPlayerSpecificState(player.id);
+              io.to(playerSocket).emit('game:stateUpdate', playerSpecificState);
+            }
+          });
+        }
 
-        // Check if round/game is complete
+        // Check if game is complete
         if (gameInstance.isComplete()) {
-          const roundResults = gameInstance.getRoundResults();
-          io.to(lobby.lobbyId).emit('game:roundEnded', roundResults);
+          lobby.status = 'finished';
+          const gameResults = gameInstance.getGameResults();
+          io.to(lobby.lobbyId).emit('game:ended', gameResults);
+          io.to(lobby.lobbyId).emit('lobby:updated', lobby);
 
-          // For single round game, end the game
-          if (lobby.currentRound >= lobby.totalRounds) {
-            lobby.status = 'finished';
-            const gameResults = gameInstance.getGameResults();
-            io.to(lobby.lobbyId).emit('game:ended', gameResults);
-            io.to(lobby.lobbyId).emit('lobby:updated', lobby);
-
-            // Clean up game instance
-            activeGames.delete(lobby.lobbyId);
-            console.log(`Game completed in lobby ${lobby.lobbyId}`);
-          }
-        }
-      } else if (lobby.gameType === 'would-you-rather') {
-        const gameInstance = activeGames.get(
-          lobby.lobbyId
-        ) as WouldYouRatherGame;
-        if (!gameInstance) {
-          callback({ success: false, error: 'Game instance not found' });
-          return;
-        }
-
-        const gameAction = action as WouldYouRatherGameAction;
-        gameAction.playerId = playerId; // Ensure playerId is set from socket
-
-        try {
-          const gameState = gameInstance.handleAction(gameAction);
-
-          callback({ success: true });
-
-          // Broadcast updated game state to all players
-          io.to(lobby.lobbyId).emit('game:stateUpdate', gameState);
-
-          // Check if game is complete
-          if (gameInstance.isGameComplete()) {
-            lobby.status = 'finished';
-            const gameResults = gameInstance.getFinalResults();
-            io.to(lobby.lobbyId).emit('game:ended', gameResults);
-            io.to(lobby.lobbyId).emit('lobby:updated', lobby);
-
-            // Clean up game instance
-            activeGames.delete(lobby.lobbyId);
-            console.log(
-              `Would You Rather game completed in lobby ${lobby.lobbyId}`
-            );
-          }
-        } catch (error: any) {
-          callback({ success: false, error: error.message });
-        }
-      } else if (lobby.gameType === 'quick-draw') {
-        const gameInstance = activeGames.get(lobby.lobbyId) as QuickDrawGame;
-        if (!gameInstance) {
-          callback({ success: false, error: 'Game instance not found' });
-          return;
-        }
-
-        const gameAction = action as QuickDrawGameAction;
-        gameAction.playerId = playerId; // Ensure playerId is set from socket
-
-        try {
-          const gameState = gameInstance.handleAction(gameAction);
-
-          callback({ success: true });
-
-          // Broadcast updated game state to all players
-          io.to(lobby.lobbyId).emit('game:stateUpdate', gameState);
-
-          // Check if game is complete
-          if (gameInstance.isGameComplete()) {
-            lobby.status = 'finished';
-            const gameResults = gameInstance.getFinalResults();
-            io.to(lobby.lobbyId).emit('game:ended', gameResults);
-            io.to(lobby.lobbyId).emit('lobby:updated', lobby);
-
-            // Clean up game instance
-            gameInstance.cleanup();
-            activeGames.delete(lobby.lobbyId);
-            console.log(`Quick Draw game completed in lobby ${lobby.lobbyId}`);
-          }
-        } catch (error: any) {
-          callback({ success: false, error: error.message });
+          // Clean up game instance
+          activeGames.delete(lobby.lobbyId);
+          console.log(`Spyfall game completed in lobby ${lobby.lobbyId}`);
         }
       } else {
         callback({ success: false, error: 'Unsupported game type' });

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Zap, ArrowRight, AlertCircle } from 'lucide-react';
+import { Users, ArrowRight, AlertCircle, Plus } from 'lucide-react';
 import { useGameSession } from '../hooks/useGameSession';
 
 interface GameType {
@@ -15,31 +15,12 @@ interface GameType {
 
 const gameTypes: GameType[] = [
   {
-    id: 'two-truths-and-a-lie',
-    name: 'Two Truths and a Lie',
-    description: 'Social deduction game where players guess the lies',
+    id: 'spyfall',
+    name: 'Spyfall',
+    description: 'Find the spy through clever questioning without revealing the location',
     minPlayers: 3,
     maxPlayers: 10,
     icon: Users,
-    available: true,
-  },
-  {
-    id: 'would-you-rather',
-    name: 'Would You Rather',
-    description:
-      'Choose between challenging scenarios and see what others pick',
-    minPlayers: 3,
-    maxPlayers: 8,
-    icon: Plus,
-    available: true,
-  },
-  {
-    id: 'quick-draw',
-    name: 'Quick Draw',
-    description: 'Drawing and guessing game with real-time canvas sharing',
-    minPlayers: 3,
-    maxPlayers: 8,
-    icon: Zap,
     available: true,
   },
 ];

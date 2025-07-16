@@ -2,9 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { useGameSession } from '../hooks/useGameSession';
-import { TwoTruthsAndALie } from '../games/TwoTruthsAndALie';
-import { WouldYouRather } from '../games/WouldYouRather';
-import { QuickDraw } from '../games/QuickDraw';
+import { SpyfallGame } from '../games/Spyfall';
 
 export default function GamePage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
@@ -63,12 +61,8 @@ export default function GamePage() {
   // Render the appropriate game component based on game type
   const renderGameComponent = () => {
     switch (game.gameType) {
-      case 'two-truths-and-a-lie':
-        return <TwoTruthsAndALie />;
-      case 'would-you-rather':
-        return <WouldYouRather />;
-      case 'quick-draw':
-        return <QuickDraw />;
+      case 'spyfall':
+        return <SpyfallGame />;
       default:
         return (
           <div className='text-center py-12'>

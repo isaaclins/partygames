@@ -135,145 +135,50 @@ export interface GameAction {
   timestamp: Date;
 }
 
-// Two Truths and a Lie specific types
-export interface TwoTruthsStatement {
-  id: string;
-  text: string;
-  isLie: boolean;
+// Spyfall specific types
+export interface SpyfallLocation {
+  name: string;
+  roles: string[];
 }
 
-export interface TwoTruthsPlayerSubmission {
+export interface SpyfallPlayerRole {
   playerId: string;
-  statements: TwoTruthsStatement[];
-  submittedAt: Date;
+  location: string | null; // null for spy
+  role: string | null; // null for spy
+  isSpy: boolean;
 }
 
-export interface TwoTruthsVote {
+export interface SpyfallVote {
   voterId: string;
   targetPlayerId: string;
-  selectedStatementId: string;
   submittedAt: Date;
 }
 
-export interface TwoTruthsRoundData {
-  submissions: TwoTruthsPlayerSubmission[];
-  votes: TwoTruthsVote[];
-  currentPhase: 'submitting' | 'voting' | 'results';
-  currentTargetPlayerId?: string; // For voting phase
-}
-
-export interface TwoTruthsGameAction extends GameAction {
-  type: 'submit_statements' | 'submit_vote';
-  data: {
-    statements?: string[]; // For submit_statements
-    selectedStatementId?: string; // For submit_vote
-    targetPlayerId?: string; // For submit_vote
-  };
-}
-
-// Would You Rather specific types
-export interface WouldYouRatherScenario {
-  id: string;
-  optionA: string;
-  optionB: string;
-  submittedBy: string;
-  round: number;
-}
-
-export interface WouldYouRatherVote {
-  voterId: string;
-  scenarioId: string;
-  choice: 'A' | 'B';
+export interface SpyfallLocationGuess {
+  spyId: string;
+  guessedLocation: string;
   submittedAt: Date;
-}
-
-export interface WouldYouRatherRoundData {
-  scenarios: WouldYouRatherScenario[];
-  votes: WouldYouRatherVote[];
-  currentPhase: 'submitting' | 'voting' | 'results';
-  currentScenarioIndex: number;
-}
-
-export interface WouldYouRatherGameAction extends GameAction {
-  type: 'submit_scenario' | 'submit_vote';
-  data: {
-    optionA?: string; // For submit_scenario
-    optionB?: string; // For submit_scenario
-    scenarioId?: string; // For submit_vote
-    choice?: 'A' | 'B'; // For submit_vote
-  };
-}
-
-// Quick Draw specific types
-export interface DrawingPoint {
-  x: number;
-  y: number;
-  pressure?: number;
-}
-
-export interface DrawingStroke {
-  id: string;
-  points: DrawingPoint[];
-  color: string;
-  width: number;
-  timestamp: Date;
-}
-
-export interface DrawingCanvas {
-  strokes: DrawingStroke[];
-  width: number;
-  height: number;
-  backgroundColor: string;
-}
-
-export interface QuickDrawGuess {
-  playerId: string;
-  guess: string;
-  timestamp: Date;
   isCorrect: boolean;
 }
 
-export interface QuickDrawPrompt {
-  id: string;
-  word: string;
-  category: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  hints?: string[];
+export interface SpyfallGameState {
+  phase: 'playing' | 'voting' | 'spy_guess' | 'finished';
+  location: string;
+  spyId: string;
+  playerRoles: SpyfallPlayerRole[];
+  votes: SpyfallVote[];
+  locationGuess?: SpyfallLocationGuess;
+  timeRemaining?: number;
+  votedOutPlayerId?: string;
+  winner?: 'spy' | 'non_spies';
+  gameStartedAt: Date;
 }
 
-export interface QuickDrawRound {
-  roundNumber: number;
-  drawerId: string;
-  prompt: QuickDrawPrompt;
-  canvas: DrawingCanvas;
-  guesses: QuickDrawGuess[];
-  timeLimit: number; // seconds
-  timeRemaining: number;
-  phase: 'waiting' | 'drawing' | 'guessing' | 'reveal' | 'complete';
-  startedAt?: Date;
-  completedAt?: Date;
-}
-
-export interface QuickDrawGameState {
-  currentRound: number;
-  totalRounds: number;
-  rounds: QuickDrawRound[];
-  scores: Record<string, number>;
-  playerOrder: string[]; // Order for taking turns drawing
-  gamePhase: 'setup' | 'playing' | 'finished';
-}
-
-export interface QuickDrawGameAction extends GameAction {
-  type:
-    | 'start_drawing'
-    | 'add_stroke'
-    | 'submit_guess'
-    | 'clear_canvas'
-    | 'undo_stroke';
+export interface SpyfallGameAction extends GameAction {
+  type: 'ready_to_vote' | 'submit_vote' | 'guess_location';
   data: {
-    stroke?: DrawingStroke; // For add_stroke
-    guess?: string; // For submit_guess
-    strokeId?: string; // For undo_stroke
+    targetPlayerId?: string; // For submit_vote
+    guessedLocation?: string; // For guess_location
   };
 }
 
@@ -314,3 +219,201 @@ export const ERROR_CODES = {
   NOT_ENOUGH_PLAYERS: 'NOT_ENOUGH_PLAYERS',
   ALREADY_IN_LOBBY: 'ALREADY_IN_LOBBY',
 } as const;
+
+// Spyfall locations and roles
+export const SPYFALL_LOCATIONS: SpyfallLocation[] = [
+  {
+    name: 'Pirate Ship',
+    roles: [
+      'Captain',
+      'First Mate',
+      'Navigator',
+      'Gunner',
+      'Sailor',
+      'Cook',
+      'Cabin Boy',
+      'Lookout',
+    ],
+  },
+  {
+    name: 'Space Station',
+    roles: [
+      'Commander',
+      'Scientist',
+      'Engineer',
+      'Pilot',
+      'Medical Officer',
+      'Communications',
+      'Security',
+      'Maintenance',
+    ],
+  },
+  {
+    name: 'Casino',
+    roles: [
+      'Dealer',
+      'Pit Boss',
+      'Security Guard',
+      'Waitress',
+      'Gambler',
+      'Bartender',
+      'Manager',
+      'VIP Guest',
+    ],
+  },
+  {
+    name: 'Hospital',
+    roles: [
+      'Doctor',
+      'Nurse',
+      'Surgeon',
+      'Patient',
+      'Receptionist',
+      'Orderly',
+      'Pharmacist',
+      'Visitor',
+    ],
+  },
+  {
+    name: 'School',
+    roles: [
+      'Teacher',
+      'Student',
+      'Principal',
+      'Janitor',
+      'Librarian',
+      'Coach',
+      'Secretary',
+      'Parent',
+    ],
+  },
+  {
+    name: 'Movie Theater',
+    roles: [
+      'Projectionist',
+      'Usher',
+      'Concession Worker',
+      'Manager',
+      'Customer',
+      'Ticket Booth',
+      'Cleaner',
+      'Security',
+    ],
+  },
+  {
+    name: 'Bank',
+    roles: [
+      'Manager',
+      'Security Guard',
+      'Customer',
+      'Loan Officer',
+      'Vault Technician',
+      'Accountant',
+      'Janitor',
+    ],
+  },
+  {
+    name: 'Restaurant',
+    roles: [
+      'Chef',
+      'Waiter',
+      'Customer',
+      'Manager',
+      'Busboy',
+      'Host',
+      'Dishwasher',
+      'Food Critic',
+    ],
+  },
+  {
+    name: 'Hotel',
+    roles: [
+      'Receptionist',
+      'Bellhop',
+      'Guest',
+      'Manager',
+      'Housekeeper',
+      'Security',
+      'Concierge',
+      'Room Service',
+    ],
+  },
+  {
+    name: 'Airplane',
+    roles: [
+      'Pilot',
+      'Flight Attendant',
+      'Passenger',
+      'Co-pilot',
+      'Air Marshal',
+      'Child',
+      'Tourist',
+      'Business Traveler',
+    ],
+  },
+  {
+    name: 'Submarine',
+    roles: [
+      'Captain',
+      'Sonar Operator',
+      'Engineer',
+      'Cook',
+      'Sailor',
+      'Radio Operator',
+      'Torpedo Operator',
+      'Medic',
+    ],
+  },
+  {
+    name: 'Art Museum',
+    roles: [
+      'Curator',
+      'Security Guard',
+      'Visitor',
+      'Tour Guide',
+      'Artist',
+      'Student',
+      'Critic',
+      'Donor',
+    ],
+  },
+  {
+    name: 'Circus',
+    roles: [
+      'Ringmaster',
+      'Clown',
+      'Acrobat',
+      'Animal Trainer',
+      'Spectator',
+      'Juggler',
+      'Ticket Seller',
+      'Strongman',
+    ],
+  },
+  {
+    name: 'Military Base',
+    roles: [
+      'General',
+      'Soldier',
+      'Medic',
+      'Engineer',
+      'Pilot',
+      'Mechanic',
+      'Intelligence Officer',
+      'Recruit',
+    ],
+  },
+  {
+    name: 'University',
+    roles: [
+      'Professor',
+      'Student',
+      'Dean',
+      'Librarian',
+      'Researcher',
+      'Teaching Assistant',
+      'Campus Security',
+      'Alumni',
+    ],
+  },
+];

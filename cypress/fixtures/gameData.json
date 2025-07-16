@@ -1,56 +1,28 @@
 {
-  "twoTruthsAndALie": {
-    "sampleStatements": {
-      "player1": {
-        "statements": [
-          "I once traveled to Japan for a month",
-          "I can speak three languages fluently",
-          "I have never broken a bone in my body"
-        ],
-        "lieIndex": 2
-      },
-      "player2": {
-        "statements": [
-          "I have run a marathon",
-          "I own a pet snake",
-          "I was born in another country"
-        ],
-        "lieIndex": 1
-      }
-    }
-  },
-  "wouldYouRather": {
-    "sampleScenarios": [
-      "Would you rather have the ability to fly or be invisible?",
-      "Would you rather always be 10 minutes late or 20 minutes early?",
-      "Would you rather have unlimited money or unlimited time?",
-      "Would you rather be able to read minds or see the future?",
-      "Would you rather live without music or without movies?"
-    ]
-  },
-  "quickDraw": {
-    "sampleWords": ["cat", "house", "tree", "car", "sun"],
-    "sampleDrawingPaths": {
-      "house": [
-        { "x": 100, "y": 200 },
-        { "x": 200, "y": 200 },
-        { "x": 200, "y": 100 },
-        { "x": 150, "y": 50 },
-        { "x": 100, "y": 100 },
-        { "x": 100, "y": 200 }
-      ],
-      "cat": [
-        { "x": 150, "y": 150 },
-        { "x": 120, "y": 120 },
-        { "x": 100, "y": 140 },
-        { "x": 120, "y": 160 },
-        { "x": 150, "y": 150 },
-        { "x": 180, "y": 160 },
-        { "x": 200, "y": 140 },
-        { "x": 180, "y": 120 }
-      ]
+  "spyfall": {
+    "sampleLocations": [
+      "Pirate Ship",
+      "Space Station", 
+      "Casino",
+      "Hospital",
+      "School"
+    ],
+    "sampleRoles": {
+      "Pirate Ship": ["Captain", "First Mate", "Navigator", "Gunner", "Sailor"],
+      "Space Station": ["Commander", "Scientist", "Engineer", "Pilot", "Medical Officer"],
+      "Casino": ["Dealer", "Pit Boss", "Security Guard", "Waitress", "Gambler"]
     },
-    "sampleGuesses": ["house", "home", "building", "cat", "kitten", "animal"]
+    "testVotes": [
+      {
+        "voterId": "test-player-1",
+        "targetPlayerId": "test-player-2"
+      },
+      {
+        "voterId": "test-player-2", 
+        "targetPlayerId": "test-player-3"
+      }
+    ],
+    "testLocationGuesses": ["Hospital", "Space Station", "Casino"]
   },
   "players": {
     "testPlayers": [
