@@ -1,26 +1,23 @@
 import { useState } from 'react';
-import { Eye, EyeOff, ArrowRight, Shield } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Shield, HelpCircle } from 'lucide-react';
 import { Button } from './ui/Button';
 import { OfflinePlayerRole } from '../../../shared/types/index.js';
 
 interface RoleRevealCardProps {
   playerName: string;
   role: OfflinePlayerRole;
-  onNext: () => void;
+  isRevealed: boolean;
+  onCardTap: () => void;
 }
 
-export default function RoleRevealCard({ playerName, role, onNext }: RoleRevealCardProps) {
-  const [isRevealed, setIsRevealed] = useState(false);
+export default function RoleRevealCard({ playerName, role, isRevealed, onCardTap }: RoleRevealCardProps) {
   const [showPrivacyWarning, setShowPrivacyWarning] = useState(true);
 
-  const handleRevealCard = () => {
+  const handleCardClick = () => {
     if (showPrivacyWarning) {
       setShowPrivacyWarning(false);
-    } else if (!isRevealed) {
-      setIsRevealed(true);
     } else {
-      // Card is revealed and clicked again - proceed to next
-      onNext();
+      onCardTap();
     }
   };
 
@@ -59,7 +56,7 @@ export default function RoleRevealCard({ playerName, role, onNext }: RoleRevealC
 
         {/* Continue Button */}
         <Button
-          onClick={handleRevealCard}
+          onClick={handleCardClick}
           variant='primary'
           size='lg'
           className='w-full'
@@ -87,12 +84,14 @@ export default function RoleRevealCard({ playerName, role, onNext }: RoleRevealC
       {/* Header */}
       <div className='text-center'>
         <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 ${
-          role.isSpy ? 'bg-red-100' : 'bg-blue-100'
+          !isRevealed ? 'bg-yellow-100' : (role.isSpy ? 'bg-red-100' : 'bg-blue-100')
         }`}>
-          {role.isSpy ? (
-            <Shield className={`w-8 h-8 ${role.isSpy ? 'text-red-600' : 'text-blue-600'}`} />
+          {!isRevealed ? (
+            <HelpCircle className='w-8 h-8 text-yellow-500' />
+          ) : role.isSpy ? (
+            <Shield className='w-8 h-8 text-red-600' />
           ) : (
-            <Eye className={`w-8 h-8 ${role.isSpy ? 'text-red-600' : 'text-blue-600'}`} />
+            <Eye className='w-8 h-8 text-blue-600' />
           )}
         </div>
         <h1 className='text-2xl font-bold text-slate-900 mb-2'>
@@ -105,21 +104,39 @@ export default function RoleRevealCard({ playerName, role, onNext }: RoleRevealC
 
       {/* Role Card */}
       <div 
-        className={`relative bg-white rounded-xl shadow-lg border-2 cursor-pointer transition-all duration-300 min-h-[300px] ${
-          isRevealed 
+        className={`relative bg-white rounded-xl shadow-lg border-2 cursor-pointer transition-all duration-300 min-h-[300px] \
+          ${isRevealed 
             ? (role.isSpy ? 'border-red-300 bg-red-50' : 'border-blue-300 bg-blue-50')
-            : 'border-slate-300 hover:border-slate-400 hover:shadow-xl'
-        }`}
-        onClick={handleRevealCard}
+            : 'border-slate-300 hover:border-slate-400 hover:shadow-xl'} \
+          group \
+        `}
+        onClick={handleCardClick}
+        tabIndex={0}
+        role="button"
+        aria-pressed={isRevealed}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCardClick();
+          }
+        }}
+        style={{ outline: 'none' }}
+        onMouseDown={e => {
+          e.currentTarget.classList.add('scale-95');
+        }}
+        onMouseUp={e => {
+          e.currentTarget.classList.remove('scale-95');
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.classList.remove('scale-95');
+        }}
       >
         <div className='p-8 text-center h-full flex flex-col justify-center'>
           {!isRevealed ? (
-            // Card Back (Player Name)
+            // Card Back (Player Name, always yellow question mark)
             <>
-              <div className='w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6'>
-                <span className='text-2xl font-bold text-slate-600'>
-                  {playerName.charAt(0).toUpperCase()}
-                </span>
+              <div className='w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6'>
+                <HelpCircle className='w-10 h-10 text-yellow-500' />
               </div>
               <h2 className='text-3xl font-bold text-slate-900 mb-4'>
                 {playerName}
@@ -127,8 +144,8 @@ export default function RoleRevealCard({ playerName, role, onNext }: RoleRevealC
               <p className='text-slate-600 mb-6'>
                 Tap to reveal your role
               </p>
-              <div className='flex items-center justify-center text-primary-600'>
-                <Eye className='w-6 h-6 mr-2' />
+              <div className='flex items-center justify-center text-yellow-600'>
+                <HelpCircle className='w-6 h-6 mr-2' />
                 <span className='font-medium'>Reveal Role</span>
               </div>
             </>
@@ -191,20 +208,12 @@ export default function RoleRevealCard({ playerName, role, onNext }: RoleRevealC
             </>
           )}
         </div>
+        {/* Interactive overlay for visual feedback */}
+        <style dangerouslySetInnerHTML={{__html: `.group:active { transform: scale(0.97); } .group:focus { box-shadow: 0 0 0 3px #2563eb33; }`}} />
       </div>
 
       {/* Action Button */}
-      {isRevealed && (
-        <Button
-          onClick={onNext}
-          variant='primary'
-          size='lg'
-          className='w-full'
-          rightIcon={<ArrowRight className='w-5 h-5' />}
-        >
-          Next Player
-        </Button>
-      )}
+      {/* Removed: Only card tap advances */}
 
       {/* Privacy Reminder (when revealed) */}
       {isRevealed && (

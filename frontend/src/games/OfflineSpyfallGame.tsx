@@ -29,6 +29,8 @@ const OfflineSpyfallGame: React.FC = () => {
     currentVoterIndex: 0,
     gameResults: undefined,
   });
+  // Add cardStep state: 0 = hidden, 1 = revealed
+  const [cardStep, setCardStep] = useState(0);
 
   // --- Phase: Setup ---
   const handlePlayersReady = (players: string[]) => {
@@ -40,14 +42,22 @@ const OfflineSpyfallGame: React.FC = () => {
       currentCardIndex: 0,
       phase: 'role-reveal',
     }));
+    setCardStep(0);
   };
 
   // --- Phase: Role Reveal ---
-  const handleNextCard = () => {
-    if (state.currentCardIndex < state.players.length - 1) {
-      setState((s) => ({ ...s, currentCardIndex: s.currentCardIndex + 1 }));
+  const handleCardTap = () => {
+    if (cardStep === 0) {
+      setCardStep(1);
     } else {
-      setState((s) => ({ ...s, phase: 'discussion', currentCardIndex: 0 }));
+      // Move to next player or phase
+      if (state.currentCardIndex < state.players.length - 1) {
+        setState((s) => ({ ...s, currentCardIndex: s.currentCardIndex + 1 }));
+        setCardStep(0);
+      } else {
+        setState((s) => ({ ...s, phase: 'discussion', currentCardIndex: 0 }));
+        setCardStep(0);
+      }
     }
   };
 
@@ -104,7 +114,8 @@ const OfflineSpyfallGame: React.FC = () => {
         <RoleRevealCard
           playerName={player}
           role={role}
-          onNext={handleNextCard}
+          isRevealed={cardStep === 1}
+          onCardTap={handleCardTap}
         />
       );
     }
