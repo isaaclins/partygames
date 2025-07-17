@@ -15,6 +15,7 @@ export default function PlayerSetup() {
   const [phase, setPhase] = useState<'setup' | 'reveal'>('setup');
   const [roles, setRoles] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
+  const [revealed, setRevealed] = useState(false);
 
   const addPlayer = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,19 +94,39 @@ export default function PlayerSetup() {
             <h2 className="text-xl font-semibold">{players[current]}'s Card</h2>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center">
-            <p className="mb-4 text-lg text-neutral-700">Tap to reveal your role</p>
-            <Button
-              className="mb-4"
-              size="lg"
-              onClick={() => setCurrent(c => c + 1)}
-              disabled={current >= players.length - 1}
-            >
-              {roles[current] === 'Spy' ? 'You are the Spy' : 'You are NOT the Spy'}
-            </Button>
-            {current < players.length - 1 ? (
-              <p className="text-sm text-neutral-500">Pass to the next player</p>
+            {!revealed ? (
+              <>
+                <p className="mb-4 text-lg text-neutral-700">{players[current]}</p>
+                <Button
+                  className="mb-4"
+                  size="lg"
+                  onClick={() => setRevealed(true)}
+                >
+                  Reveal Role
+                </Button>
+                <p className="text-sm text-neutral-500">Make sure others can't see your screen!</p>
+              </>
             ) : (
-              <p className="text-sm text-neutral-500">All roles revealed. (Voting phase coming soon)</p>
+              <>
+                <p className="mb-4 text-lg text-neutral-700">
+                  {roles[current] === 'Spy' ? 'You are the Spy' : 'You are NOT the Spy'}
+                </p>
+                <Button
+                  className="mb-4"
+                  size="lg"
+                  onClick={() => {
+                    setRevealed(false);
+                    setCurrent(c => c + 1);
+                  }}
+                  disabled={current >= players.length - 1}
+                >
+                  {current < players.length - 1 ? 'Next Player' : 'Continue'}
+                </Button>
+                <p className="text-sm text-neutral-500">Hide your role before passing the device.</p>
+              </>
+            )}
+            {current >= players.length - 1 && revealed && (
+              <p className="text-sm text-neutral-500 mt-2">All roles revealed. (Voting phase coming soon)</p>
             )}
           </CardContent>
         </Card>
