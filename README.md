@@ -81,3 +81,26 @@ so that the game runs smoothly and fairly.
 4. WHEN the spy card is revealed THEN the system SHALL clearly indicate "You are the Spy" without
    showing the location
 5. WHEN voting begins THEN the system SHALL explain the voting process and rules
+
+---
+
+## In Scope
+
+- Single-device, offline play of the Spyfall game
+- Player name entry and management (up to 16 players)
+- Role assignment and private role reveal for each player
+- Voting phase with random order and confirmation
+- Display of voting results and game outcome
+- Clear instructions and privacy reminders throughout gameplay
+- All UI built using shadcn/ui components (forms, cards, dialogs, buttons, lists, alerts, etc.)
+- No backend or server required; all state managed client-side
+
+## Out of Scope
+
+- Online or multi-device gameplay
+- User authentication or persistent accounts
+- Saving or loading games across sessions
+- Integration with third-party APIs or services
+- Support for games other than Spyfall
+- Features not described in the requirements above
+- Use of component libraries other than shadcn/ui for the main UI
