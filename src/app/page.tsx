@@ -21,6 +21,53 @@ export default function PlayerSetup() {
   const [votes, setVotes] = useState<number[]>([]); // index of voted-for player per voter
   const [confirming, setConfirming] = useState<number | null>(null);
 
+  // Spyfall locations and roles
+  const LOCATIONS = [
+    {
+      name: "Pirate Ship",
+      roles: ["Captain", "First Mate", "Cook", "Navigator", "Sailor", "Prisoner", "Stowaway", "Cannoneer"]
+    },
+    {
+      name: "Space Station",
+      roles: ["Commander", "Scientist", "Engineer", "Pilot", "Doctor", "Alien", "Security Officer", "Technician"]
+    },
+    {
+      name: "Casino",
+      roles: ["Dealer", "Gambler", "Security", "Bartender", "Manager", "Waiter", "Entertainer", "VIP"]
+    },
+    {
+      name: "Movie Studio",
+      roles: ["Director", "Actor", "Cameraman", "Makeup Artist", "Producer", "Stunt Double", "Screenwriter", "Sound Engineer"]
+    },
+    {
+      name: "Hospital",
+      roles: ["Doctor", "Nurse", "Patient", "Surgeon", "Receptionist", "Anesthetist", "Janitor", "Pharmacist"]
+    },
+    {
+      name: "Circus",
+      roles: ["Ringmaster", "Clown", "Acrobat", "Animal Trainer", "Magician", "Juggler", "Strongman", "Tightrope Walker"]
+    },
+    {
+      name: "Submarine",
+      roles: ["Captain", "Sonar Operator", "Cook", "Navigator", "Engineer", "Medic", "Weapons Officer", "Diver"]
+    },
+    {
+      name: "Theater",
+      roles: ["Director", "Lead Actor", "Stagehand", "Lighting Tech", "Audience Member", "Usher", "Musician", "Playwright"]
+    },
+    {
+      name: "Restaurant",
+      roles: ["Chef", "Waiter", "Manager", "Customer", "Dishwasher", "Host", "Sommelier", "Busser"]
+    },
+    {
+      name: "School",
+      roles: ["Teacher", "Student", "Principal", "Janitor", "Counselor", "Coach", "Librarian", "Nurse"]
+    }
+  ];
+
+  const [location, setLocation] = useState<string | null>(null);
+  const [playerRoles, setPlayerRoles] = useState<{role: string, location: string}[]>([]);
+
   const addPlayer = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim() && players.length < maxPlayers) {
@@ -30,11 +77,30 @@ export default function PlayerSetup() {
   };
 
   const startGame = () => {
-    // Assign roles: randomly select spies, rest are non-spies
+    // Pick a random location
+    const loc = LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)];
+    setLocation(loc.name);
+    // Assign spies
     const indices = Array.from({ length: players.length }, (_, i) => i);
     const spyIndices = indices.sort(() => 0.5 - Math.random()).slice(0, spies);
-    const rolesArr = players.map((_, i) => spyIndices.includes(i) ? 'Spy' : 'Not Spy');
-    setRoles(rolesArr);
+    // Assign unique roles to non-spies
+    let availableRoles = [...loc.roles];
+    // If more non-spies than roles, repeat roles
+    while (availableRoles.length < players.length - spies) {
+      availableRoles = availableRoles.concat(loc.roles);
+    }
+    availableRoles = availableRoles.slice(0, players.length - spies);
+    let roleIdx = 0;
+    const playerRolesArr = players.map((_, i) => {
+      if (spyIndices.includes(i)) {
+        return { role: "Spy", location: "" };
+      } else {
+        const role = availableRoles[roleIdx++];
+        return { role, location: loc.name };
+      }
+    });
+    setPlayerRoles(playerRolesArr);
+    setRoles(playerRolesArr.map(r => r.role));
     setPhase('reveal');
     setCurrent(0);
   };
@@ -126,9 +192,17 @@ export default function PlayerSetup() {
               </>
             ) : (
               <>
-                <p className="mb-4 text-lg text-neutral-700">
-                  {roles[current] === 'Spy' ? 'You are the Spy' : 'You are NOT the Spy'}
-                </p>
+                {playerRoles[current]?.role === 'Spy' ? (
+                  <>
+                    <p className="mb-4 text-lg text-neutral-700">You are the Spy</p>
+                    <p className="mb-2 text-neutral-500">Try to figure out the location!</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="mb-2 text-lg text-neutral-700">Location: <span className="font-semibold">{playerRoles[current]?.location}</span></p>
+                    <p className="mb-4 text-lg text-neutral-700">Your Role: <span className="font-semibold">{playerRoles[current]?.role}</span></p>
+                  </>
+                )}
                 <Button
                   className="mb-4"
                   size="lg"
@@ -217,7 +291,7 @@ export default function PlayerSetup() {
               <>
                 <p className="mb-2 text-lg font-semibold">
                   {results.isTie
-                    ? 'There is a tie! Return to discussion.'
+                    ? 'There is a tie! Vote again.'
                     : results.spyCaught
                       ? 'The spy was caught! Non-spies win.'
                       : 'The spy wins!'}
@@ -241,7 +315,20 @@ export default function PlayerSetup() {
                     ))}
                   </ul>
                 </div>
-                <Button className="w-full" onClick={() => window.location.reload()}>Start New Game</Button>
+                {results.isTie ? (
+                  <Button className="w-full" onClick={() => {
+                    setVotes([]);
+                    setVoteIndex(0);
+                    setConfirming(null);
+                    setPhase('voting');
+                  }}>
+                    Revote
+                  </Button>
+                ) : (
+                  <Button className="w-full" onClick={() => window.location.reload()}>
+                    Start New Game
+                  </Button>
+                )}
               </>
             )}
           </CardContent>
