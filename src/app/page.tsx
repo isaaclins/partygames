@@ -26,7 +26,7 @@ export default function PlayerSetup() {
           <p className="text-sm text-neutral-500">Enter player names (3-16 players)</p>
         </CardHeader>
         <CardContent>
-          <Form onSubmit={addPlayer} className="flex gap-2 mb-4">
+          <form onSubmit={addPlayer} className="flex gap-2 mb-4">
             <FormField>
               <FormItem>
                 <Input
@@ -42,7 +42,7 @@ export default function PlayerSetup() {
             <Button type="submit" disabled={!name.trim() || players.length >= maxPlayers}>
               Add
             </Button>
-          </Form>
+          </form>
           <ul className="mb-4 space-y-1">
             {players.map((p, i) => (
               <li key={i} className="text-base text-neutral-800">
