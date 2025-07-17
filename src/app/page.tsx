@@ -3,11 +3,15 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function PlayerSetup() {
   const [players, setPlayers] = useState<string[]>([]);
   const [name, setName] = useState("");
+  const [spies, setSpies] = useState(1);
   const maxPlayers = 16;
+  const minPlayers = 3;
+  const maxSpies = 3;
 
   const addPlayer = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +29,19 @@ export default function PlayerSetup() {
           <p className="text-sm text-neutral-500">Enter player names (3-16 players)</p>
         </CardHeader>
         <CardContent>
+          <div className="mb-4">
+            <Label htmlFor="spy-count" className="mb-1 block">Number of Spies</Label>
+            <select
+              id="spy-count"
+              value={spies}
+              onChange={e => setSpies(Number(e.target.value))}
+              className="w-full rounded-md border border-neutral-300 px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-neutral-400"
+            >
+              {[1, 2, 3].map(n => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </div>
           <form onSubmit={addPlayer} className="flex gap-2 mb-4">
             <Input
               value={name}
@@ -47,7 +64,7 @@ export default function PlayerSetup() {
           </ul>
           <Button
             className="w-full"
-            disabled={players.length < 3}
+            disabled={players.length < minPlayers || spies >= players.length}
             variant="default"
             size="lg"
           >
