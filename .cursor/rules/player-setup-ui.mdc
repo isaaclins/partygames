@@ -1,0 +1,8 @@
+# Player Setup UI Rule
+
+- The player setup screen MUST use only [shadcn/ui](https://ui.shadcn.com/docs) components.
+- The design MUST be clean, minimalistic, and accessible.
+- No other UI libraries or custom component libraries are allowed.
+- Use shadcn/ui forms, inputs, buttons, and lists as needed.
+- Prioritize clarity, ease of use, and privacy reminders where appropriate.
+- Reference [shadcn/ui documentation](https://ui.shadcn.com/docs) and [web examples](https://ui.shadcn.com/r) for best practices.

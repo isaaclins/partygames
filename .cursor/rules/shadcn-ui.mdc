@@ -1,0 +1,95 @@
+---
+alwaysApply: true
+---
+
+# Shadcn UI Components Rule
+
+This project uses [shadcn/ui](https://ui.shadcn.com/docs) for all user interface components. These are open code, accessible, and composable React components that you copy into your project and customize as needed.
+
+## Usage Guidelines
+
+- **All UI code must use shadcn/ui components as the foundation.**
+- **Do not use other component libraries for main UI.**
+- **Always fetch from @Web and @ShadCN for the latest component usage, updates, and best practices.**
+- **Import components from the designated `ui` directory using project aliases.**
+- **If a component does not exist, use the shadcn CLI to add it, or compose from existing primitives.**
+- **Customize components as needed for accessibility, design, and functionality.**
+
+## Example Imports
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+```
+
+## Adding Components
+
+To add a new component:
+
+```bash
+npx shadcn@latest add [component-name]
+```
+
+## Best Practices
+
+- Use composition and props to extend functionality.
+- Follow accessibility and responsive design patterns.
+- Prefer functional, declarative usage.
+- Reference [shadcn/ui documentation](https://ui.shadcn.com/docs) and [web examples](https://ui.shadcn.com/r) for implementation guidance.
+
+## In Scope
+
+- All UI elements (forms, cards, dialogs, buttons, lists, alerts, etc.)
+- Customization and extension of shadcn/ui components
+- Consistent, accessible, and maintainable UI code
+
+## Out of Scope
+
+- Use of component libraries other than shadcn/ui for the main UI
+- UI code that does not follow shadcn/ui composition and accessibility standards
+
+# Shadcn UI Components Rule
+
+This project uses [shadcn/ui](https://ui.shadcn.com/docs) for all user interface components. These are open code, accessible, and composable React components that you copy into your project and customize as needed.
+
+## Usage Guidelines
+
+- **All UI code must use shadcn/ui components as the foundation.**
+- **Do not use other component libraries for main UI.**
+- **Always fetch from @Web and @ShadCN for the latest component usage, updates, and best practices.**
+- **Import components from the designated `ui` directory using project aliases.**
+- **If a component does not exist, use the shadcn CLI to add it, or compose from existing primitives.**
+- **Customize components as needed for accessibility, design, and functionality.**
+
+## Example Imports
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+```
+
+## Adding Components
+
+To add a new component:
+
+```bash
+npx shadcn@latest add [component-name]
+```
+
+## Best Practices
+
+- Use composition and props to extend functionality.
+- Follow accessibility and responsive design patterns.
+- Prefer functional, declarative usage.
+- Reference [shadcn/ui documentation](https://ui.shadcn.com/docs) and [web examples](https://ui.shadcn.com/r) for implementation guidance.
+
+## In Scope
+
+- All UI elements (forms, cards, dialogs, buttons, lists, alerts, etc.)
+- Customization and extension of shadcn/ui components
+- Consistent, accessible, and maintainable UI code
+
+## Out of Scope
+
+- Use of component libraries other than shadcn/ui for the main UI
+- UI code that does not follow shadcn/ui composition and accessibility standards

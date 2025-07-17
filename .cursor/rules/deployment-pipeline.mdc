@@ -1,0 +1,16 @@
+---
+alwaysApply: true
+---
+# Deployment Pipeline Rule
+
+- **You MUST create and maintain GitHub Actions pipelines to enable deployment to GitHub Pages.**
+- **Pipelines must be configured to build and deploy the project automatically on push to the main branch (or as appropriate).**
+- **Before pushing any changes, you MUST run all tests to ensure the pipeline will succeed.**
+- **If tests fail, do not push until they are fixed.**
+- **Pipelines should include steps for install, build, test, and deploy.**
+- **Review pipeline logs after each push to confirm successful deployment.**
+
+## References
+
+- [GitHub Pages Documentation](https://docs.github.com/en/pages)
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)
