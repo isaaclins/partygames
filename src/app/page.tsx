@@ -27,18 +27,14 @@ export default function PlayerSetup() {
         </CardHeader>
         <CardContent>
           <form onSubmit={addPlayer} className="flex gap-2 mb-4">
-            <FormField>
-              <FormItem>
-                <Input
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  placeholder="Player name"
-                  disabled={players.length >= maxPlayers}
-                  maxLength={24}
-                  className="w-full"
-                />
-              </FormItem>
-            </FormField>
+            <Input
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Player name"
+              disabled={players.length >= maxPlayers}
+              maxLength={24}
+              className="w-full"
+            />
             <Button type="submit" disabled={!name.trim() || players.length >= maxPlayers}>
               Add
             </Button>
