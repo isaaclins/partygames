@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +12,14 @@ export default function PlayerSetup() {
   const maxPlayers = 16;
   const minPlayers = 3;
   const maxSpies = 3;
-  const [phase, setPhase] = useState<'setup' | 'reveal'>('setup');
+  const [phase, setPhase] = useState<'setup' | 'reveal' | 'voting'>('setup');
   const [roles, setRoles] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
   const [revealed, setRevealed] = useState(false);
+  const [votingOrder, setVotingOrder] = useState<number[]>([]);
+  const [voteIndex, setVoteIndex] = useState(0);
+  const [votes, setVotes] = useState<number[]>([]); // index of voted-for player per voter
+  const [confirming, setConfirming] = useState<number | null>(null);
 
   const addPlayer = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +92,7 @@ export default function PlayerSetup() {
             </Button>
           </CardContent>
         </Card>
-      ) : (
+      ) : phase === 'reveal' ? (
         <Card className="w-full max-w-md shadow-lg">
           <CardHeader>
             <h2 className="text-xl font-semibold">{players[current]}'s Card</h2>
@@ -126,8 +130,114 @@ export default function PlayerSetup() {
               </>
             )}
             {current >= players.length - 1 && revealed && (
-              <p className="text-sm text-neutral-500 mt-2">All roles revealed. (Voting phase coming soon)</p>
+              <Button
+                className="mt-4"
+                onClick={() => {
+                  // Prepare voting phase
+                  const order = Array.from({ length: players.length }, (_, i) => i).sort(() => 0.5 - Math.random());
+                  setVotingOrder(order);
+                  setVoteIndex(0);
+                  setVotes([]);
+                  setPhase('voting');
+                }}
+              >
+                Start Voting
+              </Button>
             )}
+          </CardContent>
+        </Card>
+      ) : phase === 'voting' ? (
+        <Card className="w-full max-w-md shadow-lg">
+          <CardHeader>
+            <h2 className="text-xl font-semibold">Voting Phase</h2>
+            <p className="text-sm text-neutral-500 mb-2">{players[votingOrder[voteIndex]]}, it's your turn to vote</p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              {players.map((p, i) => (
+                i !== votingOrder[voteIndex] && (
+                  <Button
+                    key={i}
+                    variant={confirming === i ? "default" : "outline"}
+                    onClick={() => setConfirming(i)}
+                    className="truncate"
+                  >
+                    {p}
+                  </Button>
+                )
+              ))}
+            </div>
+            {confirming !== null && (
+              <div className="mb-2">
+                <p className="text-sm mb-2">Vote for <span className="font-semibold">{players[confirming]}</span>?</p>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => {
+                      setVotes(vs => [...vs, confirming]);
+                      setConfirming(null);
+                      if (voteIndex < players.length - 1) {
+                        setVoteIndex(voteIndex + 1);
+                      } else {
+                        setPhase('results');
+                      }
+                    }}
+                  >
+                    Confirm
+                  </Button>
+                  <Button variant="outline" onClick={() => setConfirming(null)}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-neutral-400">You cannot vote for yourself.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="w-full max-w-md shadow-lg">
+          <CardHeader>
+            <h2 className="text-xl font-semibold">Voting Phase</h2>
+            <p className="text-sm text-neutral-500 mb-2">{players[votingOrder[voteIndex]]}, it's your turn to vote</p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              {players.map((p, i) => (
+                i !== votingOrder[voteIndex] && (
+                  <Button
+                    key={i}
+                    variant={confirming === i ? "default" : "outline"}
+                    onClick={() => setConfirming(i)}
+                    className="truncate"
+                  >
+                    {p}
+                  </Button>
+                )
+              ))}
+            </div>
+            {confirming !== null && (
+              <div className="mb-2">
+                <p className="text-sm mb-2">Vote for <span className="font-semibold">{players[confirming]}</span>?</p>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => {
+                      setVotes(vs => [...vs, confirming]);
+                      setConfirming(null);
+                      if (voteIndex < players.length - 1) {
+                        setVoteIndex(voteIndex + 1);
+                      } else {
+                        setPhase('results');
+                      }
+                    }}
+                  >
+                    Confirm
+                  </Button>
+                  <Button variant="outline" onClick={() => setConfirming(null)}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-neutral-400">You cannot vote for yourself.</p>
           </CardContent>
         </Card>
       )}
