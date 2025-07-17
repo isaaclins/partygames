@@ -11,62 +11,155 @@ export default function PlayerSetup() {
   const [spies, setSpies] = useState(1);
   const maxPlayers = 16;
   const minPlayers = 3;
-  const maxSpies = 3;
-  const [phase, setPhase] = useState<'setup' | 'reveal' | 'voting' | 'results'>('setup');
+  const [phase, setPhase] = useState<"setup" | "reveal" | "voting" | "results">(
+    "setup"
+  );
   const [roles, setRoles] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [votingOrder, setVotingOrder] = useState<number[]>([]);
   const [voteIndex, setVoteIndex] = useState(0);
-  const [votes, setVotes] = useState<number[]>([]); // index of voted-for player per voter
+  // Each element in votes is an array of indices voted for by that player
+  const [votes, setVotes] = useState<number[][]>([]);
   const [confirming, setConfirming] = useState<number | null>(null);
 
   // Spyfall locations and roles
   const LOCATIONS = [
     {
       name: "Pirate Ship",
-      roles: ["Captain", "First Mate", "Cook", "Navigator", "Sailor", "Prisoner", "Stowaway", "Cannoneer"]
+      roles: [
+        "Captain",
+        "First Mate",
+        "Cook",
+        "Navigator",
+        "Sailor",
+        "Prisoner",
+        "Stowaway",
+        "Cannoneer",
+      ],
     },
     {
       name: "Space Station",
-      roles: ["Commander", "Scientist", "Engineer", "Pilot", "Doctor", "Alien", "Security Officer", "Technician"]
+      roles: [
+        "Commander",
+        "Scientist",
+        "Engineer",
+        "Pilot",
+        "Doctor",
+        "Alien",
+        "Security Officer",
+        "Technician",
+      ],
     },
     {
       name: "Casino",
-      roles: ["Dealer", "Gambler", "Security", "Bartender", "Manager", "Waiter", "Entertainer", "VIP"]
+      roles: [
+        "Dealer",
+        "Gambler",
+        "Security",
+        "Bartender",
+        "Manager",
+        "Waiter",
+        "Entertainer",
+        "VIP",
+      ],
     },
     {
       name: "Movie Studio",
-      roles: ["Director", "Actor", "Cameraman", "Makeup Artist", "Producer", "Stunt Double", "Screenwriter", "Sound Engineer"]
+      roles: [
+        "Director",
+        "Actor",
+        "Cameraman",
+        "Makeup Artist",
+        "Producer",
+        "Stunt Double",
+        "Screenwriter",
+        "Sound Engineer",
+      ],
     },
     {
       name: "Hospital",
-      roles: ["Doctor", "Nurse", "Patient", "Surgeon", "Receptionist", "Anesthetist", "Janitor", "Pharmacist"]
+      roles: [
+        "Doctor",
+        "Nurse",
+        "Patient",
+        "Surgeon",
+        "Receptionist",
+        "Anesthetist",
+        "Janitor",
+        "Pharmacist",
+      ],
     },
     {
       name: "Circus",
-      roles: ["Ringmaster", "Clown", "Acrobat", "Animal Trainer", "Magician", "Juggler", "Strongman", "Tightrope Walker"]
+      roles: [
+        "Ringmaster",
+        "Clown",
+        "Acrobat",
+        "Animal Trainer",
+        "Magician",
+        "Juggler",
+        "Strongman",
+        "Tightrope Walker",
+      ],
     },
     {
       name: "Submarine",
-      roles: ["Captain", "Sonar Operator", "Cook", "Navigator", "Engineer", "Medic", "Weapons Officer", "Diver"]
+      roles: [
+        "Captain",
+        "Sonar Operator",
+        "Cook",
+        "Navigator",
+        "Engineer",
+        "Medic",
+        "Weapons Officer",
+        "Diver",
+      ],
     },
     {
       name: "Theater",
-      roles: ["Director", "Lead Actor", "Stagehand", "Lighting Tech", "Audience Member", "Usher", "Musician", "Playwright"]
+      roles: [
+        "Director",
+        "Lead Actor",
+        "Stagehand",
+        "Lighting Tech",
+        "Audience Member",
+        "Usher",
+        "Musician",
+        "Playwright",
+      ],
     },
     {
       name: "Restaurant",
-      roles: ["Chef", "Waiter", "Manager", "Customer", "Dishwasher", "Host", "Sommelier", "Busser"]
+      roles: [
+        "Chef",
+        "Waiter",
+        "Manager",
+        "Customer",
+        "Dishwasher",
+        "Host",
+        "Sommelier",
+        "Busser",
+      ],
     },
     {
       name: "School",
-      roles: ["Teacher", "Student", "Principal", "Janitor", "Counselor", "Coach", "Librarian", "Nurse"]
-    }
+      roles: [
+        "Teacher",
+        "Student",
+        "Principal",
+        "Janitor",
+        "Counselor",
+        "Coach",
+        "Librarian",
+        "Nurse",
+      ],
+    },
   ];
 
-  const [location, setLocation] = useState<string | null>(null);
-  const [playerRoles, setPlayerRoles] = useState<{role: string, location: string}[]>([]);
+  const [playerRoles, setPlayerRoles] = useState<
+    { role: string; location: string }[]
+  >([]);
 
   const addPlayer = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +172,7 @@ export default function PlayerSetup() {
   const startGame = () => {
     // Pick a random location
     const loc = LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)];
-    setLocation(loc.name);
+    // setLocation(loc.name); // Removed unused variable
     // Assign spies
     const indices = Array.from({ length: players.length }, (_, i) => i);
     const spyIndices = indices.sort(() => 0.5 - Math.random()).slice(0, spies);
@@ -100,57 +193,76 @@ export default function PlayerSetup() {
       }
     });
     setPlayerRoles(playerRolesArr);
-    setRoles(playerRolesArr.map(r => r.role));
-    setPhase('reveal');
+    setRoles(playerRolesArr.map((r) => r.role));
+    setPhase("reveal");
     setCurrent(0);
   };
 
   // Results calculation
   let results = null;
-  if (phase === 'results' && votes.length === players.length) {
+  if (phase === "results" && votes.length === players.length) {
     // Tally votes
     const tally = Array(players.length).fill(0);
-    votes.forEach(v => { if (typeof v === 'number') tally[v]++; });
+    votes.forEach((voteArr) => {
+      voteArr?.forEach((v) => {
+        if (typeof v === "number") tally[v]++;
+      });
+    });
     const maxVotes = Math.max(...tally);
-    const winners = tally.map((v, i) => v === maxVotes ? i : null).filter(i => i !== null) as number[];
+    const winners = tally
+      .map((v, i) => (v === maxVotes ? i : null))
+      .filter((i) => i !== null) as number[];
     const isTie = winners.length > 1;
-    const spyIndices = roles.map((r, i) => r === 'Spy' ? i : null).filter(i => i !== null) as number[];
-    const spyCaught = winners.some(i => roles[i] === 'Spy');
+    const spyIndices = roles
+      .map((r, i) => (r === "Spy" ? i : null))
+      .filter((i) => i !== null) as number[];
+    const spyCaught = winners.some((i) => roles[i] === "Spy");
     results = { tally, maxVotes, winners, isTie, spyIndices, spyCaught };
   }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-neutral-50">
-      {phase === 'setup' ? (
+      {phase === "setup" ? (
         <Card className="w-full max-w-md shadow-lg">
           <CardHeader>
             <h1 className="text-2xl font-bold">Spyfall: Player Setup</h1>
-            <p className="text-sm text-neutral-500">Enter player names (3-16 players)</p>
+            <p className="text-sm text-neutral-500">
+              Enter player names (3-16 players)
+            </p>
           </CardHeader>
           <CardContent>
             <div className="mb-4">
-              <Label htmlFor="spy-count" className="mb-1 block">Number of Spies</Label>
+              <Label htmlFor="spy-count" className="mb-1 block">
+                Number of Spies
+              </Label>
               <select
                 id="spy-count"
                 value={spies}
-                onChange={e => setSpies(Number(e.target.value))}
+                onChange={(e) => setSpies(Number(e.target.value))}
                 className="w-full rounded-md border border-neutral-300 px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-neutral-400"
               >
-                {[1, 2, 3].map(n => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
+                {Array.from({ length: maxPlayers }, (_, i) => i + 1).map(
+                  (n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  )
+                )}
               </select>
             </div>
             <form onSubmit={addPlayer} className="flex gap-2 mb-4">
               <Input
                 value={name}
-                onChange={e => setName(e.target.value)}
+                onChange={(e) => setName(e.target.value)}
                 placeholder="Player name"
                 disabled={players.length >= maxPlayers}
                 maxLength={24}
                 className="w-full"
               />
-              <Button type="submit" disabled={!name.trim() || players.length >= maxPlayers}>
+              <Button
+                type="submit"
+                disabled={!name.trim() || players.length >= maxPlayers}
+              >
                 Add
               </Button>
             </form>
@@ -172,15 +284,19 @@ export default function PlayerSetup() {
             </Button>
           </CardContent>
         </Card>
-      ) : phase === 'reveal' ? (
+      ) : phase === "reveal" ? (
         <Card className="w-full max-w-md shadow-lg">
           <CardHeader>
-            <h2 className="text-xl font-semibold">{players[current]}'s Card</h2>
+            <h2 className="text-xl font-semibold">
+              {players[current]}&apos;s Card
+            </h2>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center">
             {!revealed ? (
               <>
-                <p className="mb-4 text-lg text-neutral-700">{players[current]}</p>
+                <p className="mb-4 text-lg text-neutral-700">
+                  {players[current]}
+                </p>
                 <Button
                   className="mb-4"
                   size="lg"
@@ -188,19 +304,35 @@ export default function PlayerSetup() {
                 >
                   Reveal Role
                 </Button>
-                <p className="text-sm text-neutral-500">Make sure others can't see your screen!</p>
+                <p className="text-sm text-neutral-500">
+                  Make sure others can&apos;t see your screen!
+                </p>
               </>
             ) : (
               <>
-                {playerRoles[current]?.role === 'Spy' ? (
+                {playerRoles[current]?.role === "Spy" ? (
                   <>
-                    <p className="mb-4 text-lg text-neutral-700">You are the Spy</p>
-                    <p className="mb-2 text-neutral-500">Try to figure out the location!</p>
+                    <p className="mb-4 text-lg text-neutral-700">
+                      You are the Spy
+                    </p>
+                    <p className="mb-2 text-neutral-500">
+                      Try to figure out the location!
+                    </p>
                   </>
                 ) : (
                   <>
-                    <p className="mb-2 text-lg text-neutral-700">Location: <span className="font-semibold">{playerRoles[current]?.location}</span></p>
-                    <p className="mb-4 text-lg text-neutral-700">Your Role: <span className="font-semibold">{playerRoles[current]?.role}</span></p>
+                    <p className="mb-2 text-lg text-neutral-700">
+                      Location:{" "}
+                      <span className="font-semibold">
+                        {playerRoles[current]?.location}
+                      </span>
+                    </p>
+                    <p className="mb-4 text-lg text-neutral-700">
+                      Your Role:{" "}
+                      <span className="font-semibold">
+                        {playerRoles[current]?.role}
+                      </span>
+                    </p>
                   </>
                 )}
                 <Button
@@ -208,13 +340,15 @@ export default function PlayerSetup() {
                   size="lg"
                   onClick={() => {
                     setRevealed(false);
-                    setCurrent(c => c + 1);
+                    setCurrent((c) => c + 1);
                   }}
                   disabled={current >= players.length - 1}
                 >
-                  {current < players.length - 1 ? 'Next Player' : 'Continue'}
+                  {current < players.length - 1 ? "Next Player" : "Continue"}
                 </Button>
-                <p className="text-sm text-neutral-500">Hide your role before passing the device.</p>
+                <p className="text-sm text-neutral-500">
+                  Hide your role before passing the device.
+                </p>
               </>
             )}
             {current >= players.length - 1 && revealed && (
@@ -222,11 +356,14 @@ export default function PlayerSetup() {
                 className="mt-4"
                 onClick={() => {
                   // Prepare voting phase
-                  const order = Array.from({ length: players.length }, (_, i) => i).sort(() => 0.5 - Math.random());
+                  const order = Array.from(
+                    { length: players.length },
+                    (_, i) => i
+                  ).sort(() => 0.5 - Math.random());
                   setVotingOrder(order);
                   setVoteIndex(0);
                   setVotes([]);
-                  setPhase('voting');
+                  setPhase("voting");
                 }}
               >
                 Start Voting
@@ -234,40 +371,53 @@ export default function PlayerSetup() {
             )}
           </CardContent>
         </Card>
-      ) : phase === 'voting' ? (
+      ) : phase === "voting" ? (
         <Card className="w-full max-w-md shadow-lg">
           <CardHeader>
             <h2 className="text-xl font-semibold">Voting Phase</h2>
-            <p className="text-sm text-neutral-500 mb-2">{players[votingOrder[voteIndex]]}, it's your turn to vote</p>
+            <p className="text-sm text-neutral-500 mb-2">
+              {players[votingOrder[voteIndex]]}, it&apos;s your turn to vote
+            </p>
           </CardHeader>
           <CardContent>
+            <div className="mb-2 text-sm text-neutral-700">
+              Votes remaining: {spies - (votes[voteIndex]?.length || 0)}
+            </div>
             <div className="grid grid-cols-2 gap-2 mb-4">
-              {players.map((p, i) => (
-                i !== votingOrder[voteIndex] && (
-                  <Button
-                    key={i}
-                    variant={confirming === i ? "default" : "outline"}
-                    onClick={() => setConfirming(i)}
-                    className="truncate"
-                  >
-                    {p}
-                  </Button>
-                )
-              ))}
+              {players.map(
+                (p, i) =>
+                  i !== votingOrder[voteIndex] &&
+                  !votes[voteIndex]?.includes(i) && (
+                    <Button
+                      key={i}
+                      variant={confirming === i ? "default" : "outline"}
+                      onClick={() => setConfirming(i)}
+                      className="truncate"
+                    >
+                      {p}
+                    </Button>
+                  )
+              )}
             </div>
             {confirming !== null && (
               <div className="mb-2">
-                <p className="text-sm mb-2">Vote for <span className="font-semibold">{players[confirming]}</span>?</p>
+                <p className="text-sm mb-2">
+                  Vote for{" "}
+                  <span className="font-semibold">{players[confirming]}</span>?
+                </p>
                 <div className="flex gap-2">
                   <Button
                     onClick={() => {
-                      setVotes(vs => [...vs, confirming]);
+                      setVotes((vs) => {
+                        const newVotes = [...vs];
+                        if (!newVotes[voteIndex]) newVotes[voteIndex] = [];
+                        newVotes[voteIndex] = [
+                          ...newVotes[voteIndex],
+                          confirming,
+                        ];
+                        return newVotes;
+                      });
                       setConfirming(null);
-                      if (voteIndex < players.length - 1) {
-                        setVoteIndex(voteIndex + 1);
-                      } else {
-                        setPhase('results');
-                      }
                     }}
                   >
                     Confirm
@@ -278,10 +428,27 @@ export default function PlayerSetup() {
                 </div>
               </div>
             )}
-            <p className="text-xs text-neutral-400">You cannot vote for yourself.</p>
+            {(votes[voteIndex]?.length || 0) === spies && (
+              <Button
+                className="w-full mt-2"
+                onClick={() => {
+                  if (voteIndex < players.length - 1) {
+                    setVoteIndex(voteIndex + 1);
+                  } else {
+                    setPhase("results");
+                  }
+                }}
+              >
+                Submit Votes
+              </Button>
+            )}
+            <p className="text-xs text-neutral-400">
+              You cannot vote for yourself. You must select {spies} different
+              players.
+            </p>
           </CardContent>
         </Card>
-      ) : phase === 'results' ? (
+      ) : phase === "results" ? (
         <Card className="w-full max-w-md shadow-lg">
           <CardHeader>
             <h2 className="text-xl font-semibold">Results</h2>
@@ -291,18 +458,19 @@ export default function PlayerSetup() {
               <>
                 <p className="mb-2 text-lg font-semibold">
                   {results.isTie
-                    ? 'There is a tie! Vote again.'
+                    ? "There is a tie! Vote again."
                     : results.spyCaught
-                      ? 'The spy was caught! Non-spies win.'
-                      : 'The spy wins!'}
+                    ? "The spy was caught! Non-spies win."
+                    : "The spy wins!"}
                 </p>
                 <div className="mb-4">
                   <h3 className="font-semibold mb-1">Votes:</h3>
                   <ul className="text-sm mb-2">
                     {players.map((p, i) => (
                       <li key={i}>
-                        {p}: {results.tally[i]} vote{results.tally[i] !== 1 ? 's' : ''}
-                        {results.spyIndices.includes(i) ? ' (Spy)' : ''}
+                        {p}: {results.tally[i]} vote
+                        {results.tally[i] !== 1 ? "s" : ""}
+                        {results.spyIndices.includes(i) ? " (Spy)" : ""}
                       </li>
                     ))}
                   </ul>
@@ -316,16 +484,22 @@ export default function PlayerSetup() {
                   </ul>
                 </div>
                 {results.isTie ? (
-                  <Button className="w-full" onClick={() => {
-                    setVotes([]);
-                    setVoteIndex(0);
-                    setConfirming(null);
-                    setPhase('voting');
-                  }}>
+                  <Button
+                    className="w-full"
+                    onClick={() => {
+                      setVotes([]);
+                      setVoteIndex(0);
+                      setConfirming(null);
+                      setPhase("voting");
+                    }}
+                  >
                     Revote
                   </Button>
                 ) : (
-                  <Button className="w-full" onClick={() => window.location.reload()}>
+                  <Button
+                    className="w-full"
+                    onClick={() => window.location.reload()}
+                  >
                     Start New Game
                   </Button>
                 )}
