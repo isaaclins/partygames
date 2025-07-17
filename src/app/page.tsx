@@ -12,7 +12,7 @@ export default function PlayerSetup() {
   const maxPlayers = 16;
   const minPlayers = 3;
   const maxSpies = 3;
-  const [phase, setPhase] = useState<'setup' | 'reveal' | 'voting'>('setup');
+  const [phase, setPhase] = useState<'setup' | 'reveal' | 'voting' | 'results'>('setup');
   const [roles, setRoles] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
   const [revealed, setRevealed] = useState(false);
@@ -38,6 +38,20 @@ export default function PlayerSetup() {
     setPhase('reveal');
     setCurrent(0);
   };
+
+  // Results calculation
+  let results = null;
+  if (phase === 'results' && votes.length === players.length) {
+    // Tally votes
+    const tally = Array(players.length).fill(0);
+    votes.forEach(v => { if (typeof v === 'number') tally[v]++; });
+    const maxVotes = Math.max(...tally);
+    const winners = tally.map((v, i) => v === maxVotes ? i : null).filter(i => i !== null) as number[];
+    const isTie = winners.length > 1;
+    const spyIndices = roles.map((r, i) => r === 'Spy' ? i : null).filter(i => i !== null) as number[];
+    const spyCaught = winners.some(i => roles[i] === 'Spy');
+    results = { tally, maxVotes, winners, isTie, spyIndices, spyCaught };
+  }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-neutral-50">
@@ -193,51 +207,43 @@ export default function PlayerSetup() {
             <p className="text-xs text-neutral-400">You cannot vote for yourself.</p>
           </CardContent>
         </Card>
-      ) : (
+      ) : phase === 'results' ? (
         <Card className="w-full max-w-md shadow-lg">
           <CardHeader>
-            <h2 className="text-xl font-semibold">Voting Phase</h2>
-            <p className="text-sm text-neutral-500 mb-2">{players[votingOrder[voteIndex]]}, it's your turn to vote</p>
+            <h2 className="text-xl font-semibold">Results</h2>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              {players.map((p, i) => (
-                i !== votingOrder[voteIndex] && (
-                  <Button
-                    key={i}
-                    variant={confirming === i ? "default" : "outline"}
-                    onClick={() => setConfirming(i)}
-                    className="truncate"
-                  >
-                    {p}
-                  </Button>
-                )
-              ))}
-            </div>
-            {confirming !== null && (
-              <div className="mb-2">
-                <p className="text-sm mb-2">Vote for <span className="font-semibold">{players[confirming]}</span>?</p>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => {
-                      setVotes(vs => [...vs, confirming]);
-                      setConfirming(null);
-                      if (voteIndex < players.length - 1) {
-                        setVoteIndex(voteIndex + 1);
-                      } else {
-                        setPhase('results');
-                      }
-                    }}
-                  >
-                    Confirm
-                  </Button>
-                  <Button variant="outline" onClick={() => setConfirming(null)}>
-                    Cancel
-                  </Button>
+            {results && (
+              <>
+                <p className="mb-2 text-lg font-semibold">
+                  {results.isTie
+                    ? 'There is a tie! Return to discussion.'
+                    : results.spyCaught
+                      ? 'The spy was caught! Non-spies win.'
+                      : 'The spy wins!'}
+                </p>
+                <div className="mb-4">
+                  <h3 className="font-semibold mb-1">Votes:</h3>
+                  <ul className="text-sm mb-2">
+                    {players.map((p, i) => (
+                      <li key={i}>
+                        {p}: {results.tally[i]} vote{results.tally[i] !== 1 ? 's' : ''}
+                        {results.spyIndices.includes(i) ? ' (Spy)' : ''}
+                      </li>
+                    ))}
+                  </ul>
+                  <h3 className="font-semibold mb-1">Roles:</h3>
+                  <ul className="text-sm">
+                    {players.map((p, i) => (
+                      <li key={i}>
+                        {p}: {roles[i]}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
+                <Button className="w-full" onClick={() => window.location.reload()}>Start New Game</Button>
+              </>
             )}
-            <p className="text-xs text-neutral-400">You cannot vote for yourself.</p>
           </CardContent>
         </Card>
       )}
