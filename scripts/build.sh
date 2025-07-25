@@ -3,13 +3,13 @@
 set -e
 
 if npm run build > /dev/null 2>&1; then
-  echo "build success"
+  echo "[1/2] build success"
 else
-  echo "build error"
+  echo "[1/2] build error"
 fi
 
 if npx cap sync > /dev/null 2>&1; then
-  echo "sync success"
+  echo "[2/2] sync success"
 else
-  echo "sync error"
+  echo "[2/2] sync error"
 fi
