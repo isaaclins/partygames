@@ -1,7 +1,0 @@
-{
-  "name": "partygames",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "react-vite"
-}
